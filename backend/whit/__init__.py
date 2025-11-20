@@ -1,0 +1,3 @@
+"""
+whit package initialization
+"""

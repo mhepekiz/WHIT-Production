@@ -1,0 +1,352 @@
+.form-page-container {
+  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-page-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Center Layout */
+.form-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0;
+  margin: 0;
+}
+
+/* Split Layout (Left or Right) */
+.form-split {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+}
+
+.form-left {
+  flex-direction: row;
+}
+
+.form-right {
+  flex-direction: row-reverse;
+}
+
+/* Form Section */
+.form-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  background: #ffffff;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 450px;
+}
+
+/* Side Panel */
+.side-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 3rem;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.side-panel-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.side-image {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.side-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.text-overlay {
+  position: absolute;
+  z-index: 10;
+  padding: 3rem;
+  max-width: 600px;
+}
+
+.text-overlay.top-left {
+  top: 0;
+  left: 0;
+}
+
+.text-overlay.top-center {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.text-overlay.top-right {
+  top: 0;
+  right: 0;
+}
+
+.text-overlay.center-left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.text-overlay.center-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.text-overlay.center-right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.text-overlay.bottom-left {
+  bottom: 0;
+  left: 0;
+}
+
+.text-overlay.bottom-center {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.text-overlay.bottom-right {
+  bottom: 0;
+  right: 0;
+}
+
+/* Text overlay styling for all HTML tags */
+.text-overlay h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.text-overlay h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.text-overlay h3 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+  line-height: 1.3;
+}
+
+.text-overlay h4 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.text-overlay h5 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.text-overlay h6 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.text-overlay p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.text-overlay span {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.text-overlay div {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+/* Legacy class support for backwards compatibility */
+.side-heading {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.side-subheading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.side-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  opacity: 0.85;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .text-overlay h1 {
+    font-size: 2.75rem;
+  }
+
+  .text-overlay h2 {
+    font-size: 2rem;
+  }
+
+  .text-overlay h3 {
+    font-size: 1.75rem;
+  }
+
+  .text-overlay h4 {
+    font-size: 1.5rem;
+  }
+
+  .text-overlay h5 {
+    font-size: 1.3rem;
+  }
+
+  .text-overlay h6 {
+    font-size: 1.1rem;
+  }
+
+  .text-overlay p,
+  .text-overlay span,
+  .text-overlay div {
+    font-size: 1rem;
+  }
+
+  .side-heading {
+    font-size: 2.5rem;
+  }
+
+  .side-subheading {
+    font-size: 1.3rem;
+  }
+
+  .side-text {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-split {
+    flex-direction: column;
+  }
+
+  .form-left,
+  .form-right {
+    flex-direction: column;
+  }
+
+  .form-section,
+  .side-panel {
+    min-height: auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .side-panel {
+    order: 2;
+  }
+
+  .form-section {
+    order: 1;
+  }
+
+  .text-overlay h1 {
+    font-size: 2.25rem;
+  }
+
+  .text-overlay h2 {
+    font-size: 1.75rem;
+  }
+
+  .text-overlay h3 {
+    font-size: 1.5rem;
+  }
+
+  .text-overlay h4 {
+    font-size: 1.3rem;
+  }
+
+  .text-overlay h5 {
+    font-size: 1.2rem;
+  }
+
+  .text-overlay h6 {
+    font-size: 1rem;
+  }
+
+  .text-overlay p,
+  .text-overlay span,
+  .text-overlay div {
+    font-size: 0.95rem;
+  }
+
+  .side-heading {
+    font-size: 2rem;
+  }
+
+  .side-subheading {
+    font-size: 1.2rem;
+  }
+
+  .side-text {
+    font-size: 0.95rem;
+  }
+
+  .form-wrapper {
+    max-width: 100%;
+  }
+}

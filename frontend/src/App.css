@@ -1,0 +1,6 @@
+@import './styles/splunk-theme.css';
+
+.app {
+  min-height: 100vh;
+  background: var(--background);
+}

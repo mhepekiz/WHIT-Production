@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: whit_production
+      POSTGRES_USER: whit_user
+      POSTGRES_PASSWORD: secure-database-password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: gunicorn whit.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - DATABASE_ENGINE=postgresql
+      - DATABASE_NAME=whit_production
+      - DATABASE_USER=whit_user
+      - DATABASE_PASSWORD=secure-database-password
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+    depends_on:
+      - db
+    volumes:
+      - ./backend/media:/app/media
+      - ./backend/staticfiles:/app/staticfiles
+
+volumes:
+  postgres_data:

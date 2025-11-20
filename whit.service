@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn instance to serve WHIT Django application
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/whit/backend
+Environment="PATH=/var/www/whit/backend/venv/bin"
+ExecStart=/var/www/whit/backend/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 whit.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
