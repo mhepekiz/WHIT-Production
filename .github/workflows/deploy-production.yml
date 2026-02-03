@@ -1,0 +1,174 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  release:
+    types: [published]
+  workflow_dispatch: # Allow manual triggering
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production # This will require approval if configured
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Build frontend for production
+      run: |
+        cd frontend
+        npm run build
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        
+    - name: Run Django tests
+      run: |
+        cd backend
+        python manage.py test
+        
+    - name: Run security checks
+      run: |
+        cd backend
+        pip install bandit safety
+        bandit -r . -x ./venv,./venv_new
+        safety check
+        
+    - name: Collect static files
+      run: |
+        cd backend
+        python manage.py collectstatic --noinput
+        
+    - name: Deploy to production server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PROD_SERVER_HOST }}
+        username: ${{ secrets.PROD_SERVER_USERNAME }}
+        key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+        script: |
+          # Create backup
+          sudo cp -r /var/www/whit /var/www/whit-backup-$(date +%Y%m%d-%H%M%S) || true
+          
+          # Stop services gracefully
+          sudo systemctl stop whit || true
+          
+          # Create whit directory if it doesn't exist
+          sudo mkdir -p /var/www/whit
+          sudo chown -R $USER:$USER /var/www/whit
+          
+    - name: Copy files to production server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.PROD_SERVER_HOST }}
+        username: ${{ secrets.PROD_SERVER_USERNAME }}
+        key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+        source: "frontend/dist/*,backend/*,nginx.conf,whit.service"
+        target: "/tmp/whit-deploy"
+        strip_components: 0
+        
+    - name: Complete production deployment
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PROD_SERVER_HOST }}
+        username: ${{ secrets.PROD_SERVER_USERNAME }}
+        key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+        script: |
+          # Move files to final location
+          sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/ || sudo mkdir -p /var/www/whit/backend && sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/
+          sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/ || sudo mkdir -p /var/www/whit/frontend && sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/
+          
+          # Update systemd service
+          sudo cp /tmp/whit-deploy/whit.service /etc/systemd/system/whit.service
+          sudo systemctl daemon-reload
+          
+          # Update nginx configuration
+          sudo cp /tmp/whit-deploy/nginx.conf /etc/nginx/sites-available/whit
+          sudo ln -sf /etc/nginx/sites-available/whit /etc/nginx/sites-enabled/whit
+          
+          # Set proper permissions
+          sudo chown -R www-data:www-data /var/www/whit
+          sudo chmod -R 755 /var/www/whit
+          
+          # Install Python dependencies in virtual environment
+          cd /var/www/whit/backend
+          sudo -u www-data python3 -m venv venv
+          sudo -u www-data ./venv/bin/pip install -r requirements.txt
+          
+          # Run Django management commands
+          sudo -u www-data ./venv/bin/python manage.py migrate
+          sudo -u www-data ./venv/bin/python manage.py collectstatic --noinput
+          
+          # Test nginx configuration
+          sudo nginx -t
+          
+          # Reload nginx
+          sudo systemctl reload nginx
+          
+          # Start Django service
+          sudo systemctl start whit
+          sudo systemctl enable whit
+          
+          # Verify services are running
+          sudo systemctl status nginx --no-pager
+          sudo systemctl status whit --no-pager
+          
+          # Cleanup
+          rm -rf /tmp/whit-deploy
+          
+    - name: Verify production deployment
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PROD_SERVER_HOST }}
+        username: ${{ secrets.PROD_SERVER_USERNAME }}
+        key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+        script: |
+          # Check if the production site is responding
+          curl -f -s -o /dev/null https://nahhat.com || {
+            echo "Production site is not responding!"
+            exit 1
+          }
+          
+          # Check if API is working
+          curl -f -s -o /dev/null https://nahhat.com/api/ || {
+            echo "API is not responding!"
+            exit 1
+          }
+          
+          echo "Production deployment successful! 🚀"
+          echo "Production site: https://nahhat.com"
+          
+    - name: Notify deployment success
+      if: success()
+      run: |
+        echo "✅ Production deployment completed successfully!"
+        echo "🌐 Site: https://nahhat.com"
+        echo "🔧 Admin: https://nahhat.com/admin"
