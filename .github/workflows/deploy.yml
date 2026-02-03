@@ -28,7 +28,7 @@ jobs:
     - name: Build frontend
       run: |
         cd frontend
-        npm run build
+        VITE_API_URL=https://staging.whoishiringintech.com/api npm run build
         
     - name: Setup Python
       uses: actions/setup-python@v4
