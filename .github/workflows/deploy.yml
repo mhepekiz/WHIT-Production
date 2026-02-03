@@ -61,11 +61,11 @@ jobs:
           sudo systemctl stop whit || true
           
           # Backup current deployment
-          sudo cp -r /var/www/whit /var/www/whit-backup-$(date +%Y%m%d-%H%M%S) || true
+          sudo cp -r /var/www/WHIT /var/www/WHIT-backup-$(date +%Y%m%d-%H%M%S) || true
           
-          # Create whit directory if it doesn't exist
-          sudo mkdir -p /var/www/whit
-          sudo chown -R $USER:$USER /var/www/whit
+          # Create WHIT directory if it doesn't exist
+          sudo mkdir -p /var/www/WHIT
+          sudo chown -R $USER:$USER /var/www/WHIT
           
     - name: Copy files to server
       uses: appleboy/scp-action@v0.1.7
@@ -74,7 +74,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         source: "frontend/dist/*,backend/*,nginx.conf"
-        target: "/tmp/whit-deploy"
+        target: "/tmp/WHIT-deploy"
         strip_components: 0
         
     - name: Complete deployment
@@ -85,19 +85,19 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           # Move files to final location
-          sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/ || sudo mkdir -p /var/www/whit/backend && sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/
-          sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/ || sudo mkdir -p /var/www/whit/frontend && sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/
+          sudo cp -r /tmp/WHIT-deploy/backend/* /var/www/WHIT/backend/ || sudo mkdir -p /var/www/WHIT/backend && sudo cp -r /tmp/WHIT-deploy/backend/* /var/www/WHIT/backend/
+          sudo cp -r /tmp/WHIT-deploy/frontend/dist /var/www/WHIT/frontend/ || sudo mkdir -p /var/www/WHIT/frontend && sudo cp -r /tmp/WHIT-deploy/frontend/dist /var/www/WHIT/frontend/
           
           # Update nginx configuration
-          sudo cp /tmp/whit-deploy/nginx.conf /etc/nginx/sites-available/whit
+          sudo cp /tmp/WHIT-deploy/nginx.conf /etc/nginx/sites-available/whit
           sudo ln -sf /etc/nginx/sites-available/whit /etc/nginx/sites-enabled/whit
           
           # Set proper permissions
-          sudo chown -R www-data:www-data /var/www/whit
-          sudo chmod -R 755 /var/www/whit
+          sudo chown -R www-data:www-data /var/www/WHIT
+          sudo chmod -R 755 /var/www/WHIT
           
           # Install Python dependencies in virtual environment
-          cd /var/www/whit/backend
+          cd /var/www/WHIT/backend
           sudo -u www-data python3 -m venv venv
           sudo -u www-data ./venv/bin/pip install -r requirements.txt
           

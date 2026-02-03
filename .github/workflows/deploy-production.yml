@@ -92,7 +92,7 @@ jobs:
         username: ${{ secrets.PROD_SERVER_USERNAME }}
         key: ${{ secrets.PROD_SERVER_SSH_KEY }}
         source: "frontend/dist/*,backend/*,nginx.conf,whit.service"
-        target: "/tmp/whit-deploy"
+        target: "/tmp/WHIT-deploy"
         strip_components: 0
         
     - name: Complete production deployment
@@ -103,23 +103,23 @@ jobs:
         key: ${{ secrets.PROD_SERVER_SSH_KEY }}
         script: |
           # Move files to final location
-          sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/ || sudo mkdir -p /var/www/whit/backend && sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/
-          sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/ || sudo mkdir -p /var/www/whit/frontend && sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/
+          sudo cp -r /tmp/WHIT-deploy/backend/* /var/www/WHIT/backend/ || sudo mkdir -p /var/www/WHIT/backend && sudo cp -r /tmp/WHIT-deploy/backend/* /var/www/WHIT/backend/
+          sudo cp -r /tmp/WHIT-deploy/frontend/dist /var/www/WHIT/frontend/ || sudo mkdir -p /var/www/WHIT/frontend && sudo cp -r /tmp/WHIT-deploy/frontend/dist /var/www/WHIT/frontend/
           
           # Update systemd service
-          sudo cp /tmp/whit-deploy/whit.service /etc/systemd/system/whit.service
+          sudo cp /tmp/WHIT-deploy/whit.service /etc/systemd/system/whit.service
           sudo systemctl daemon-reload
           
           # Update nginx configuration
-          sudo cp /tmp/whit-deploy/nginx.conf /etc/nginx/sites-available/whit
+          sudo cp /tmp/WHIT-deploy/nginx.conf /etc/nginx/sites-available/whit
           sudo ln -sf /etc/nginx/sites-available/whit /etc/nginx/sites-enabled/whit
           
           # Set proper permissions
-          sudo chown -R www-data:www-data /var/www/whit
-          sudo chmod -R 755 /var/www/whit
+          sudo chown -R www-data:www-data /var/www/WHIT
+          sudo chmod -R 755 /var/www/WHIT
           
           # Install Python dependencies in virtual environment
-          cd /var/www/whit/backend
+          cd /var/www/WHIT/backend
           sudo -u www-data python3 -m venv venv
           sudo -u www-data ./venv/bin/pip install -r requirements.txt
           
