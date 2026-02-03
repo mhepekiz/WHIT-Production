@@ -9,8 +9,9 @@ const FormPageLayout = ({ children, pageName }) => {
     const fetchLayout = async () => {
       try {
         console.log('Fetching layout for page:', pageName);
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
         const response = await fetch(
-          `http://localhost:8000/api/form-layouts/by_page/?page=${pageName}`
+          `${API_BASE_URL}/form-layouts/by_page/?page=${pageName}`
         );
         console.log('Response status:', response.status);
         if (response.ok) {

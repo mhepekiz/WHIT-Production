@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/recruiters';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_URL = `${API_BASE_URL.replace('/api', '')}/api/recruiters`;
 
 // Create axios instance with auth header
 const getAuthHeader = () => {
