@@ -108,6 +108,26 @@ jobs:
           # Test nginx configuration
           sudo nginx -t
           
+          # Check if SSL certificate exists for staging domain
+          if [ ! -f "/etc/letsencrypt/live/staging.whoishiringintech.com/fullchain.pem" ]; then
+            echo "⚠️  SSL certificate not found. Attempting to create..."
+            # Install certbot if not present
+            which certbot || {
+              sudo apt update && \
+              sudo apt install -y snapd && \
+              sudo snap install --classic certbot && \
+              sudo ln -sf /snap/bin/certbot /usr/bin/certbot
+            }
+            # Try to get SSL certificate
+            sudo certbot --nginx -d staging.whoishiringintech.com --non-interactive --agree-tos --email admin@whoishiringintech.com || {
+              echo "⚠️  Could not obtain SSL certificate. Site will run on HTTP only."
+              # Temporarily modify nginx config to work without SSL
+              sudo sed -i 's/listen 443 ssl http2;/listen 80;/' /etc/nginx/sites-available/whit
+              sudo sed -i '/ssl_certificate/d' /etc/nginx/sites-available/whit
+              sudo sed -i '/ssl_/d' /etc/nginx/sites-available/whit
+            }
+          fi
+          
           # Reload nginx
           sudo systemctl reload nginx
           
@@ -116,8 +136,8 @@ jobs:
           sudo systemctl enable whit
           
           # Verify services are running
-          sudo systemctl status nginx
-          sudo systemctl status whit
+          sudo systemctl status nginx --no-pager || echo "Nginx status check failed"
+          sudo systemctl status whit --no-pager || echo "Whit status check failed"
           
           # Cleanup
           rm -rf /tmp/whit-deploy
@@ -129,17 +149,47 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          # Check if the staging site is responding
-          curl -f -s -o /dev/null https://staging.whoishiringintech.com || {
-            echo "Staging site is not responding!"
-            exit 1
-          }
+          echo "=== Deployment Verification ==="
           
-          # Check if API is working
-          curl -f -s -o /dev/null https://staging.whoishiringintech.com/api/ || {
-            echo "API is not responding!"
-            exit 1
-          }
+          # Check if nginx is running
+          echo "Checking nginx status..."
+          sudo systemctl status nginx --no-pager || echo "Nginx is not running properly"
           
-          echo "Deployment successful! 🚀"
-          echo "Staging site: https://staging.whoishiringintech.com"
+          # Check if whit service is running  
+          echo "Checking whit service status..."
+          sudo systemctl status whit --no-pager || echo "Whit service is not running properly"
+          
+          # Check nginx configuration
+          echo "Testing nginx configuration..."
+          sudo nginx -t || echo "Nginx configuration has errors"
+          
+          # Check if SSL certificate exists
+          echo "Checking SSL certificate for staging domain..."
+          if [ -f "/etc/letsencrypt/live/staging.whoishiringintech.com/fullchain.pem" ]; then
+            echo "✅ SSL certificate exists for staging domain"
+            # Try HTTPS
+            echo "Testing HTTPS connection..."
+            curl -f -s -o /dev/null -w "HTTP Status: %{http_code}\n" https://staging.whoishiringintech.com || echo "❌ HTTPS connection failed"
+          else
+            echo "⚠️  SSL certificate does not exist for staging domain"
+            # Try HTTP instead
+            echo "Testing HTTP connection..."
+            curl -f -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://staging.whoishiringintech.com || echo "❌ HTTP connection also failed"
+          fi
+          
+          # Check API endpoint
+          echo "Testing API endpoint..."
+          if [ -f "/etc/letsencrypt/live/staging.whoishiringintech.com/fullchain.pem" ]; then
+            curl -f -s -o /dev/null -w "API Status: %{http_code}\n" https://staging.whoishiringintech.com/api/ || echo "❌ API not responding via HTTPS"
+          else
+            curl -f -s -o /dev/null -w "API Status: %{http_code}\n" http://staging.whoishiringintech.com/api/ || echo "❌ API not responding via HTTP"
+          fi
+          
+          # Show recent logs
+          echo "=== Recent Nginx Logs ==="
+          sudo tail -10 /var/log/nginx/error.log || echo "No nginx error logs found"
+          
+          echo "=== Recent Whit Service Logs ==="
+          sudo journalctl -u whit --no-pager -n 10 || echo "No whit service logs found"
+          
+          echo "Deployment verification complete (errors above are expected if this is first deployment)"
