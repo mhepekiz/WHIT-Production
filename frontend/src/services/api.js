@@ -1,7 +1,21 @@
 import axios from 'axios';
 
-// Force staging API URL to be correctly set during build
+// Environment-aware API configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const BACKEND_BASE_URL = API_BASE_URL.replace('/api', '');
+
+// Helper function to construct API URLs
+export const getApiUrl = (endpoint) => {
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+  return `${API_BASE_URL}/${cleanEndpoint}`;
+};
+
+// Helper function for media URLs
+export const getMediaUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http')) return path;
+  return `${BACKEND_BASE_URL}${path.startsWith('/') ? path : '/' + path}`;
+};
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
