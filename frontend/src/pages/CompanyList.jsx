@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { companyService } from '../services/api';
+import { companyService, getApiUrl } from '../services/api';
 import CompanyTable from '../components/CompanyTable';
 import Filters from '../components/Filters';
 import SearchBar from '../components/SearchBar';
@@ -46,8 +46,7 @@ function CompanyList() {
 
     const fetchAdSlots = async () => {
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-        const response = await fetch(`${API_BASE_URL}/ad-slots/active/`);
+        const response = await fetch(getApiUrl('ad-slots/active/'));
         if (response.ok) {
           const data = await response.json();
           console.log('Ad slots data:', data);
@@ -60,8 +59,7 @@ function CompanyList() {
 
     const fetchSiteSettings = async () => {
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-        const response = await fetch(`${API_BASE_URL}/site-settings/current/`);
+        const response = await fetch(getApiUrl('site-settings/current/'));
         if (response.ok) {
           const data = await response.json();
           console.log('Site settings loaded:', data);
@@ -80,7 +78,7 @@ function CompanyList() {
           console.log('Setting button styles:', styles);
           setButtonStyles(styles);
           
-          console.log('Applied sizes:', sizes);
+          console.log('Applied styles:', styles);
         }
       } catch (err) {
         console.error('Failed to fetch site settings:', err);

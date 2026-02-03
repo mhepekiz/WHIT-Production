@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getApiUrl } from '../services/api';
 import './DashboardNew.css';
 
 const DashboardNew = () => {
@@ -21,10 +22,10 @@ const DashboardNew = () => {
   const fetchDashboardData = async () => {
     try {
       const [profileRes, prefsRes] = await Promise.all([
-        fetch('http://localhost:8000/api/accounts/profile/me/', {
+        fetch(getApiUrl('accounts/profile/me/'), {
           headers: { 'Authorization': `Token ${token}` },
         }),
-        fetch('http://localhost:8000/api/accounts/job-preferences/me/', {
+        fetch(getApiUrl('accounts/job-preferences/me/'), {
           headers: { 'Authorization': `Token ${token}` },
         }),
       ]);

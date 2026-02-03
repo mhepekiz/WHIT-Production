@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getApiUrl } from '../services/api';
 import PhoneInput from '../components/PhoneInput';
 import LocationInput from '../components/LocationInput';
 import './ProfileEdit.css';
@@ -33,7 +34,7 @@ const ProfileEdit = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/profile/me/', {
+      const response = await fetch(getApiUrl('accounts/profile/me/'), {
         headers: { 'Authorization': `Token ${token}` },
       });
 
@@ -62,8 +63,7 @@ const ProfileEdit = () => {
     setMessage('');
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-      const response = await fetch(`${API_BASE_URL}/accounts/profile/me/`, {
+      const response = await fetch(getApiUrl('accounts/profile/me/'), {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,
