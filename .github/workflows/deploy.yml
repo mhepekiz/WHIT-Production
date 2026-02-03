@@ -74,7 +74,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         source: "frontend/dist/*,backend/*,nginx.conf"
-        target: "/tmp/WHIT-deploy"
+        target: "/tmp/whit-deploy"
         strip_components: 0
         
     - name: Complete deployment
@@ -85,11 +85,11 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           # Move files to final location
-          sudo cp -r /tmp/WHIT-deploy/backend/* /var/www/WHIT/backend/ || sudo mkdir -p /var/www/WHIT/backend && sudo cp -r /tmp/WHIT-deploy/backend/* /var/www/WHIT/backend/
-          sudo cp -r /tmp/WHIT-deploy/frontend/dist /var/www/WHIT/frontend/ || sudo mkdir -p /var/www/WHIT/frontend && sudo cp -r /tmp/WHIT-deploy/frontend/dist /var/www/WHIT/frontend/
+          sudo cp -r /tmp/whit-deploy/backend/* /var/www/WHIT/backend/ || sudo mkdir -p /var/www/WHIT/backend && sudo cp -r /tmp/whit-deploy/backend/* /var/www/WHIT/backend/
+          sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/WHIT/frontend/ || sudo mkdir -p /var/www/WHIT/frontend && sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/WHIT/frontend/
           
           # Update nginx configuration
-          sudo cp /tmp/WHIT-deploy/nginx.conf /etc/nginx/sites-available/whit
+          sudo cp /tmp/whit-deploy/nginx.conf /etc/nginx/sites-available/whit
           sudo ln -sf /etc/nginx/sites-available/whit /etc/nginx/sites-enabled/whit
           
           # Set proper permissions
