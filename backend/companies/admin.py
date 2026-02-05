@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout
 
 
@@ -8,16 +10,20 @@ class CompanyAdmin(admin.ModelAdmin):
     
     list_display = [
         'name',
+        'logo_preview',
         'country',
         'state',
         'city',
         'status',
+        'is_sponsored',
+        'sponsor_order',
         'engineering_positions',
         'updated_at',
     ]
     
     list_filter = [
         'status',
+        'is_sponsored',
         'engineering_positions',
         'country',
         'state',
@@ -29,19 +35,32 @@ class CompanyAdmin(admin.ModelAdmin):
         'functions',
     ]
     
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'logo_preview']
     
     filter_horizontal = ['functions']
     
+    def save_model(self, request, obj, form, change):
+        # Check sponsored limit before saving
+        if obj.is_sponsored:
+            sponsored_count = Company.objects.filter(is_sponsored=True).exclude(pk=obj.pk).count()
+            if sponsored_count >= 3:
+                messages.error(request, "Maximum of 3 sponsored companies allowed. Please unmark another company as sponsored first.")
+                return
+        super().save_model(request, obj, form, change)
+    
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'logo', 'jobs_page_url', 'company_reviews')
+            'fields': ('name', 'logo', 'logo_preview', 'jobs_page_url', 'company_reviews')
         }),
         ('Location', {
             'fields': ('country', 'state', 'city')
         }),
         ('Work Details', {
             'fields': ('work_environment', 'functions', 'engineering_positions')
+        }),
+        ('Sponsorship', {
+            'fields': ('is_sponsored', 'sponsor_order'),
+            'description': 'Maximum 3 sponsored companies allowed. Lower sponsor_order numbers appear first.'
         }),
         ('Status', {
             'fields': ('status',)
@@ -101,8 +120,8 @@ class AdSlotAdmin(admin.ModelAdmin):
             'description': 'Use this for Google AdSense or custom ad scripts'
         }),
         ('Image Banner Option', {
-            'fields': ('banner_image', 'banner_link', 'banner_alt_text', 'open_in_new_tab'),
-            'description': 'Upload a banner image and provide a click-through URL'
+            'fields': ('banner_image', 'mobile_banner_image', 'banner_link', 'banner_alt_text', 'open_in_new_tab'),
+            'description': 'Upload banner images and provide a click-through URL. Mobile banner is optional - desktop banner will be used if mobile is not provided.'
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -172,3 +191,183 @@ class FormLayoutAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+# Sponsor Campaign Admin
+from .models import SponsorCampaign, SponsorStatsDaily, SponsorDeliveryLog
+
+
+@admin.register(SponsorCampaign)
+class SponsorCampaignAdmin(admin.ModelAdmin):
+    """Admin interface for managing sponsor campaigns."""
+    
+    list_display = [
+        'name',
+        'company',
+        'status', 
+        'start_at',
+        'end_at',
+        'priority',
+        'daily_impression_cap',
+        'impressions_today_display',
+        'clicks_today_display',
+        'created_at'
+    ]
+    
+    list_filter = [
+        'status',
+        'priority',
+        'pacing',
+        'start_at',
+        'end_at',
+        'company'
+    ]
+    
+    search_fields = ['name', 'company__name']
+    
+    readonly_fields = [
+        'created_at', 
+        'updated_at', 
+        'impressions_today_display',
+        'clicks_today_display',
+        'campaign_performance'
+    ]
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'company', 'status')
+        }),
+        ('Schedule', {
+            'fields': ('start_at', 'end_at')
+        }),
+        ('Delivery Settings', {
+            'fields': (
+                'priority', 
+                'weight',
+                'daily_impression_cap', 
+                'daily_click_cap',
+                'pacing'
+            )
+        }),
+        ('Targeting', {
+            'fields': (
+                'targeting_countries',
+                'targeting_functions', 
+                'targeting_work_env'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Advanced', {
+            'fields': ('bid_cpm', 'created_by'),
+            'classes': ('collapse',)
+        }),
+        ('Performance (Read-Only)', {
+            'fields': (
+                'impressions_today_display',
+                'clicks_today_display', 
+                'campaign_performance'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def impressions_today_display(self, obj):
+        """Display today's impression count"""
+        return f"{obj.impressions_today()} / {obj.daily_impression_cap}"
+    impressions_today_display.short_description = "Today's Impressions"
+    
+    def clicks_today_display(self, obj):
+        """Display today's click count"""
+        clicks = obj.clicks_today()
+        if obj.daily_click_cap:
+            return f"{clicks} / {obj.daily_click_cap}"
+        return str(clicks)
+    clicks_today_display.short_description = "Today's Clicks"
+    
+    def campaign_performance(self, obj):
+        """Display campaign performance summary"""
+        from django.utils.html import format_html
+        from django.utils import timezone
+        
+        stats = obj.stats_daily.filter(
+            date__gte=timezone.now().date() - timezone.timedelta(days=7)
+        ).order_by('-date')
+        
+        if not stats.exists():
+            return "No recent activity"
+            
+        total_impressions = sum(s.impressions for s in stats)
+        total_clicks = sum(s.clicks for s in stats)
+        ctr = (total_clicks / total_impressions * 100) if total_impressions > 0 else 0
+        
+        return format_html(
+            "<strong>Last 7 days:</strong><br/>"
+            "Impressions: {}<br/>"
+            "Clicks: {}<br/>"
+            "CTR: {:.2f}%",
+            total_impressions,
+            total_clicks,
+            ctr
+        )
+    campaign_performance.short_description = "Performance Summary"
+    
+    def save_model(self, request, obj, form, change):
+        if not change:  # Creating new campaign
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(SponsorStatsDaily)
+class SponsorStatsDailyAdmin(admin.ModelAdmin):
+    """Admin interface for daily sponsor stats."""
+    
+    list_display = [
+        'campaign',
+        'date', 
+        'impressions',
+        'clicks',
+        'ctr_display'
+    ]
+    
+    list_filter = ['date', 'campaign__company']
+    search_fields = ['campaign__name', 'campaign__company__name']
+    readonly_fields = ['ctr_display']
+    
+    def ctr_display(self, obj):
+        """Calculate and display CTR"""
+        if obj.impressions > 0:
+            ctr = (obj.clicks / obj.impressions) * 100
+            return f"{ctr:.2f}%"
+        return "0.00%"
+    ctr_display.short_description = "CTR"
+
+
+@admin.register(SponsorDeliveryLog) 
+class SponsorDeliveryLogAdmin(admin.ModelAdmin):
+    """Admin interface for sponsor delivery logs."""
+    
+    list_display = [
+        'campaign',
+        'user_hash_short',
+        'action',
+        'page_key_short',
+        'shown_at'
+    ]
+    
+    list_filter = ['action', 'shown_at', 'campaign__company']
+    search_fields = ['campaign__name', 'user_hash', 'page_key']
+    readonly_fields = ['shown_at']
+    
+    def user_hash_short(self, obj):
+        """Display shortened user hash"""
+        return obj.user_hash[:12] + "..." if len(obj.user_hash) > 12 else obj.user_hash
+    user_hash_short.short_description = "User"
+    
+    def page_key_short(self, obj):
+        """Display shortened page key"""
+        return obj.page_key[:30] + "..." if len(obj.page_key) > 30 else obj.page_key
+    page_key_short.short_description = "Page Context"

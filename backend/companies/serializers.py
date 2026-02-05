@@ -34,6 +34,8 @@ class CompanySerializer(serializers.ModelSerializer):
             'functions_list',
             'engineering_positions',
             'status',
+            'is_sponsored',
+            'sponsor_order',
             'created_at',
             'updated_at',
         ]
@@ -66,6 +68,8 @@ class CompanyListSerializer(serializers.ModelSerializer):
             'functions',
             'engineering_positions',
             'status',
+            'is_sponsored',
+            'sponsor_order',
         ]
 
 

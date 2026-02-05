@@ -1,10 +1,10 @@
 .filters-container {
-  background: var(--surface);
-  border-radius: 12px;
+  background: transparent;
+  border-radius: 0;
   padding: 20px;
-  margin: 20px 0;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-color);
+  margin: 0;
+  box-shadow: none;
+  border: none;
 }
 
 .filters-header {

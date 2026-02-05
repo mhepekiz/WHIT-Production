@@ -220,12 +220,12 @@
 }
 
 .btn-save {
-  background: #10b981;
+  background: #4F46E5;
   color: white;
 }
 
 .btn-save:hover {
-  background: #059669;
+  background: #4338CA;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }

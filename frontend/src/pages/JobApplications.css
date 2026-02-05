@@ -294,12 +294,12 @@
 }
 
 .btn-success {
-  background: #10b981;
+  background: #4F46E5;
   color: white;
 }
 
 .btn-success:hover {
-  background: #059669;
+  background: #4338CA;
 }
 
 .btn-danger {
@@ -595,7 +595,7 @@
 }
 
 .profile-value.active-looking {
-  color: #059669;
+  color: #4F46E5;
 }
 
 .skills-tags {
@@ -631,7 +631,7 @@
 .salary-range {
   font-size: 16px;
   font-weight: 600;
-  color: #059669;
+  color: #4F46E5;
 }
 
 .social-links {

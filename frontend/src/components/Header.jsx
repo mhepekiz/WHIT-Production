@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRecruiterAuth } from '../contexts/RecruiterAuthContext';
+import MobileMenu from './MobileMenu';
 import './Header.css';
 
 function Header() {
@@ -28,8 +29,29 @@ function Header() {
       }
     };
 
+    const handleEscKey = (event) => {
+      if (event.key === 'Escape') {
+        setDropdownOpen(false);
+        setRegisterDropdownOpen(false);
+        setLoginDropdownOpen(false);
+      }
+    };
+
+    const handleScroll = () => {
+      setDropdownOpen(false);
+      setRegisterDropdownOpen(false);
+      setLoginDropdownOpen(false);
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscKey); // Fix 8: ESC key support
+    window.addEventListener('scroll', handleScroll, true); // Fix 8: Close on scroll
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscKey);
+      window.removeEventListener('scroll', handleScroll, true);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -47,18 +69,24 @@ function Header() {
   };
 
   return (
-    <header className="header">
-      <div className="header-top">
-        <div className="header-logo">
-          <h1 className="header-title">
-            <span className="header-title-highlight">Who Is Hiring</span> In Tech
-          </h1>
+    <header className="nav">
+      <div className="nav__inner">
+        {/* Left: Brand */}
+        <div className="nav__left">
+          <Link to="/" className="nav__brand">
+            WhoIsHiringInTech
+          </Link>
         </div>
-        <nav className="header-nav">
-          <Link to="/" className="nav-link">Home</Link>
-          <a href="#add-company" className="nav-link">Add New Company</a>
-          <a href="#contact" className="nav-link">Contact</a>
-          <a href="#about" className="nav-link">About</a>
+
+        {/* Center: Primary Navigation */}
+        <nav className="nav__center" aria-label="Primary">
+          <Link to="/" className="nav__link">Browse Companies</Link>
+          <a href="#add-company" className="nav__link">Add Company</a>
+        </nav>
+
+        {/* Right: Secondary Navigation */}
+        <div className="nav__right">
+          <a href="#about" className="nav__link">About</a>
           {isAuthenticated || isRecruiterAuth ? (
             <div className="user-menu" ref={dropdownRef}>
               <button 
@@ -238,7 +266,7 @@ function Header() {
                         <path d="M8 8C10.2091 8 12 6.20914 12 4C12 1.79086 10.2091 0 8 0C5.79086 0 4 1.79086 4 4C4 6.20914 5.79086 8 8 8Z" fill="currentColor"/>
                         <path d="M0 16C0 12.6863 2.68629 10 6 10H10C13.3137 10 16 12.6863 16 16H0Z" fill="currentColor"/>
                       </svg>
-                      Job Seeker
+                      Register as Job Seeker
                     </Link>
                     <Link 
                       to="/recruiter/register" 
@@ -250,7 +278,7 @@ function Header() {
                         <path d="M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4" stroke="currentColor" strokeWidth="1.5"/>
                         <path d="M8 7V10M6.5 8.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                       </svg>
-                      Recruiter
+                      Register as Recruiter
                     </Link>
                   </div>
                 )}
@@ -282,7 +310,7 @@ function Header() {
                         <path d="M8 8C10.2091 8 12 6.20914 12 4C12 1.79086 10.2091 0 8 0C5.79086 0 4 1.79086 4 4C4 6.20914 5.79086 8 8 8Z" fill="currentColor"/>
                         <path d="M0 16C0 12.6863 2.68629 10 6 10H10C13.3137 10 16 12.6863 16 16H0Z" fill="currentColor"/>
                       </svg>
-                      Job Seeker
+                      Login as Job Seeker
                     </Link>
                     <Link 
                       to="/recruiter/login" 
@@ -294,17 +322,17 @@ function Header() {
                         <path d="M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4" stroke="currentColor" strokeWidth="1.5"/>
                         <path d="M8 7V10M6.5 8.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                       </svg>
-                      Recruiter
+                      Login as Recruiter
                     </Link>
                   </div>
                 )}
               </div>
             </>
           )}
-        </nav>
-      </div>
-      <div className="header-subtitle-section">
-        <p className="header-subtitle">Find your next tech opportunity from companies actively hiring</p>
+        </div>
+        
+        {/* Mobile Navigation */}
+        <MobileMenu />
       </div>
     </header>
   );

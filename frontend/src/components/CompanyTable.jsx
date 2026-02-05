@@ -57,119 +57,89 @@ function CompanyTable({ companies, buttonStyles = { padding: '6px 12px', fontSiz
   }, [resizing]);
 
   return (
-    <div className="table-container">
-      <table className="company-table">
-        <thead>
-          <tr>
-            <th>Company</th>
-            <th>Jobs Page</th>
-            <th>Reviews</th>
-            <th className="resizable-header" style={{ width: `${columnWidths.functions}px` }}>
-              <div className="header-content">
-                <span>Functions</span>
-                <div className="resize-handle" onMouseDown={handleMouseDown('functions')} />
+    <div className="company-list">
+      {companies.map((company) => (
+        <div key={company.id} className={`company-card ${company.is_sponsored ? 'sponsored' : ''}`}>
+          {company.is_sponsored && (
+            <div className="sponsored-badge">
+              <span>Sponsored</span>
+            </div>
+          )}
+          <div className="company-header">
+            <div className="company-info">
+              {company.logo && (
+                <img
+                  src={company.logo}
+                  alt={`${company.name} logo`}
+                  className="company-logo"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              )}
+              <div className="company-name-wrapper">
+                <span className="company-name">{company.name}</span>
               </div>
-            </th>
-            <th className="resizable-header" style={{ width: `${columnWidths.location}px` }}>
-              <div className="header-content">
-                <span>Location</span>
-                <div className="resize-handle" onMouseDown={handleMouseDown('location')} />
-              </div>
-            </th>
-            <th className="resizable-header" style={{ width: `${columnWidths.workEnvironment}px` }}>
-              <div className="header-content">
-                <span>Work Environment</span>
-                <div className="resize-handle" onMouseDown={handleMouseDown('workEnvironment')} />
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {companies.map((company) => (
-            <tr key={company.id}>
-              <td className="company-name-cell">
-                <div className="company-name-wrapper">
-                  {company.logo && (
-                    <img
-                      src={company.logo}
-                      alt={`${company.name} logo`}
-                      className="company-logo"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  )}
-                  <span className="company-name">{company.name}</span>
-                </div>
-              </td>
-
-              <td>
+            </div>
+            <div className="company-actions">
+              <a
+                href={company.jobs_page_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-btn careers-btn"
+                style={buttonStyles}
+              >
+                Careers
+              </a>
+              {company.company_reviews && (
                 <a
-                  href={company.jobs_page_url}
+                  href={company.company_reviews}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-btn careers-btn"
+                  className="link-btn reviews-btn"
                   style={buttonStyles}
                 >
-                  Careers
+                  Reviews
                 </a>
-              </td>
-
-              <td>
-                {company.company_reviews ? (
-                  <a
-                    href={company.company_reviews}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="link-btn reviews-btn"
-                    style={buttonStyles}
-                  >
-                    Reviews
-                  </a>
-                ) : (
-                  <span className="text-muted">—</span>
-                )}
-              </td>
-
-              <td style={{ width: `${columnWidths.functions}px` }}>
-                <div className="tags-container">
-                  {company.functions && company.functions.map((func) => (
-                    <span 
-                      key={func.id} 
-                      className="tag tag-function"
-                      style={{
-                        backgroundColor: func.color,
-                        color: func.text_color
-                      }}
-                    >
-                      {func.name}
-                    </span>
-                  ))}
-                </div>
-              </td>
-
-              <td className="location-cell" style={{ width: `${columnWidths.location}px` }}>
-                <div className="location-text">
-                  {company.city && <span>{company.city}, </span>}
-                  {company.state && <span>{company.state}, </span>}
-                  <span className="country">{company.country}</span>
-                </div>
-              </td>
-
-              <td className="work-environment-cell" style={{ width: `${columnWidths.workEnvironment}px` }}>
-                <div className="tags-container">
-                  {parseTags(company.work_environment).map((env, index) => (
-                    <span key={index} className="tag tag-environment">
-                      {env}
-                    </span>
-                  ))}
-                </div>
-              </td>
-
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              )}
+            </div>
+          </div>
+          
+          <div className="company-location">
+            {company.city && <span>{company.city}, </span>}
+            {company.state && <span>{company.state}, </span>}
+            <span className="country">{company.country}</span>
+          </div>
+          
+          <div className="company-functions">
+            {company.functions && company.functions.slice(0, 4).map((func) => (
+              <span 
+                key={func.id} 
+                className="tag tag-function"
+                style={{
+                  backgroundColor: func.color,
+                  color: func.text_color
+                }}
+              >
+                {func.name}
+              </span>
+            ))}
+            {company.functions && company.functions.length > 4 && (
+              <span className="tag tag-overflow">
+                +{company.functions.length - 4} more
+              </span>
+            )}
+          </div>
+          
+          <div className="company-environment">
+            {parseTags(company.work_environment).map((env, index) => (
+              <span key={index} className="tag tag-environment">
+                {env}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

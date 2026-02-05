@@ -13,12 +13,12 @@
 .location-field label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--text-secondary);
 }
 
 .location-input-field {
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
   font-size: 14px;
   transition: border-color 0.2s;
@@ -27,7 +27,7 @@
 
 .location-input-field:focus {
   outline: none;
-  border-color: #00c853;
+  border-color: var(--primary);
 }
 
 .location-input-field:disabled {

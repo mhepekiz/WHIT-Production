@@ -12,20 +12,6 @@ function Filters({ filters, availableFilters, onFilterChange, onReset }) {
 
       <div className="filters-grid">
         <div className="filter-group">
-          <label htmlFor="status">Status</label>
-          <select
-            id="status"
-            value={filters.status}
-            onChange={(e) => onFilterChange('status', e.target.value)}
-            className="filter-select"
-          >
-            <option value="">All</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
-
-        <div className="filter-group">
           <label htmlFor="country">Country</label>
           <select
             id="country"

@@ -1,10 +1,10 @@
-/* Muted Indigo Professional System */
+/* Final Color System v1.0 - Professional Indigo Brand */
 :root {
-  /* 1. Brand / Primary (Indigo – analytical tool) */
+  /* 1. Brand / Primary (Indigo – core identity) */
   --primary: #4F46E5;           /* indigo-600 */
   --primary-hover: #4338CA;     /* indigo-700 */
   --primary-active: #3730A3;    /* indigo-800 */
-  --primary-soft-bg: #EEF2FF;   /* indigo-50 */
+  --primary-soft-bg: #EEF2FF;   /* indigo-100 */
   --primary-subtle-border: #C7D2FE; /* indigo-200 */
   
   /* 2. Neutrals (90% of UI) */
@@ -19,16 +19,16 @@
   --text-muted: #6B7280;        /* Muted text */
   --text-disabled: #9CA3AF;     /* Disabled text */
   
-  /* 3. Semantic Function Chips (colorful) */
+  /* 3. Semantic Function Chips (muted, consistent) */
   --function-engineering: #2563EB;
   --function-engineering-bg: #EFF6FF;
-  --function-data: #0E7490;
-  --function-data-bg: #F0F9FF;
-  --function-product: #6D28D9;
-  --function-product-bg: #FAF5FF;
-  --function-design: #BE185D;
-  --function-design-bg: #FDF2F8;
-  --function-marketing: #D97706;
+  --function-data: #0891B2;
+  --function-data-bg: #ECFEFF;
+  --function-product: #7C3AED;
+  --function-product-bg: #F5F3FF;
+  --function-design: #DB2777;
+  --function-design-bg: #FCE7F3;
+  --function-marketing: #F59E0B;
   --function-marketing-bg: #FFFBEB;
   --function-sales: #EA580C;
   --function-sales-bg: #FFF7ED;
@@ -41,7 +41,7 @@
   --function-internship: #9333EA;
   --function-internship-bg: #FAF5FF;
   
-  /* 4. Work Environment Chips (colorful) */
+  /* 4. Work Environment Chips (metadata, subtle) */
   --env-remote: #2563EB;
   --env-remote-bg: #EFF6FF;
   --env-hybrid: #7C3AED;
@@ -71,12 +71,12 @@
   --hover-row: #F3F4F6;
   --selected-row: #EEF2FF;
   
-  /* Legacy support - Use green color system */
-  --splunk-primary: #4F46E5;      /* indigo-600 - primary indigo */
-  --splunk-primary-light: #EEF2FF; /* indigo-50 - light indigo bg */
-  --splunk-primary-dark: #3730A3;  /* indigo-800 - dark indigo */
-  --splunk-secondary: #F9FAFB;     /* neutral surface */
-  --splunk-accent: #4F46E5;        /* indigo-600 - accent indigo */
+  /* Legacy support - Force indigo everywhere */
+  --splunk-primary: #4F46E5;
+  --splunk-primary-light: #EEF2FF;
+  --splunk-primary-dark: #4338CA;
+  --splunk-secondary: #F9FAFB;
+  --splunk-accent: #4F46E5;
   
   /* System Colors */
   --splunk-light: var(--background);
@@ -124,7 +124,7 @@ body {
   line-height: 1.6;
 }
 
-/* Utility Classes */
+/* Updated Utility Classes */
 .text-primary { color: var(--text-primary); }
 .text-secondary { color: var(--text-secondary); }
 .text-muted { color: var(--text-muted); }
@@ -184,17 +184,17 @@ body {
   cursor: not-allowed;
 }
 
-/* Card Styles - Clean and minimal */
+/* Card Styles */
 .card {
-  background: var(--card-bg);
+  background: var(--surface);
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: var(--shadow);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border-color);
 }
 
 .card-header {
-  border-bottom: 1px solid var(--divider);
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 1rem;
   margin-bottom: 1rem;
 }
@@ -353,54 +353,6 @@ body {
   background-color: #FEF2F2 !important;
 }
 
-/* Premium Neutral Chips - No confetti colors */
-.chip-neutral {
-  background: var(--surface-alt) !important;
-  color: var(--text-secondary) !important;
-  border: 1px solid var(--border-light) !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  padding: 4px 8px !important;
-  border-radius: 999px !important;
-  white-space: nowrap !important;
-  display: inline-flex !important;
-  align-items: center !important;
-}
-
-/* Work Environment Chips - More Prominent */
-.chip-env-remote {
-  background: var(--env-remote-bg) !important;
-  color: var(--env-remote) !important;
-  border: 1px solid rgba(37, 99, 235, 0.2) !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  padding: 4px 8px !important;
-  border-radius: 999px !important;
-  white-space: nowrap !important;
-}
-
-.chip-env-hybrid {
-  background: var(--env-hybrid-bg) !important;
-  color: var(--env-hybrid) !important;
-  border: 1px solid rgba(124, 58, 237, 0.2) !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  padding: 4px 8px !important;
-  border-radius: 999px !important;
-  white-space: nowrap !important;
-}
-
-.chip-env-onsite {
-  background: var(--env-onsite-bg) !important;
-  color: var(--env-onsite) !important;
-  border: 1px solid rgba(75, 85, 99, 0.2) !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  padding: 4px 8px !important;
-  border-radius: 999px !important;
-  white-space: nowrap !important;
-}
-
 /* Function Color Helper Classes */
 .text-function-engineering { color: var(--function-engineering); }
 .text-function-data { color: var(--function-data); }
@@ -519,6 +471,34 @@ a:visited {
   margin-bottom: 0.5rem;
   display: block;
 }
+
+/* Card Styles - Clean and minimal */
+.card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
+}
+
+.card-header {
+  border-bottom: 1px solid var(--divider);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Utility Classes */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--primary); }
+
+.bg-surface { background: var(--surface); }
+.bg-elevated { background: var(--surface-elevated); }
+
+.border-accent { border-color: var(--primary); }
+.shadow { box-shadow: var(--shadow); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
 
 /* Professional hover states */
 .hover-row:hover {

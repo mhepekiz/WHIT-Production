@@ -1,4 +1,8 @@
 from django.db import models
+from django.utils.html import format_html
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.core.validators import MinValueValidator
 
 
 class Company(models.Model):
@@ -11,7 +15,7 @@ class Company(models.Model):
     
     # Basic Information
     name = models.CharField(max_length=255, unique=True)
-    logo = models.URLField(max_length=500, blank=True, null=True)
+    logo = models.ImageField(upload_to='company_logos/', blank=True, null=True, help_text='Upload company logo image')
     jobs_page_url = models.URLField(max_length=500)
     company_reviews = models.URLField(max_length=500, blank=True, null=True)
     
@@ -31,6 +35,10 @@ class Company(models.Model):
     engineering_positions = models.BooleanField(default=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Active')
     
+    # Sponsorship
+    is_sponsored = models.BooleanField(default=False, help_text="Mark as sponsored company")
+    sponsor_order = models.PositiveIntegerField(default=0, help_text="Order for sponsored companies (lower numbers first)")
+    
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -38,11 +46,12 @@ class Company(models.Model):
     class Meta:
         verbose_name = 'Company'
         verbose_name_plural = 'Companies'
-        ordering = ['name']
+        ordering = ['-is_sponsored', 'sponsor_order', 'name']
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['country', 'state', 'city']),
             models.Index(fields=['status']),
+            models.Index(fields=['is_sponsored', 'sponsor_order']),
         ]
     
     def __str__(self):
@@ -64,6 +73,16 @@ class Company(models.Model):
         if self.work_environment:
             return [w.strip() for w in self.work_environment.split(',')]
         return []
+    
+    def logo_preview(self):
+        """Return HTML for logo preview in admin."""
+        if self.logo:
+            return format_html(
+                '<img src="{}" style="max-width: 100px; max-height: 100px; object-fit: contain;" />',
+                self.logo.url
+            )
+        return 'No logo'
+    logo_preview.short_description = 'Logo Preview'
 
 
 class Function(models.Model):
@@ -128,7 +147,13 @@ class AdSlot(models.Model):
         upload_to='ad_banners/',
         blank=True,
         null=True,
-        help_text='Upload banner image'
+        help_text='Upload desktop banner image'
+    )
+    mobile_banner_image = models.ImageField(
+        upload_to='ad_banners/',
+        blank=True,
+        null=True,
+        help_text='Upload mobile banner image (optional - will use desktop banner if not provided)'
     )
     banner_link = models.URLField(
         max_length=500,
@@ -328,3 +353,198 @@ class FormLayout(models.Model):
         if self.side_image:
             return self.side_image.url
         return self.side_image_url
+
+
+# Sponsor Campaign Models
+class SponsorCampaign(models.Model):
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('paused', 'Paused'),
+        ('completed', 'Completed'),
+        ('draft', 'Draft'),
+    ]
+    
+    PACING_CHOICES = [
+        ('even', 'Even Distribution'),
+        ('asap', 'As Soon As Possible'),
+    ]
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='sponsor_campaigns')
+    name = models.CharField(max_length=200, help_text="Campaign name for internal tracking")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    
+    # Date range
+    start_at = models.DateTimeField()
+    end_at = models.DateTimeField()
+    
+    # Delivery settings
+    priority = models.IntegerField(default=1, validators=[MinValueValidator(1)], 
+                                 help_text="Higher numbers get more exposure")
+    daily_impression_cap = models.IntegerField(validators=[MinValueValidator(1)], 
+                                              help_text="Maximum impressions per day")
+    daily_click_cap = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1)], 
+                                         help_text="Optional daily click limit")
+    
+    # Targeting (JSON fields)
+    targeting_countries = models.JSONField(default=list, blank=True, 
+                                          help_text="List of country codes. Empty = all countries")
+    targeting_functions = models.JSONField(default=list, blank=True, 
+                                          help_text="List of function names. Empty = all functions")  
+    targeting_work_env = models.JSONField(default=list, blank=True, 
+                                         help_text="List of work environments. Empty = all")
+    
+    # Advanced settings
+    bid_cpm = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                                 help_text="Cost per thousand impressions (optional)")
+    weight = models.IntegerField(default=1, validators=[MinValueValidator(1)], 
+                                help_text="Weight for selection algorithm")
+    pacing = models.CharField(max_length=10, choices=PACING_CHOICES, default='even')
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', 'start_at', 'end_at']),
+            models.Index(fields=['company', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.company.name} - {self.name}"
+
+    def is_active(self, now=None):
+        """Check if campaign is currently active"""
+        if now is None:
+            now = timezone.now()
+        return (
+            self.status == 'active' and 
+            self.start_at <= now <= self.end_at
+        )
+
+    def matches_targeting(self, filters):
+        """Check if campaign matches current page filters"""
+        # Country targeting
+        if self.targeting_countries and filters.get('country'):
+            if filters['country'] not in self.targeting_countries:
+                return False
+                
+        # Function targeting  
+        if self.targeting_functions and filters.get('function'):
+            if filters['function'] not in self.targeting_functions:
+                return False
+                
+        # Work environment targeting
+        if self.targeting_work_env and filters.get('work_environment'):
+            if filters['work_environment'] not in self.targeting_work_env:
+                return False
+                
+        return True
+
+    def impressions_today(self, date=None):
+        """Get impression count for today"""
+        if date is None:
+            date = timezone.now().date()
+        stats = self.stats_daily.filter(date=date).first()
+        return stats.impressions if stats else 0
+
+    def clicks_today(self, date=None):
+        """Get click count for today"""
+        if date is None:
+            date = timezone.now().date()
+        stats = self.stats_daily.filter(date=date).first()
+        return stats.clicks if stats else 0
+
+    def under_daily_caps(self, date=None):
+        """Check if campaign is under daily impression/click caps"""
+        if date is None:
+            date = timezone.now().date()
+            
+        # Check impression cap
+        if self.impressions_today(date) >= self.daily_impression_cap:
+            return False
+            
+        # Check click cap (if set)
+        if self.daily_click_cap and self.clicks_today(date) >= self.daily_click_cap:
+            return False
+            
+        return True
+
+
+class SponsorStatsDaily(models.Model):
+    """Daily aggregated stats per campaign"""
+    campaign = models.ForeignKey(SponsorCampaign, on_delete=models.CASCADE, related_name='stats_daily')
+    date = models.DateField()
+    impressions = models.IntegerField(default=0)
+    clicks = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['campaign', 'date']
+        indexes = [
+            models.Index(fields=['campaign', 'date']),
+        ]
+
+    def __str__(self):
+        return f"{self.campaign} - {self.date} ({self.impressions}i/{self.clicks}c)"
+
+
+class SponsorDeliveryLog(models.Model):
+    """Log of sponsor deliveries to users for anti-fatigue"""
+    ACTION_CHOICES = [
+        ('impression', 'Impression'),
+        ('click', 'Click'),
+    ]
+
+    campaign = models.ForeignKey(SponsorCampaign, on_delete=models.CASCADE, related_name='delivery_logs')
+    user_hash = models.CharField(max_length=64, db_index=True, 
+                                help_text="Anonymized user identifier")
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    page_key = models.CharField(max_length=500, 
+                               help_text="Page context: browse:page=1:filters=hash")
+    
+    # Request context
+    user_agent = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    referrer = models.URLField(blank=True)
+    
+    shown_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['campaign', 'user_hash', 'shown_at']),
+            models.Index(fields=['user_hash', 'shown_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.campaign} -> {self.user_hash[:8]} ({self.action})"
+
+
+class SponsorImpressionEvent(models.Model):
+    """Real-time impression events for immediate processing"""
+    campaign = models.ForeignKey(SponsorCampaign, on_delete=models.CASCADE, related_name='impression_events')
+    user_hash = models.CharField(max_length=64, db_index=True)
+    session_id = models.CharField(max_length=100, blank=True)
+    page_url = models.URLField()
+    
+    # Viewport tracking
+    is_above_fold = models.BooleanField(default=False)
+    viewport_time_ms = models.IntegerField(null=True, blank=True, 
+                                          help_text="Time spent in viewport in milliseconds")
+    
+    # Context
+    user_agent = models.TextField(blank=True)
+    referrer = models.URLField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['created_at', 'processed']),
+            models.Index(fields=['campaign', 'user_hash']),
+        ]

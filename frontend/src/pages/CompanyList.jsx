@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { companyService, getApiUrl } from '../services/api';
+import { Link } from 'react-router-dom';
+import { companyService } from '../services/api';
 import CompanyTable from '../components/CompanyTable';
 import Filters from '../components/Filters';
 import SearchBar from '../components/SearchBar';
@@ -32,6 +33,7 @@ function CompanyList() {
     slot1: null,
     slot2: null,
   });
+  const [filtersVisible, setFiltersVisible] = useState(false);
 
   // Fetch available filter options and ad slots
   useEffect(() => {
@@ -46,7 +48,7 @@ function CompanyList() {
 
     const fetchAdSlots = async () => {
       try {
-        const response = await fetch(getApiUrl('ad-slots/active/'));
+        const response = await fetch('http://localhost:8000/api/ad-slots/active/');
         if (response.ok) {
           const data = await response.json();
           console.log('Ad slots data:', data);
@@ -59,7 +61,7 @@ function CompanyList() {
 
     const fetchSiteSettings = async () => {
       try {
-        const response = await fetch(getApiUrl('site-settings/current/'));
+        const response = await fetch('http://localhost:8000/api/site-settings/current/');
         if (response.ok) {
           const data = await response.json();
           console.log('Site settings loaded:', data);
@@ -78,7 +80,7 @@ function CompanyList() {
           console.log('Setting button styles:', styles);
           setButtonStyles(styles);
           
-          console.log('Applied styles:', styles);
+          console.log('Applied sizes:', sizes);
         }
       } catch (err) {
         console.error('Failed to fetch site settings:', err);
@@ -106,7 +108,7 @@ function CompanyList() {
         if (filters.engineering_positions) params.engineering_positions = filters.engineering_positions;
         if (filters.status) params.status = filters.status;
         params.page = pagination.currentPage;
-        params.page_size = 30;
+        params.page_size = 12;
 
         const data = await companyService.getCompanies(params);
         console.log('Companies API response:', data);
@@ -162,18 +164,42 @@ function CompanyList() {
 
   return (
     <div className="company-list-page">
-      <div className="search-section">
-        <SearchBar onSearch={handleSearch} initialValue={filters.search} />
+      <div className="top-bar">
+        <div className="search-section">
+          <SearchBar onSearch={handleSearch} initialValue={filters.search} />
+        </div>
+        <button 
+          className="filters-toggle-btn"
+          onClick={() => setFiltersVisible(!filtersVisible)}
+          aria-label="Toggle filters"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          Filters
+          <svg 
+            className={`chevron ${filtersVisible ? 'open' : ''}`}
+            width="16" height="16" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
       </div>
 
-      {availableFilters && (
-        <Filters
-          filters={filters}
-          availableFilters={availableFilters}
-          onFilterChange={handleFilterChange}
-          onReset={resetFilters}
-        />
-      )}
+      <div className={`filters-wrapper ${filtersVisible ? 'visible' : ''}`}>
+        {availableFilters && (
+          <Filters
+            filters={filters}
+            availableFilters={availableFilters}
+            onFilterChange={handleFilterChange}
+            onReset={resetFilters}
+          />
+        )}
+      </div>
 
       {error && (
         <div className="error-message">
@@ -188,82 +214,24 @@ function CompanyList() {
         </div>
       ) : (
         <>
-          {/* First group of 10 companies */}
-          <CompanyTable companies={companies.slice(0, 10)} buttonStyles={buttonStyles} />
-
-          {/* First Ad Slot */}
-          {adSlots.slot1 && (
-            <div className="ad-slot">
-              {adSlots.slot1.type === 'image' ? (
-                <a 
-                  href={adSlots.slot1.link} 
-                  target={adSlots.slot1.open_in_new_tab ? '_blank' : '_self'}
-                  rel={adSlots.slot1.open_in_new_tab ? 'noopener noreferrer' : ''}
-                  className="ad-banner-link"
-                >
-                  <img 
-                    src={adSlots.slot1.image_url} 
-                    alt={adSlots.slot1.alt_text}
-                    className="ad-banner-image"
-                  />
-                </a>
-              ) : (
-                <div dangerouslySetInnerHTML={{ __html: adSlots.slot1.code }} />
-              )}
+          <div className="homepage-preview">
+            <div className="preview-header">
+              <h2 className="preview-title">Recently Updated Companies</h2>
+              <p className="preview-subtitle">Discover companies actively hiring in tech</p>
             </div>
-          )}
-
-          {/* Second group of 10 companies */}
-          {companies.length > 10 && (
-            <CompanyTable companies={companies.slice(10, 20)} buttonStyles={buttonStyles} />
-          )}
-
-          {/* Second Ad Slot */}
-          {companies.length > 10 && adSlots.slot2 && (
-            <div className="ad-slot">
-              {adSlots.slot2.type === 'image' ? (
-                <a 
-                  href={adSlots.slot2.link} 
-                  target={adSlots.slot2.open_in_new_tab ? '_blank' : '_self'}
-                  rel={adSlots.slot2.open_in_new_tab ? 'noopener noreferrer' : ''}
-                  className="ad-banner-link"
-                >
-                  <img 
-                    src={adSlots.slot2.image_url} 
-                    alt={adSlots.slot2.alt_text}
-                    className="ad-banner-image"
-                  />
-                </a>
-              ) : (
-                <div dangerouslySetInnerHTML={{ __html: adSlots.slot2.code }} />
-              )}
+            
+            {/* Show first 10 companies */}
+            <CompanyTable companies={companies.slice(0, 10)} buttonStyles={buttonStyles} />
+            
+            {/* View All Companies CTA */}
+            <div className="view-all-section">
+              <Link to="/companies" className="view-all-btn">
+                <span>View All {pagination.count} Companies</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </Link>
             </div>
-          )}
-
-          {/* Third group of 10 companies */}
-          {companies.length > 20 && (
-            <CompanyTable companies={companies.slice(20, 30)} buttonStyles={buttonStyles} />
-          )}
-
-          {/* Pagination */}
-          <div className="pagination">
-            <button
-              onClick={() => handlePageChange(pagination.currentPage - 1)}
-              disabled={!pagination.previous}
-              className="pagination-btn"
-            >
-              Previous
-            </button>
-            <span className="pagination-info">
-              Page {pagination.currentPage} of {Math.ceil(pagination.count / 30)}
-            </span>
-            <button
-              onClick={() => handlePageChange(pagination.currentPage + 1)}
-              disabled={!pagination.next}
-              className="pagination-btn"
-            >
-              Next
-            </button>
           </div>
         </>
       )}

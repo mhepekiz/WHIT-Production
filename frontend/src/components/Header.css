@@ -1,130 +1,73 @@
-.header {
-  background: var(--surface);
-  border-bottom: 3px solid var(--splunk-primary);
-  box-shadow: var(--shadow-lg);
+/* 3-Zone Navbar Layout */
+.nav {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  z-index: 50;
 }
 
-.header-top {
+.nav__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 14px 20px;
+  gap: 16px; /* prevents collisions */
   max-width: 1800px;
   margin: 0 auto;
-  padding: 1rem 1.5rem;
 }
 
-.header-logo {
+.nav__left { 
+  flex: 0 0 auto; 
+}
+
+.nav__center {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 18px;
+  flex: 1 1 auto;         /* center can grow */
+  min-width: 0;           /* prevents overflow weirdness */
+  justify-content: flex-start;
 }
 
-.header-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin: 0;
-  color: var(--text-primary);
-}
-
-.header-title-highlight {
-  color: var(--splunk-primary);
-}
-
-.header-nav {
+.nav__right {
   display: flex;
-  gap: 2rem;
   align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
 }
 
-.nav-link {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-secondary);
+.nav__brand {
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.2px;
   text-decoration: none;
+  white-space: nowrap;    /* brand never wraps into nav */
+  padding-right: 8px;     /* extra safety spacing */
+  color: #333;
+  transition: color 0.2s ease;
+}
+
+.nav__brand:hover {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.nav__link {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  white-space: nowrap;
+  color: #666;
+  transition: color 0.2s ease;
   padding: 0.5rem 0;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s;
 }
 
-.nav-link:hover {
-  color: var(--splunk-primary);
-  border-bottom-color: var(--splunk-primary);
-}
-
-.nav-link.active {
-  color: var(--splunk-primary);
-  border-bottom-color: var(--splunk-primary);
-}
-
-.nav-link-register {
-  background-color: var(--splunk-primary);
-  color: white !important;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border-bottom: 3px solid var(--splunk-primary) !important;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  border: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-family: inherit;
-}
-
-.nav-link-register:hover {
-  background-color: var(--splunk-primary-dark);
-}
-
-.nav-link-login {
-  border: 2px solid var(--splunk-primary);
-  color: var(--splunk-primary) !important;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border-bottom: 2px solid var(--splunk-primary) !important;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  background: white;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-family: inherit;
-}
-
-.nav-link-login:hover {
-  background-color: var(--splunk-lighter);
-}
-
-.nav-link-dashboard {
-  background-color: var(--splunk-primary);
-  color: white !important;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border-bottom: 3px solid var(--splunk-primary) !important;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  border: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-family: inherit;
-}
-
-.nav-link-dashboard:hover {
-  background-color: var(--splunk-primary-dark);
+.nav__link:hover {
+  color: #007bff;
+  text-decoration: none;
 }
 
 /* User Menu Dropdown */
@@ -148,25 +91,26 @@
 
 .dropdown-menu {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 8px); /* Fix 7: Add vertical offset */
   right: 0;
   background: white;
-  border-radius: 8px;
+  border-radius: 8px; /* Fix 4: Reduce corner radius */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  min-width: 220px;
-  padding: 0.5rem 0;
+  min-width: 248px; /* Wider to prevent text wrapping */
+  max-width: 280px; /* Reasonable maximum */
+  padding: 6px 0; /* Adjusted for new item padding */
   z-index: 1000;
-  animation: dropdownFadeIn 0.2s ease;
+  animation: dropdownFadeIn 0.15s ease-out; /* Fix 9: Refined animation */
 }
 
 .auth-dropdown {
-  min-width: 180px;
+  min-width: 248px; /* Match main dropdown width */
 }
 
 @keyframes dropdownFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-4px); /* Fix 9: Subtle entrance motion */
   }
   to {
     opacity: 1;
@@ -177,82 +121,165 @@
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
-  color: #2c3e50;
+  gap: 10px; /* Fix 1: Consistent gap */
+  padding: 10px 14px; /* Optimal padding for wider dropdown */
+  color: #111827; /* Fix 3: Neutral text color */
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   border: none;
   background: none;
   width: 100%;
   text-align: left;
   cursor: pointer;
   font-family: inherit;
+  border-radius: 6px; /* Subtle inner radius */
+  margin: 0 6px; /* Slight margin from container edge */
+  min-height: 40px; /* Fix 1: Ensure minimum tap target */
+  white-space: nowrap; /* Prevent wrapping with adequate width */
 }
 
 .dropdown-item:hover {
-  background-color: #f8f9fa;
-  color: var(--splunk-primary);
+  background-color: #F3F4F6; /* Fix 2: Clear hover state background */
+  color: #111827; /* Keep text neutral on hover */
 }
 
 .dropdown-item svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+  color: #6B7280; /* Fix 3: Neutral icon color instead of brand */
 }
 
 .dropdown-divider {
   height: 1px;
-  background-color: #e9ecef;
-  margin: 0.5rem 0;
+  background-color: #E5E7EB; /* Subtle neutral divider */
+  margin: 6px 12px; /* Consistent with item margins */
 }
 
 .logout-item {
-  color: #dc3545;
+  color: #DC2626; /* Keep logout text red for clarity */
 }
 
 .logout-item:hover {
-  background-color: #fff5f5;
-  color: #c82333;
+  background-color: #FEF2F2; /* Light red background on hover */
+  color: #B91C1C; /* Darker red on hover */
 }
 
-.header-subtitle-section {
-  background: var(--splunk-lighter);
-  border-top: 1px solid var(--border-color);
+.logout-item svg {
+  color: #DC2626; /* Red icon for logout to match text */
 }
 
-.header-subtitle {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  color: var(--text-secondary);
+/* Button Styles for Authentication - Proper Navbar Hierarchy */
+.nav-link-register {
+  background: #e3f2fd; /* primary-100 equivalent */
+  color: #1565c0 !important; /* primary-700 equivalent */
+  border: 1px solid #bbdefb; /* primary-200 equivalent */
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  height: 32px;
+  white-space: nowrap;
 }
 
-@media (max-width: 768px) {
-  .header-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
+.nav-link-register:hover {
+  background: #bbdefb; /* primary-200 equivalent */
+  color: #0d47a1 !important; /* primary-800 equivalent */
+  border-color: #90caf9; /* primary-300 equivalent */
+}
 
-  .header-nav {
-    width: 100%;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
+.nav-link-login {
+  background: transparent;
+  color: #1565c0 !important; /* primary-700 equivalent */
+  border: none;
+  padding: 6px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  height: 32px;
+  white-space: nowrap;
+  text-decoration: none;
+}
 
-  .nav-link {
-    font-size: 0.85rem;
-  }
+.nav-link-login:hover {
+  color: #0d47a1 !important; /* primary-800 equivalent */
+  text-decoration: underline;
+  background: rgba(21, 101, 192, 0.04); /* very subtle background */
+}
 
-  .header-title {
-    font-size: 1.5rem;
-  }
+.nav-link-dashboard {
+  background: #e3f2fd; /* primary-100 equivalent - consistent with register */
+  color: #1565c0 !important; /* primary-700 equivalent */
+  border: 1px solid #bbdefb; /* primary-200 equivalent */
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  height: 32px;
+  white-space: nowrap;
+}
 
-  .header-subtitle {
-    font-size: 0.9rem;
+.nav-link-dashboard:hover {
+  background: #bbdefb; /* primary-200 equivalent */
+  color: #0d47a1 !important; /* primary-800 equivalent */
+  border-color: #90caf9; /* primary-300 equivalent */
+}
+
+/* Optional: responsive */
+@media (max-width: 900px) {
+  .nav__center { 
+    display: none; 
+  } /* move these to hamburger */
+  
+  .nav__inner {
+    padding: 12px 16px;
+  }
+  
+  .nav__brand {
+    font-size: 18px;
+  }
+  
+  .nav__right {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav__inner {
+    padding: 10px 12px;
+  }
+  
+  .nav__brand {
+    font-size: 16px;
+  }
+  
+  .nav__right {
+    gap: 6px;
   }
 }

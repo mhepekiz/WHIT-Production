@@ -1,0 +1,121 @@
+/* Active Filters Container */
+.active-filters {
+  margin: 12px 0 20px;
+  padding: 16px;
+  background: var(--splunk-lighter);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.active-filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.active-filters-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.clear-all-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--splunk-primary);
+  border-radius: 6px;
+  color: var(--splunk-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-all-btn:hover {
+  background: var(--splunk-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Filter Chips */
+.active-filters-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--splunk-primary);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+}
+
+.filter-chip-label {
+  font-weight: 500;
+}
+
+.filter-chip-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--splunk-primary);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-chip-remove:hover {
+  background: var(--splunk-secondary);
+  transform: scale(1.1);
+}
+
+.filter-chip-remove:active {
+  transform: scale(0.95);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .active-filters {
+    margin: 8px 0 16px;
+    padding: 12px;
+  }
+  
+  .active-filters-header {
+    margin-bottom: 8px;
+  }
+  
+  .active-filters-title {
+    font-size: 0.75rem;
+  }
+  
+  .clear-all-btn {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+  
+  .filter-chip {
+    font-size: 0.75rem;
+    padding: 5px 6px 5px 10px;
+  }
+  
+  .filter-chip-remove {
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+  }
+}

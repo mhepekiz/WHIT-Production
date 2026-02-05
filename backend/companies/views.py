@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count
-from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout
+from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout, SponsorCampaign
 from .serializers import (
     CompanySerializer,
     CompanyListSerializer,
@@ -11,6 +11,7 @@ from .serializers import (
     WorkEnvironmentSerializer
 )
 from .filters import CompanyFilter
+from .services.sponsor_service import SponsorSelector
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
@@ -26,14 +27,101 @@ class CompanyViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = CompanyFilter
     search_fields = ['name', 'city', 'functions__name', 'country']
-    ordering_fields = ['name', 'country', 'created_at', 'updated_at']
-    ordering = ['name']
+    ordering_fields = ['name', 'country', 'created_at', 'updated_at', 'is_sponsored', 'sponsor_order']
+    ordering = ['-is_sponsored', 'sponsor_order', 'name']
     
     def get_serializer_class(self):
         """Use lightweight serializer for list view."""
         if self.action == 'list':
             return CompanyListSerializer
         return CompanySerializer
+    
+    def list(self, request, *args, **kwargs):
+        """Override list to implement production sponsor placement algorithm."""
+        # Get user hash for tracking and anti-fatigue
+        user_hash = SponsorSelector.get_user_hash(request)
+        
+        # Get current filters from request
+        filters = {}
+        if hasattr(request, 'query_params'):
+            filters.update({
+                'country': request.query_params.get('country'),
+                'function': request.query_params.get('functions'),
+                'work_environment': request.query_params.get('work_environments'),
+                'search': request.query_params.get('search'),
+            })
+            # Remove None values
+            filters = {k: v for k, v in filters.items() if v}
+        
+        # Get all companies matching filters (organic only for main results)
+        queryset = self.filter_queryset(self.get_queryset())
+        organic_companies = queryset.filter(is_sponsored=False)
+        
+        # Get pagination info
+        page = self.paginate_queryset(organic_companies)
+        if page is not None:
+            # Paginated response
+            page_number = getattr(self.paginator.page, 'number', 1)
+            page_key = SponsorSelector.build_page_key(request, filters, page_number)
+            
+            # Select sponsored campaign using production algorithm
+            sponsored_campaign = SponsorSelector.pick_sponsored_campaign(
+                filters=filters,
+                user_hash=user_hash,
+                page_number=page_number,
+                request_path=request.path
+            )
+            
+            # Build final results: [1 sponsored company] + [organic results]
+            final_results = []
+            if sponsored_campaign:
+                final_results.append(sponsored_campaign.company)
+                
+                # Record impression (will be confirmed by frontend)
+                # For now just log the selection, actual impression recorded via API
+                
+            final_results.extend(page)
+            
+            # Serialize with sponsored context
+            serializer = self.get_serializer(final_results, many=True)
+            response_data = serializer.data
+            
+            # Add sponsored campaign info to response
+            if sponsored_campaign:
+                response_data[0]['sponsored_campaign_id'] = sponsored_campaign.id
+                
+            return self.get_paginated_response(response_data)
+        
+        # Non-paginated fallback (e.g., homepage preview)
+        page_key = SponsorSelector.build_page_key(request, filters, 1)
+        
+        # Select sponsored campaign for homepage
+        sponsored_campaign = SponsorSelector.pick_sponsored_campaign(
+            filters=filters,
+            user_hash=user_hash,
+            page_number=1,
+            request_path=request.path
+        )
+        
+        # Build results: [1 sponsored] + [organic results]
+        final_results = []
+        if sponsored_campaign:
+            final_results.append(sponsored_campaign.company)
+        
+        # Get organic results (limit based on context)
+        organic_limit = 12 if 'homepage' in request.get_full_path() else 30
+        remaining_limit = organic_limit - len(final_results)
+        final_results.extend(organic_companies[:remaining_limit])
+        
+        # Serialize with sponsored context
+        serializer = self.get_serializer(final_results, many=True)
+        response_data = serializer.data
+        
+        # Add sponsored campaign info to first result if present
+        if sponsored_campaign and response_data:
+            response_data[0]['sponsored_campaign_id'] = sponsored_campaign.id
+            
+        return Response(response_data)
     
     @action(detail=False, methods=['get'])
     def filters(self, request):
@@ -80,6 +168,98 @@ class CompanyViewSet(viewsets.ModelViewSet):
             'engineering_positions': engineering_positions,
             'countries_count': countries_count,
         })
+    
+    @action(detail=False, methods=['post'], url_path='sponsored/impression')
+    def record_sponsored_impression(self, request):
+        """Record impression for sponsored campaign."""
+        try:
+            campaign_id = request.data.get('campaign_id')
+            page_url = request.data.get('page_url', '')
+            
+            if not campaign_id:
+                return Response(
+                    {'error': 'campaign_id is required'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get campaign
+            try:
+                campaign = SponsorCampaign.objects.get(id=campaign_id, status='active')
+            except SponsorCampaign.DoesNotExist:
+                return Response(
+                    {'error': 'Invalid campaign_id'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get user hash and build page key
+            user_hash = SponsorSelector.get_user_hash(request)
+            filters = request.data.get('filters', {})
+            page_number = request.data.get('page_number', 1)
+            page_key = SponsorSelector.build_page_key(request, filters, page_number)
+            
+            # Record impression
+            SponsorSelector.record_impression(
+                campaign=campaign,
+                user_hash=user_hash,
+                page_key=page_key,
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                ip_address=SponsorSelector._get_client_ip(request),
+                referrer=request.META.get('HTTP_REFERER', '')
+            )
+            
+            return Response({'success': True})
+            
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @action(detail=False, methods=['post'], url_path='sponsored/click')
+    def record_sponsored_click(self, request):
+        """Record click for sponsored campaign."""
+        try:
+            campaign_id = request.data.get('campaign_id')
+            page_url = request.data.get('page_url', '')
+            
+            if not campaign_id:
+                return Response(
+                    {'error': 'campaign_id is required'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get campaign
+            try:
+                campaign = SponsorCampaign.objects.get(id=campaign_id, status='active')
+            except SponsorCampaign.DoesNotExist:
+                return Response(
+                    {'error': 'Invalid campaign_id'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get user hash and build page key
+            user_hash = SponsorSelector.get_user_hash(request)
+            filters = request.data.get('filters', {})
+            page_number = request.data.get('page_number', 1)
+            page_key = SponsorSelector.build_page_key(request, filters, page_number)
+            
+            # Record click
+            SponsorSelector.record_click(
+                campaign=campaign,
+                user_hash=user_hash,
+                page_key=page_key,
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                ip_address=SponsorSelector._get_client_ip(request),
+                referrer=request.META.get('HTTP_REFERER', '')
+            )
+            
+            return Response({'success': True})
+            
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class FunctionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -106,18 +286,36 @@ class AdSlotViewSet(viewsets.ReadOnlyModelViewSet):
         """Get all active ad slots with support for both code and image banners."""
         ad_slots = AdSlot.objects.filter(is_active=True)
         data = {}
+        
+        # Get user agent from request headers to detect mobile
+        user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+        is_mobile = any(keyword in user_agent for keyword in [
+            'mobile', 'android', 'iphone', 'ipad', 'windows phone', 'blackberry'
+        ])
+        
         for ad in ad_slots:
             # Check if banner image exists (prioritize image over code)
-            if ad.banner_image:
-                # Build absolute URL for banner image
-                image_url = request.build_absolute_uri(ad.banner_image.url)
-                data[ad.slot_name] = {
-                    'type': 'image',
-                    'image_url': image_url,
-                    'link': ad.banner_link or '#',
-                    'alt_text': ad.banner_alt_text or 'Advertisement',
-                    'open_in_new_tab': ad.open_in_new_tab
-                }
+            if ad.banner_image or ad.mobile_banner_image:
+                # Choose appropriate banner based on device type
+                banner_image = None
+                if is_mobile and ad.mobile_banner_image:
+                    banner_image = ad.mobile_banner_image
+                elif ad.banner_image:
+                    banner_image = ad.banner_image
+                
+                if banner_image:
+                    # Build absolute URL for banner image
+                    image_url = request.build_absolute_uri(banner_image.url)
+                    data[ad.slot_name] = {
+                        'type': 'image',
+                        'image_url': image_url,
+                        'mobile_image_url': request.build_absolute_uri(ad.mobile_banner_image.url) if ad.mobile_banner_image else None,
+                        'desktop_image_url': request.build_absolute_uri(ad.banner_image.url) if ad.banner_image else None,
+                        'link': ad.banner_link or '#',
+                        'alt_text': ad.banner_alt_text or 'Advertisement',
+                        'open_in_new_tab': ad.open_in_new_tab,
+                        'is_mobile_optimized': bool(ad.mobile_banner_image)
+                    }
             elif ad.ad_code:
                 data[ad.slot_name] = {
                     'type': 'code',
