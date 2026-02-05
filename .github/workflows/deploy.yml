@@ -194,3 +194,99 @@ jobs:
           sudo journalctl -u whit --no-pager -n 10 || echo "No whit service logs found"
           
           echo "Deployment verification complete (errors above are expected if this is first deployment)"
+          
+    - name: Deep Django Diagnostics
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          echo "=== DEEP DJANGO DIAGNOSTICS ==="
+          
+          # Check Django application directory structure
+          echo "--- Directory Structure ---"
+          ls -la /var/www/whit/backend/ || echo "Backend directory not found"
+          
+          # Check database file
+          echo "--- Database File ---"
+          ls -la /var/www/whit/backend/db.sqlite3 || echo "Database file not found"
+          
+          # Check virtual environment
+          echo "--- Virtual Environment ---"
+          ls -la /var/www/whit/backend/venv/bin/ || echo "Virtual environment not found"
+          
+          # Test Django commands directly
+          echo "--- Testing Django Commands ---"
+          cd /var/www/whit/backend
+          sudo -u www-data ./venv/bin/python -c "
+          import sys
+          print(f'Python version: {sys.version}')
+          print(f'Python path: {sys.path}')
+          " 2>&1 || echo "Python test failed"
+          
+          # Test Django settings import
+          echo "--- Testing Django Settings ---"
+          sudo -u www-data ./venv/bin/python -c "
+          import os
+          os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'whit.settings')
+          
+          try:
+              import django
+              django.setup()
+              print('✅ Django setup successful')
+              
+              # Test database connection
+              from django.db import connection
+              cursor = connection.cursor()
+              cursor.execute('SELECT 1')
+              print('✅ Database connection successful')
+              
+              # Check migrations
+              from django.core.management import execute_from_command_line
+              import sys
+              sys.argv = ['manage.py', 'showmigrations', '--list']
+              execute_from_command_line(sys.argv)
+              
+          except Exception as e:
+              print(f'❌ Django setup failed: {e}')
+              import traceback
+              traceback.print_exc()
+          " 2>&1 || echo "Django settings test failed"
+          
+          # Test API endpoints directly through Django
+          echo "--- Testing Django API Directly ---"
+          sudo -u www-data ./venv/bin/python manage.py shell -c "
+          from companies.models import Company, HowItWorksSection
+          print(f'Companies count: {Company.objects.count()}')
+          print(f'HowItWorksSection count: {HowItWorksSection.objects.count()}')
+          
+          # Test a simple API response
+          from django.test import Client
+          client = Client()
+          response = client.get('/api/companies/')
+          print(f'API response status: {response.status_code}')
+          if response.status_code == 200:
+              print('✅ API working through Django test client')
+          else:
+              print(f'❌ API failed through Django test client: {response.status_code}')
+              print(f'Response content: {response.content[:200]}')
+          " 2>&1 || echo "Django API test failed"
+          
+          # Check systemd service file
+          echo "--- Systemd Service File ---"
+          cat /etc/systemd/system/whit.service || echo "Whit service file not found"
+          
+          # Check environment variables
+          echo "--- Environment Variables ---"
+          sudo -u www-data env | grep -E "(DJANGO|DEBUG|SECRET|ALLOWED)" || echo "No Django environment variables found"
+          
+          # Check recent Django logs in detail
+          echo "--- Detailed Django Logs ---"
+          sudo journalctl -u whit --no-pager -n 50 --since "10 minutes ago" || echo "No recent Django logs"
+          
+          # Test direct uWSGI/Gunicorn process
+          echo "--- Process Check ---"
+          ps aux | grep -E "(python|django|whit)" || echo "No Django processes found"
+          
+          echo "=== END DIAGNOSTICS ==="
