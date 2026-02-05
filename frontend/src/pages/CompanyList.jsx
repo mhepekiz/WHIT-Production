@@ -51,7 +51,8 @@ function CompanyList() {
 
     const fetchAdSlots = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/ad-slots/active/`);
+        const API_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
+        const response = await fetch(`${API_URL}/ad-slots/active/`);
         if (response.ok) {
           const data = await response.json();
           console.log('Ad slots data:', data);
@@ -59,12 +60,15 @@ function CompanyList() {
         }
       } catch (err) {
         console.error('Failed to fetch ad slots:', err);
+        // Set empty ad slots instead of failing
+        setAdSlots({ slot1: null, slot2: null });
       }
     };
 
     const fetchSiteSettings = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/site-settings/current/`);
+        const API_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
+        const response = await fetch(`${API_URL}/site-settings/current/`);
         if (response.ok) {
           const data = await response.json();
           console.log('Site settings loaded:', data);

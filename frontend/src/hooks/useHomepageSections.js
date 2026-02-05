@@ -8,20 +8,26 @@ const useHomepageSections = () => {
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:8001/api'}/homepage-sections/`
-        );
+        // Use the same API URL logic as other components
+        const API_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
+        const response = await fetch(`${API_URL}/homepage-sections/`);
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // If the endpoint doesn't exist or fails, just return empty sections
+          console.warn('Homepage sections API not available:', response.status);
+          setSections({ how_it_works_sections: [], recruiter_sections: [] });
+          setError(null);
+          return;
         }
 
         const data = await response.json();
         setSections(data);
         setError(null);
       } catch (err) {
-        console.error('Failed to fetch homepage sections:', err);
-        setError('Failed to load homepage sections');
+        console.warn('Failed to fetch homepage sections:', err);
+        // Don't show error to user, just use empty sections
+        setSections({ how_it_works_sections: [], recruiter_sections: [] });
+        setError(null);
       } finally {
         setLoading(false);
       }

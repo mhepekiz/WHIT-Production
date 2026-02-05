@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Environment-aware API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
 const BACKEND_BASE_URL = API_BASE_URL.replace('/api', '');
 
 // Helper function to construct API URLs

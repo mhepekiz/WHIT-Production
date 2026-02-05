@@ -421,15 +421,22 @@ def homepage_sections_api(request):
     """Standalone API endpoint for homepage sections."""
     from rest_framework.response import Response
     
-    # Get How It Works sections
-    how_it_works_sections = HowItWorksSection.objects.filter(is_active=True).order_by('order')
-    how_it_works_data = HowItWorksSectionSerializer(how_it_works_sections, many=True).data
-    
-    # Get Recruiter sections
-    recruiter_sections = RecruiterSection.objects.filter(is_active=True).order_by('order')
-    recruiter_data = RecruiterSectionSerializer(recruiter_sections, many=True).data
-    
-    return Response({
-        'how_it_works_sections': how_it_works_data,
-        'recruiter_sections': recruiter_data
-    })
+    try:
+        # Get How It Works sections
+        how_it_works_sections = HowItWorksSection.objects.filter(is_active=True).order_by('order')
+        how_it_works_data = HowItWorksSectionSerializer(how_it_works_sections, many=True).data
+        
+        # Get Recruiter sections
+        recruiter_sections = RecruiterSection.objects.filter(is_active=True).order_by('order')
+        recruiter_data = RecruiterSectionSerializer(recruiter_sections, many=True).data
+        
+        return Response({
+            'how_it_works_sections': how_it_works_data,
+            'recruiter_sections': recruiter_data
+        })
+    except Exception as e:
+        # If models don't exist or there's a DB error, return empty sections
+        return Response({
+            'how_it_works_sections': [],
+            'recruiter_sections': []
+        })
