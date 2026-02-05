@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './CompanyTable.css';
+import { getMediaUrl } from '../services/api';
 
 function CompanyTable({ companies, buttonStyles = { padding: '6px 12px', fontSize: '0.75rem' } }) {
   const [columnWidths, setColumnWidths] = useState({
@@ -69,7 +70,7 @@ function CompanyTable({ companies, buttonStyles = { padding: '6px 12px', fontSiz
             <div className="company-info">
               {company.logo && (
                 <img
-                  src={company.logo}
+                  src={getMediaUrl(company.logo)}
                   alt={`${company.name} logo`}
                   className="company-logo"
                   onError={(e) => {

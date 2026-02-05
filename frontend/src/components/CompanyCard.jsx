@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './CompanyCard.css';
 import sponsoredTracking from '../services/sponsoredTracking';
+import { getMediaUrl } from '../services/api';
 
 // Function to get semantic class names based on function type
 const getFunctionChipClass = (functionName) => {
@@ -108,7 +109,7 @@ function CompanyCard({ company, buttonStyles = { padding: '6px 12px', fontSize: 
         <div className="company-info">
           {company.logo && (
             <img
-              src={company.logo}
+              src={getMediaUrl(company.logo)}
               alt={`${company.name} logo`}
               className="company-card-logo"
               onError={(e) => {
