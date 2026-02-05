@@ -139,7 +139,7 @@ REST_FRAMEWORK = {
 # CORS settings
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:3000'
+    default='http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:3000,https://staging.whoishiringintech.com,https://whoishiringintech.com'
 ).split(',')
 
 CORS_ALLOW_CREDENTIALS = True
