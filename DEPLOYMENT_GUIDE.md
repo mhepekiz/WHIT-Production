@@ -58,11 +58,22 @@ npm run build
 
 ### 6. Configure Services
 ```bash
+# Setup Gunicorn log directory
+cd /var/www/whit
+sudo ./setup-gunicorn-logs.sh
+
+# Run health checks
+sudo ./health-check.sh
+
 # Setup systemd service
 sudo cp /var/www/whit/whit.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable whit
 sudo systemctl start whit
+
+# Verify service is running
+sleep 5
+sudo systemctl status whit
 
 # Setup NGINX
 sudo cp /var/www/whit/nginx.conf /etc/nginx/sites-available/nahhat.com
@@ -159,8 +170,15 @@ A Record: www.nahhat.com → YOUR_SERVER_IP
 
 **Service won't start:**
 ```bash
+# Run health checks
+cd /var/www/whit
+sudo ./health-check.sh
+
+# View detailed logs
 sudo journalctl -u whit --no-pager -l
 ```
+
+For detailed troubleshooting steps, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 **NGINX errors:**
 ```bash
