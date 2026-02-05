@@ -59,7 +59,7 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/dashboard/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/accounts/dashboard/`, {
         headers: {
           'Authorization': `Token ${token}`,
         },
@@ -78,7 +78,7 @@ const Dashboard = () => {
 
   const fetchFunctions = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/functions/');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/functions/`);
       if (response.ok) {
         const data = await response.json();
         setFunctions(data);
@@ -90,7 +90,7 @@ const Dashboard = () => {
 
   const fetchWorkEnvironments = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/work-environments/');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/work-environments/`);
       if (response.ok) {
         const data = await response.json();
         setWorkEnvironments(data);
@@ -113,7 +113,7 @@ const Dashboard = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/profile/me/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/accounts/profile/me/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,
@@ -171,7 +171,7 @@ const Dashboard = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/job-preferences/me/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/accounts/job-preferences/me/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,
@@ -202,7 +202,7 @@ const Dashboard = () => {
     formData.append('resume', resumeFile);
 
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/profile/upload_resume/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/accounts/profile/upload_resume/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,

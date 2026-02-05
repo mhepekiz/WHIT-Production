@@ -46,7 +46,7 @@ function CompanyBrowse() {
 
     const fetchAdSlots = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/ad-slots/active/');
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/ad-slots/active/`);
         const data = await response.json();
         
         const slotsObject = {};

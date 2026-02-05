@@ -48,7 +48,7 @@ function CompanyList() {
 
     const fetchAdSlots = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/ad-slots/active/');
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/ad-slots/active/`);
         if (response.ok) {
           const data = await response.json();
           console.log('Ad slots data:', data);
@@ -61,7 +61,7 @@ function CompanyList() {
 
     const fetchSiteSettings = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/site-settings/current/');
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/site-settings/current/`);
         if (response.ok) {
           const data = await response.json();
           console.log('Site settings loaded:', data);
