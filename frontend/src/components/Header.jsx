@@ -80,8 +80,8 @@ function Header() {
 
         {/* Center: Primary Navigation */}
         <nav className="nav__center" aria-label="Primary">
-          <Link to="/" className="nav__link">Browse Companies</Link>
-          <a href="#add-company" className="nav__link">Add Company</a>
+          <Link to="/companies" className="nav__link">Browse Companies</Link>
+          <Link to="/add-company" className="nav__link">Add Company</Link>
         </nav>
 
         {/* Right: Secondary Navigation */}

@@ -4,6 +4,7 @@ import { RecruiterAuthProvider, useRecruiterAuth } from './contexts/RecruiterAut
 import Header from './components/Header'
 import CompanyList from './pages/CompanyList'
 import CompanyBrowse from './pages/CompanyBrowse'
+import AddCompany from './pages/AddCompany'
 import Register from './components/Register'
 import Login from './components/Login'
 import DashboardNew from './pages/DashboardNew'
@@ -65,6 +66,11 @@ function App() {
             <Route path="/companies" element={
               <main className="main-content">
                 <CompanyBrowse />
+              </main>
+            } />
+            <Route path="/add-company" element={
+              <main className="main-content">
+                <AddCompany />
               </main>
             } />
               <Route 
