@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout
+from .models import (
+    Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout,
+    HowItWorksSection, HowItWorksStep, RecruiterSection
+)
 
 
 @admin.register(Company)
@@ -371,3 +374,82 @@ class SponsorDeliveryLogAdmin(admin.ModelAdmin):
         """Display shortened page key"""
         return obj.page_key[:30] + "..." if len(obj.page_key) > 30 else obj.page_key
     page_key_short.short_description = "Page Context"
+
+
+class HowItWorksStepInline(admin.TabularInline):
+    """Inline admin for How It Works Steps"""
+    model = HowItWorksStep
+    extra = 3
+    fields = ['step_number', 'icon', 'title', 'description', 'is_active', 'order']
+    ordering = ['order', 'step_number']
+
+
+@admin.register(HowItWorksSection)
+class HowItWorksSectionAdmin(admin.ModelAdmin):
+    """Admin interface for How It Works Section"""
+    
+    list_display = [
+        'title',
+        'is_active',
+        'order',
+        'steps_count',
+        'updated_at'
+    ]
+    
+    list_filter = ['is_active']
+    search_fields = ['title', 'subtitle']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    inlines = [HowItWorksStepInline]
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('title', 'subtitle', 'section_header', 'description')
+        }),
+        ('Display Settings', {
+            'fields': ('is_active', 'order')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def steps_count(self, obj):
+        """Display number of steps"""
+        return obj.steps.count()
+    steps_count.short_description = "Steps"
+
+
+@admin.register(RecruiterSection)
+class RecruiterSectionAdmin(admin.ModelAdmin):
+    """Admin interface for Recruiter Section"""
+    
+    list_display = [
+        'title',
+        'button_text',
+        'is_active',
+        'order',
+        'updated_at'
+    ]
+    
+    list_filter = ['is_active']
+    search_fields = ['title', 'description']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('title', 'description', 'button_text', 'button_link')
+        }),
+        ('Display Settings', {
+            'fields': ('is_active', 'order')
+        }),
+        ('Styling', {
+            'fields': ('background_color', 'text_color', 'button_color'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )

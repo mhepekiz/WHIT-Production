@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Company, Function, WorkEnvironment
+from .models import Company, Function, WorkEnvironment, HowItWorksSection, HowItWorksStep, RecruiterSection
 
 
 class FunctionSerializer(serializers.ModelSerializer):
@@ -79,3 +79,35 @@ class WorkEnvironmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkEnvironment
         fields = ['id', 'name']
+
+
+class HowItWorksStepSerializer(serializers.ModelSerializer):
+    """Serializer for HowItWorksStep model."""
+    
+    class Meta:
+        model = HowItWorksStep
+        fields = ['id', 'step_number', 'icon', 'title', 'description', 'is_active', 'order']
+
+
+class HowItWorksSectionSerializer(serializers.ModelSerializer):
+    """Serializer for HowItWorksSection model."""
+    
+    steps = HowItWorksStepSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = HowItWorksSection
+        fields = [
+            'id', 'title', 'subtitle', 'section_header', 'description',
+            'is_active', 'order', 'steps'
+        ]
+
+
+class RecruiterSectionSerializer(serializers.ModelSerializer):
+    """Serializer for RecruiterSection model."""
+    
+    class Meta:
+        model = RecruiterSection
+        fields = [
+            'id', 'title', 'description', 'button_text', 'button_link',
+            'is_active', 'order', 'background_color', 'text_color', 'button_color'
+        ]

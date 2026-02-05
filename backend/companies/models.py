@@ -548,3 +548,75 @@ class SponsorImpressionEvent(models.Model):
             models.Index(fields=['created_at', 'processed']),
             models.Index(fields=['campaign', 'user_hash']),
         ]
+
+
+class HowItWorksSection(models.Model):
+    """Homepage 'How It Works' section configuration"""
+    
+    title = models.CharField(max_length=200, default="Best-performing patterns for tools like yours")
+    subtitle = models.CharField(max_length=300, default="After a results preview, the best-performing sections are:")
+    section_header = models.CharField(max_length=100, default="Option A — How It Works (compact)")
+    description = models.CharField(max_length=200, default="This builds instant understanding + trust.")
+    
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=1, help_text="Display order on homepage")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = 'How It Works Section'
+        verbose_name_plural = 'How It Works Sections'
+    
+    def __str__(self):
+        return f"How It Works - {self.title[:50]}"
+
+
+class HowItWorksStep(models.Model):
+    """Individual steps for the How It Works section"""
+    
+    section = models.ForeignKey(HowItWorksSection, on_delete=models.CASCADE, related_name='steps')
+    step_number = models.PositiveIntegerField()
+    icon = models.CharField(max_length=50, help_text="Emoji or icon character", default="🔍")
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=200)
+    
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=1)
+    
+    class Meta:
+        ordering = ['section', 'order', 'step_number']
+        verbose_name = 'How It Works Step'
+        verbose_name_plural = 'How It Works Steps'
+    
+    def __str__(self):
+        return f"Step {self.step_number}: {self.title}"
+
+
+class RecruiterSection(models.Model):
+    """Homepage recruiter section configuration"""
+    
+    title = models.CharField(max_length=100, default="Are you hiring?")
+    description = models.TextField(default="Add your company and get discovered by candidates tracking active hiring signals.")
+    button_text = models.CharField(max_length=50, default="Add Company")
+    button_link = models.CharField(max_length=100, default="/add-company", help_text="Internal link or external URL")
+    
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=2, help_text="Display order on homepage")
+    
+    # Styling options
+    background_color = models.CharField(max_length=7, default="#f8f9fa", help_text="Hex color code")
+    text_color = models.CharField(max_length=7, default="#212529", help_text="Hex color code")
+    button_color = models.CharField(max_length=7, default="#007bff", help_text="Hex color code")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = 'Recruiter Section'
+        verbose_name_plural = 'Recruiter Sections'
+    
+    def __str__(self):
+        return f"Recruiter Section - {self.title}"

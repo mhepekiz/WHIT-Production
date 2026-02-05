@@ -5,12 +5,15 @@ import CompanyTable from '../components/CompanyTable';
 import Filters from '../components/Filters';
 import SearchBar from '../components/SearchBar';
 import Stats from '../components/Stats';
+import HomepageSections from '../components/HomepageSections';
+import useHomepageSections from '../hooks/useHomepageSections';
 import './CompanyList.css';
 
 function CompanyList() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { sections: homepageSections, loading: sectionsLoading } = useHomepageSections();
   const [filters, setFilters] = useState({
     search: '',
     country: '',
@@ -233,6 +236,11 @@ function CompanyList() {
               </Link>
             </div>
           </div>
+
+          {/* Homepage Sections */}
+          {!sectionsLoading && homepageSections && (
+            <HomepageSections sections={homepageSections} />
+          )}
         </>
       )}
     </div>

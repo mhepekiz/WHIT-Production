@@ -1,0 +1,195 @@
+/* How It Works Section Styles */
+.how-it-works-section {
+  margin: 40px 0;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  color: white;
+  text-align: center;
+}
+
+.how-it-works-section .section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.how-it-works-section .section-subtitle {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  opacity: 0.9;
+  color: white;
+}
+
+.how-it-works-section .section-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #ffd700;
+}
+
+.how-it-works-section .section-description {
+  font-size: 1rem;
+  margin-bottom: 32px;
+  opacity: 0.85;
+  color: white;
+}
+
+.how-it-works-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.how-it-works-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 280px;
+  text-align: left;
+}
+
+.how-it-works-step .step-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.how-it-works-step .step-content {
+  flex: 1;
+}
+
+.how-it-works-step .step-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: white;
+}
+
+.how-it-works-step .step-description {
+  font-size: 0.85rem;
+  margin: 0;
+  opacity: 0.8;
+  color: white;
+  line-height: 1.4;
+}
+
+/* Recruiter Section Styles */
+.recruiter-section {
+  margin: 40px 0;
+  padding: 32px 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.recruiter-section .recruiter-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.recruiter-section .recruiter-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.recruiter-section .recruiter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.recruiter-section .recruiter-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .how-it-works-section {
+    margin: 20px 0;
+    padding: 24px 16px;
+  }
+
+  .how-it-works-section .section-title {
+    font-size: 1.5rem;
+  }
+
+  .how-it-works-section .section-subtitle {
+    font-size: 1rem;
+  }
+
+  .how-it-works-section .section-header {
+    font-size: 1.1rem;
+  }
+
+  .how-it-works-steps {
+    flex-direction: column;
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .how-it-works-step {
+    text-align: center;
+    flex-direction: column;
+    max-width: none;
+  }
+
+  .how-it-works-step .step-content {
+    text-align: center;
+  }
+
+  .recruiter-section {
+    margin: 20px 0;
+    padding: 24px 16px;
+  }
+
+  .recruiter-section .recruiter-title {
+    font-size: 1.5rem;
+  }
+
+  .recruiter-section .recruiter-description {
+    font-size: 1rem;
+  }
+
+  .recruiter-section .recruiter-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .how-it-works-steps {
+    gap: 16px;
+  }
+
+  .how-it-works-step .step-icon {
+    font-size: 1.5rem;
+  }
+
+  .how-it-works-step .step-title {
+    font-size: 0.9rem;
+  }
+
+  .how-it-works-step .step-description {
+    font-size: 0.8rem;
+  }
+}

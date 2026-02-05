@@ -1,14 +1,16 @@
 from rest_framework import viewsets, filters, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count
-from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout, SponsorCampaign
+from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout, SponsorCampaign, HowItWorksSection, RecruiterSection
 from .serializers import (
     CompanySerializer,
     CompanyListSerializer,
     FunctionSerializer,
-    WorkEnvironmentSerializer
+    WorkEnvironmentSerializer,
+    HowItWorksSectionSerializer,
+    RecruiterSectionSerializer
 )
 from .filters import CompanyFilter
 from .services.sponsor_service import SponsorSelector
@@ -392,3 +394,42 @@ class FormLayoutViewSet(viewsets.ReadOnlyModelViewSet):
                 'background_color': '#ffffff',
                 'text_color': '#000000',
             })
+
+
+@action(detail=False, methods=['get'])
+def homepage_sections(request):
+    """Get all active homepage sections."""
+    from rest_framework.response import Response
+    from rest_framework.decorators import api_view
+    
+    # Get How It Works sections
+    how_it_works_sections = HowItWorksSection.objects.filter(is_active=True).order_by('order')
+    how_it_works_data = HowItWorksSectionSerializer(how_it_works_sections, many=True).data
+    
+    # Get Recruiter sections
+    recruiter_sections = RecruiterSection.objects.filter(is_active=True).order_by('order')
+    recruiter_data = RecruiterSectionSerializer(recruiter_sections, many=True).data
+    
+    return Response({
+        'how_it_works_sections': how_it_works_data,
+        'recruiter_sections': recruiter_data
+    })
+
+
+@api_view(['GET'])
+def homepage_sections_api(request):
+    """Standalone API endpoint for homepage sections."""
+    from rest_framework.response import Response
+    
+    # Get How It Works sections
+    how_it_works_sections = HowItWorksSection.objects.filter(is_active=True).order_by('order')
+    how_it_works_data = HowItWorksSectionSerializer(how_it_works_sections, many=True).data
+    
+    # Get Recruiter sections
+    recruiter_sections = RecruiterSection.objects.filter(is_active=True).order_by('order')
+    recruiter_data = RecruiterSectionSerializer(recruiter_sections, many=True).data
+    
+    return Response({
+        'how_it_works_sections': how_it_works_data,
+        'recruiter_sections': recruiter_data
+    })
