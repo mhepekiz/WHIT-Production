@@ -157,7 +157,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/django/django.log',  # Use more secure path  # nosec B108
+            'filename': os.path.join(BASE_DIR.parent, 'logs', 'django.log'),  # Use project relative path
             'formatter': 'verbose',
         },
         'console': {
