@@ -73,7 +73,7 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_SSH_KEY }}
-        source: "frontend/dist/*,backend/*,nginx.conf"
+        source: "frontend/dist/*,backend/*,nginx.conf,whit.service,*.sh,gunicorn-logrotate"
         target: "/tmp/whit-deploy"
         strip_components: 0
         
@@ -87,6 +87,14 @@ jobs:
           # Move files to final location
           sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/ || sudo mkdir -p /var/www/whit/backend && sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/
           sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/ || sudo mkdir -p /var/www/whit/frontend && sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/
+          
+          # Copy helper scripts to /var/www/whit
+          sudo cp /tmp/whit-deploy/*.sh /var/www/whit/ 2>/dev/null || true
+          sudo chmod +x /var/www/whit/*.sh
+          
+          # Copy logrotate configuration
+          sudo cp /tmp/whit-deploy/gunicorn-logrotate /etc/logrotate.d/gunicorn 2>/dev/null || true
+          sudo chmod 644 /etc/logrotate.d/gunicorn 2>/dev/null || true
           
           # Update nginx configuration
           sudo cp /tmp/whit-deploy/nginx.conf /etc/nginx/sites-available/whit
@@ -168,6 +176,14 @@ jobs:
           
           # Cleanup
           rm -rf /tmp/whit-deploy
+          
+          # Run post-deployment verification
+          echo "Running post-deployment verification..."
+          cd /var/www/whit
+          sudo ./verify-deployment.sh || {
+            echo "❌ Post-deployment verification failed!"
+            exit 1
+          }
           
     - name: Verify deployment
       uses: appleboy/ssh-action@v1.0.3
