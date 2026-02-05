@@ -98,7 +98,7 @@ const ResumeUpload = () => {
     formData.append('resume', selectedFile);
 
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/profile/me/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/accounts/profile/me/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,
@@ -135,7 +135,7 @@ const ResumeUpload = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/profile/me/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/accounts/profile/me/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,

@@ -37,7 +37,7 @@ const RecruiterProfile = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:8000/api/recruiters/profile/me/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/recruiters/profile/me/`, {
         headers: {
           'Authorization': `Token ${token}`,
         },
@@ -86,7 +86,7 @@ const RecruiterProfile = () => {
 
     try {
       const token = localStorage.getItem('recruiterToken');
-      const response = await fetch('http://localhost:8000/api/recruiters/profile/me/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/recruiters/profile/me/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,
