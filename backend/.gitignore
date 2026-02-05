@@ -30,7 +30,7 @@ ENV/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media/
+# media/  # Allow media files for staging environment
 staticfiles/
 
 # Environment variables
@@ -46,3 +46,4 @@ staticfiles/
 # OS
 .DS_Store
 Thumbs.db
+!company_logos/.gitkeep
