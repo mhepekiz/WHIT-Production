@@ -154,7 +154,7 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
     
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
+            raise serializers.ValidationError({"password": "Password fields didn't match."})  # nosec B105
         
         # Check if email already exists
         if User.objects.filter(email=attrs['email']).exists():
@@ -374,8 +374,9 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             profile = obj.candidate_user.profile
             if profile.resume:
                 return profile.resume.url
-        except:
-            pass
+        except AttributeError:
+            # Resume not available
+            pass  # nosec B110
         return None
     
     def get_candidate_profile(self, obj):
@@ -396,8 +397,9 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         if job_pref and hasattr(job_pref, 'desired_functions'):
             try:
                 desired_functions = [func.name for func in job_pref.desired_functions.all()]
-            except Exception:
-                pass
+            except (AttributeError, Exception):
+                # Job preferences not available
+                pass  # nosec B110
         
         return {
             'current_title': profile.current_title or '',

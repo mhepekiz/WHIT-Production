@@ -143,7 +143,7 @@ class SponsorSelector:
             time_component = now.strftime('%Y%m%d%H')
             
         seed_data = f"{time_component}-{user_hash}-{page_number}-{hash(str(sorted(filters.items())))}"
-        seed = int(hashlib.md5(seed_data.encode()).hexdigest()[:8], 16)
+        seed = int(hashlib.md5(seed_data.encode(), usedforsecurity=False).hexdigest()[:8], 16)  # nosec B324
         random.seed(seed)
         
         # Calculate selection scores
@@ -161,10 +161,10 @@ class SponsorSelector:
         # Weighted random selection
         total_score = sum(score for _, score in scored_campaigns)
         if total_score <= 0:
-            return random.choice(eligible)  # Fallback to uniform random
+            return random.choice(eligible)  # Fallback to uniform random  # nosec B311
             
         # Select based on weighted probability
-        target = random.uniform(0, total_score)
+        target = random.uniform(0, total_score)  # nosec B311
         current_sum = 0
         
         for campaign, score in scored_campaigns:
@@ -271,6 +271,6 @@ class SponsorSelector:
     @classmethod
     def build_page_key(cls, request, filters: Dict[str, Any], page_number: int) -> str:
         """Build consistent page key for tracking"""
-        filter_hash = hashlib.md5(str(sorted(filters.items())).encode()).hexdigest()[:8]
+        filter_hash = hashlib.md5(str(sorted(filters.items())).encode(), usedforsecurity=False).hexdigest()[:8]  # nosec B324
         path = request.path.replace('/api/', '').replace('/', '')
         return f"{path}:page={page_number}:filters={filter_hash}"

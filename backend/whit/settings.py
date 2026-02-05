@@ -157,7 +157,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/tmp/django.log',
+            'filename': '/var/log/django/django.log',  # Use more secure path  # nosec B108
             'formatter': 'verbose',
         },
         'console': {

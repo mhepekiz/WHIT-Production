@@ -240,7 +240,7 @@ def create_dummy_users():
         user = User.objects.create_user(
             username=user_data['username'],
             email=user_data['email'],
-            password='testpass123',  # Same password for all test users
+            password='testpass123',  # Same password for all test users  # nosec B106
             first_name=user_data['first_name'],
             last_name=user_data['last_name']
         )
