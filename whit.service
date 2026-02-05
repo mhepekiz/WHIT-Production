@@ -6,10 +6,28 @@ After=network.target
 User=www-data
 Group=www-data
 WorkingDirectory=/var/www/whit/backend
-Environment="PATH=/var/www/whit/backend/venv/bin"
-ExecStart=/var/www/whit/backend/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8003 whit.wsgi:application
+Environment="PATH=/var/www/whit/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="DJANGO_SETTINGS_MODULE=whit.settings"
+EnvironmentFile=-/var/www/whit/backend/.env
+ExecStart=/var/www/whit/backend/venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8003 \
+    --timeout 120 \
+    --access-logfile /var/log/gunicorn/access.log \
+    --error-logfile /var/log/gunicorn/error.log \
+    --log-level info \
+    --capture-output \
+    whit.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security and performance settings
+KillMode=mixed
+KillSignal=SIGQUIT
+TimeoutStopSec=30
 
 [Install]
 WantedBy=multi-user.target

@@ -100,9 +100,18 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 CORS_ALLOWED_ORIGINS=http://localhost:5173
 ```
 
+## Production Deployment
+
+For production deployment to a server, see:
+- [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) - Complete deployment instructions
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Troubleshooting guide for common issues
+
+### Production Scripts
+
+- `setup-gunicorn-logs.sh` - Setup Gunicorn logging directories
+- `health-check.sh` - Verify Django application health before deployment
+- `restart_production.sh` - Restart production services with health checks
+
 ## License
 
 MIT
-# Test deployment
-# Test deployment
-# Test deployment

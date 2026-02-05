@@ -1,0 +1,47 @@
+# Logrotate configuration for Gunicorn logs
+# This file should be copied to /etc/logrotate.d/gunicorn
+#
+# Installation:
+#   sudo cp gunicorn-logrotate /etc/logrotate.d/gunicorn
+#   sudo chmod 644 /etc/logrotate.d/gunicorn
+#
+# Test the configuration:
+#   sudo logrotate -d /etc/logrotate.d/gunicorn
+#
+# Force rotation (for testing):
+#   sudo logrotate -f /etc/logrotate.d/gunicorn
+
+/var/log/gunicorn/*.log {
+    # Rotate logs daily
+    daily
+    
+    # Keep 14 days of logs
+    rotate 14
+    
+    # Don't error if log file is missing
+    missingok
+    
+    # Don't rotate empty logs
+    notifempty
+    
+    # Compress old logs
+    compress
+    
+    # Delay compression until next rotation
+    delaycompress
+    
+    # Create new log file with these permissions
+    create 0644 www-data www-data
+    
+    # Use date as suffix for rotated files
+    dateext
+    dateformat -%Y%m%d
+    
+    # Reload Gunicorn after rotation to write to new file
+    postrotate
+        systemctl reload whit >/dev/null 2>&1 || true
+    endscript
+    
+    # Share scripts between all rotated logs
+    sharedscripts
+}
