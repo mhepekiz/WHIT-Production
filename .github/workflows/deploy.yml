@@ -106,6 +106,12 @@ jobs:
           sudo -u www-data ./venv/bin/python manage.py force_create_homepage_sections
           sudo -u www-data ./venv/bin/python manage.py collectstatic --noinput
           
+          # Setup Gunicorn log directory
+          echo "Setting up Gunicorn logs..."
+          sudo mkdir -p /var/log/gunicorn
+          sudo chown -R www-data:www-data /var/log/gunicorn
+          sudo chmod 755 /var/log/gunicorn
+          
           # Test nginx configuration
           sudo nginx -t
           
@@ -132,13 +138,33 @@ jobs:
           # Reload nginx
           sudo systemctl reload nginx
           
+          # Run health checks before starting Django service
+          echo "Running Django health checks..."
+          cd /var/www/whit/backend
+          sudo -u www-data ./venv/bin/python manage.py check --deploy || {
+            echo "❌ Django health check failed!"
+            exit 1
+          }
+          
+          # Update systemd service file
+          sudo cp /tmp/whit-deploy/whit.service /etc/systemd/system/whit.service
+          sudo systemctl daemon-reload
+          
           # Start/restart Django service
           sudo systemctl start whit || sudo systemctl restart whit
           sudo systemctl enable whit
           
+          # Wait for service to stabilize
+          sleep 5
+          
           # Verify services are running
           sudo systemctl status nginx --no-pager || echo "Nginx status check failed"
-          sudo systemctl status whit --no-pager || echo "Whit status check failed"
+          sudo systemctl status whit --no-pager || {
+            echo "❌ Whit service failed to start!"
+            echo "=== Service Logs ==="
+            sudo journalctl -u whit --no-pager -n 50
+            exit 1
+          }
           
           # Cleanup
           rm -rf /tmp/whit-deploy
