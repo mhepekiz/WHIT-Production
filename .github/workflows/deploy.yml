@@ -290,3 +290,116 @@ jobs:
           ps aux | grep -E "(python|django|whit)" || echo "No Django processes found"
           
           echo "=== END DIAGNOSTICS ==="
+          
+    - name: Immediate SSH Troubleshooting
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          echo "=== IMMEDIATE SSH TROUBLESHOOTING ==="
+          
+          # Check current working directory and navigate
+          pwd
+          whoami
+          
+          # Stop the service first to get clean slate
+          echo "--- Stopping Django service ---"
+          sudo systemctl stop whit || echo "Service not running"
+          
+          # Navigate to Django directory
+          cd /var/www/whit/backend || { echo "Cannot access /var/www/whit/backend"; exit 1; }
+          
+          # Check what's actually in the directory
+          echo "--- Backend directory contents ---"
+          ls -la
+          
+          # Check if manage.py exists
+          if [ -f "manage.py" ]; then
+            echo "✅ manage.py found"
+          else
+            echo "❌ manage.py not found!"
+            find /var/www/whit -name "manage.py" -type f 2>/dev/null || echo "No manage.py found anywhere"
+          fi
+          
+          # Check virtual environment
+          if [ -d "venv" ]; then
+            echo "✅ Virtual environment found"
+            ls -la venv/bin/ | head -10
+          else
+            echo "❌ Virtual environment not found!"
+            find /var/www/whit -name "venv" -type d 2>/dev/null || echo "No venv found anywhere"
+          fi
+          
+          # Try to activate venv and test Python
+          if [ -f "venv/bin/activate" ]; then
+            echo "--- Testing virtual environment ---"
+            source venv/bin/activate || echo "Failed to activate venv"
+            python --version || echo "Python not working in venv"
+            pip list | head -10 || echo "Pip list failed"
+            
+            # Test Django import
+            python -c "import django; print(f'Django version: {django.get_version()}')" || echo "Django import failed"
+          fi
+          
+          # Check database file
+          echo "--- Database check ---"
+          if [ -f "db.sqlite3" ]; then
+            echo "✅ SQLite database found"
+            ls -la db.sqlite3
+            file db.sqlite3
+          else
+            echo "❌ SQLite database not found!"
+            find /var/www/whit -name "*.sqlite*" -type f 2>/dev/null || echo "No SQLite files found"
+          fi
+          
+          # Check environment file
+          echo "--- Environment variables ---"
+          if [ -f ".env" ]; then
+            echo "✅ .env file found"
+            cat .env | grep -v "SECRET" || echo "No .env content (or only secrets)"
+          else
+            echo "❌ No .env file found"
+          fi
+          
+          # Try to run Django management command manually
+          echo "--- Testing Django manually ---"
+          if [ -f "venv/bin/python" ] && [ -f "manage.py" ]; then
+            sudo -u www-data ./venv/bin/python manage.py check --deploy 2>&1 || echo "Django check failed"
+            sudo -u www-data ./venv/bin/python manage.py showmigrations --list 2>&1 | head -20 || echo "Migrations check failed"
+          fi
+          
+          # Check systemd service file
+          echo "--- Systemd service ---"
+          if [ -f "/etc/systemd/system/whit.service" ]; then
+            echo "✅ Service file exists"
+            cat /etc/systemd/system/whit.service
+          else
+            echo "❌ Service file not found"
+            find /etc/systemd -name "*whit*" 2>/dev/null || echo "No whit service files found"
+          fi
+          
+          # Check processes
+          echo "--- Active processes ---"
+          ps aux | grep -E "(python|django|gunicorn|uwsgi)" | grep -v grep || echo "No Python processes running"
+          
+          # Check ports
+          echo "--- Port usage ---"
+          netstat -tulpn | grep -E ":(80|443|8000|8001)" || echo "No relevant ports open"
+          
+          # Check nginx config
+          echo "--- Nginx configuration ---"
+          if [ -f "/etc/nginx/sites-enabled/whit" ]; then
+            echo "✅ Nginx config exists"
+            nginx -t 2>&1 || echo "Nginx config test failed"
+          else
+            echo "❌ Nginx config not found"
+          fi
+          
+          # Try to start Django manually in foreground
+          echo "--- Attempting manual Django startup ---"
+          cd /var/www/whit/backend
+          timeout 10s sudo -u www-data ./venv/bin/python manage.py runserver 127.0.0.1:8080 2>&1 || echo "Manual Django startup failed"
+          
+          echo "=== TROUBLESHOOTING COMPLETE ==="
