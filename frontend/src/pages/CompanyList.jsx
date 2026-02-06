@@ -87,7 +87,7 @@ function CompanyList() {
           console.log('Setting button styles:', styles);
           setButtonStyles(styles);
           
-          console.log('Applied sizes:', sizes);
+          console.log('Applied styles:', styles);
         }
       } catch (err) {
         console.error('Failed to fetch site settings:', err);
