@@ -179,3 +179,14 @@ LOGGING = {
         },
     },
 }
+
+# CSRF Trusted Origins for cross-origin requests
+CSRF_TRUSTED_ORIGINS = [
+    'https://staging.whoishiringintech.com',
+    'https://whoishiringintech.com',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'http://localhost:5176'
+]
