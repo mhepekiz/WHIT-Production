@@ -262,6 +262,12 @@
     display: none;
   }
   
+  /* Hide register and login buttons on mobile to give more space for hamburger */
+  .nav-link-register,
+  .nav-link-login {
+    display: none;
+  }
+  
   .nav__inner {
     padding: 12px 16px;
   }
