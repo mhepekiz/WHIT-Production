@@ -73,7 +73,7 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_SSH_KEY }}
-        source: "frontend/dist/*,backend/*,nginx.conf,whit.service,*.sh,gunicorn-logrotate"
+        source: "frontend/dist/*,backend/*,nginx.conf,whit.service,*.sh,gunicorn-logrotate,post-deploy-fix.sh"
         target: "/tmp/whit-deploy"
         strip_components: 0
         
@@ -156,14 +156,14 @@ jobs:
           
           # Update systemd service file
           sudo cp /tmp/whit-deploy/whit.service /etc/systemd/system/whit.service
-          sudo systemctl daemon-reload
           
-          # Start/restart Django service
-          sudo systemctl start whit || sudo systemctl restart whit
-          sudo systemctl enable whit
+          # Run post-deployment fixes
+          sudo cp /tmp/whit-deploy/post-deploy-fix.sh /var/www/whit/
+          sudo chmod +x /var/www/whit/post-deploy-fix.sh
+          sudo /var/www/whit/post-deploy-fix.sh
           
           # Wait for service to stabilize
-          sleep 5
+          sleep 10
           
           # Verify services are running
           sudo systemctl status nginx --no-pager || echo "Nginx status check failed"

@@ -3,31 +3,42 @@ Description=Gunicorn instance to serve WHIT Django application
 After=network.target
 
 [Service]
+Type=notify
 User=www-data
 Group=www-data
+RuntimeDirectory=gunicorn
 WorkingDirectory=/var/www/whit/backend
-Environment="PATH=/var/www/whit/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PATH=/var/www/whit/backend/venv/bin"
 Environment="DJANGO_SETTINGS_MODULE=whit.settings"
 EnvironmentFile=-/var/www/whit/backend/.env
+
 ExecStart=/var/www/whit/backend/venv/bin/gunicorn \
     --workers 3 \
     --bind 127.0.0.1:8003 \
     --timeout 120 \
+    --keep-alive 60 \
+    --max-requests 1000 \
+    --max-requests-jitter 50 \
+    --preload \
     --access-logfile /var/log/gunicorn/access.log \
     --error-logfile /var/log/gunicorn/error.log \
     --log-level info \
     --capture-output \
     whit.wsgi:application
+
 ExecReload=/bin/kill -s HUP $MAINPID
-Restart=always
-RestartSec=10
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Conservative restart policy to prevent restart loops
+Restart=on-failure
+RestartSec=30
+StartLimitInterval=300
+StartLimitBurst=3
+
 StandardOutput=journal
 StandardError=journal
-
-# Security and performance settings
-KillMode=mixed
-KillSignal=SIGQUIT
-TimeoutStopSec=30
 
 [Install]
 WantedBy=multi-user.target
