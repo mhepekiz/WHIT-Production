@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Q, Count, Sum
+from django.views.decorators.csrf import csrf_exempt
 from .models import (
     Recruiter, RecruiterPackage, JobOpening, JobApplication,
     CandidateSearch, RecruiterUsage, RecruiterMessage
@@ -25,6 +26,7 @@ class IsRecruiter(permissions.BasePermission):
         return request.user.is_authenticated and hasattr(request.user, 'recruiter_profile')
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def recruiter_register(request):
@@ -52,6 +54,7 @@ def recruiter_register(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def recruiter_login(request):
