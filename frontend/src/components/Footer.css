@@ -1,0 +1,278 @@
+/* Site Footer Styles */
+.site-footer {
+  background: #1f2937;
+  color: #ffffff;
+  margin-top: 60px;
+}
+
+.footer-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1.2fr;
+  gap: 40px;
+  padding: 60px 0 40px;
+}
+
+/* Footer Column Styles */
+.footer-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-links a {
+  color: #d1d5db !important;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  display: block;
+  padding: 4px 0;
+}
+
+.footer-links a:hover,
+.footer-links a:focus {
+  color: #6366f1 !important;
+  text-decoration: underline;
+  transform: translateX(4px);
+  outline: none;
+}
+
+.footer-links a:focus-visible {
+  outline: 2px solid #a5b4fc;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Brand Column Specific Styles */
+.footer-brand {
+  padding-left: 20px;
+}
+
+.brand-section {
+  margin-bottom: 32px;
+}
+
+.footer-logo {
+  display: inline-block;
+  margin-bottom: 16px;
+  text-decoration: none;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.footer-slogan {
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 280px;
+}
+
+/* Social Media Styles */
+.social-section {
+  border-top: 1px solid #374151;
+  padding-top: 24px;
+}
+
+.social-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 16px 0;
+}
+
+.social-links {
+  display: flex;
+  gap: 16px;
+}
+
+.social-link {
+  width: 40px;
+  height: 40px;
+  background: #374151;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e5e7eb;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.social-link:hover,
+.social-link:focus {
+  background: #6366f1;
+  color: #ffffff;
+  transform: translateY(-2px);
+  text-decoration: none;
+  outline: none;
+}
+
+.social-link:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.social-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  border-top: 1px solid rgba(229, 231, 235, 0.3);
+  padding: 24px 0;
+}
+
+.footer-bottom-content {
+  text-align: center;
+}
+
+.copyright {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .footer-container {
+    padding: 0 16px;
+  }
+  
+  .footer-content {
+    gap: 32px;
+    padding: 50px 0 35px;
+  }
+  
+  .footer-brand {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 40px 0 30px;
+  }
+  
+  .footer-column:nth-child(3) {
+    order: 4;
+  }
+  
+  .footer-brand {
+    order: 3;
+    grid-column: 1 / -1;
+    padding-top: 24px;
+    border-top: 1px solid #374151;
+    margin-top: 16px;
+  }
+  
+  .brand-section {
+    margin-bottom: 24px;
+  }
+  
+  .social-section {
+    border-top: none;
+    padding-top: 0;
+  }
+  
+  .footer-bottom-content {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-container {
+    padding: 0 12px;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 32px 0 24px;
+  }
+  
+  .footer-column {
+    order: initial !important;
+    grid-column: initial !important;
+    border-top: none !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  .footer-brand {
+    order: 4;
+    border-top: 1px solid #374151;
+    padding-top: 20px;
+    margin-top: 12px;
+  }
+  
+  .footer-title {
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+  }
+  
+  .footer-links li {
+    margin-bottom: 10px;
+  }
+  
+  .footer-links a {
+    font-size: 0.9rem;
+  }
+  
+  .logo-text {
+    font-size: 1.25rem;
+  }
+  
+  .footer-slogan {
+    font-size: 0.9rem;
+    max-width: none;
+  }
+  
+  .social-links {
+    gap: 12px;
+  }
+  
+  .social-link {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .social-link svg {
+    width: 18px;
+    height: 18px;
+  }
+}

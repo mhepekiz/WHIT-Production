@@ -221,30 +221,32 @@ function CompanyList() {
         </div>
       ) : (
         <>
-          <div className="homepage-preview">
-            <div className="preview-header">
-              <h2 className="preview-title">Recently Updated Companies</h2>
-              <p className="preview-subtitle">Discover companies actively hiring in tech</p>
+          <div className="main-content-container">
+            <div className="homepage-preview">
+              <div className="preview-header">
+                <h2 className="preview-title">Recently Updated Companies</h2>
+                <p className="preview-subtitle">Discover companies actively hiring in tech</p>
+              </div>
+              
+              {/* Show first 10 companies */}
+              <CompanyTable companies={companies.slice(0, 10)} buttonStyles={buttonStyles} />
+              
+              {/* View All Companies CTA */}
+              <div className="view-all-section">
+                <Link to="/companies" className="view-all-btn">
+                  <span>View All {pagination.count} Companies</span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </Link>
+              </div>
             </div>
-            
-            {/* Show first 10 companies */}
-            <CompanyTable companies={companies.slice(0, 10)} buttonStyles={buttonStyles} />
-            
-            {/* View All Companies CTA */}
-            <div className="view-all-section">
-              <Link to="/companies" className="view-all-btn">
-                <span>View All {pagination.count} Companies</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </Link>
-            </div>
-          </div>
 
-          {/* Homepage Sections */}
-          {!sectionsLoading && homepageSections && (
-            <HomepageSections sections={homepageSections} />
-          )}
+            {/* Homepage Sections */}
+            {!sectionsLoading && homepageSections && (
+              <HomepageSections sections={homepageSections} />
+            )}
+          </div>
         </>
       )}
     </div>

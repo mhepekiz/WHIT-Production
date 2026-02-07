@@ -2,80 +2,107 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/HomepageSections.css';
 
-const HowItWorksSection = ({ section }) => {
+const JobSeekerCard = ({ section }) => {
+  const steps = section.steps
+    .filter(step => step.is_active)
+    .sort((a, b) => a.order - b.order)
+    .slice(0, 4); // Enforce 4 bullets max
+
   return (
-    <div className="how-it-works-section">
-      <h2 className="section-title">{section.title}</h2>
-      <p className="section-subtitle">{section.subtitle}</p>
-      <h3 className="section-header">{section.section_header}</h3>
-      <p className="section-description">{section.description}</p>
+    <div className="role-navigation-card job-seeker-card">
+      <div className="card-header">
+        <div className="card-icon">🔍</div>
+        <h3 className="card-title">For Job Seekers</h3>
+      </div>
       
-      <div className="how-it-works-steps">
-        {section.steps
-          .filter(step => step.is_active)
-          .sort((a, b) => a.order - b.order)
-          .map(step => (
-            <div key={step.id} className="how-it-works-step">
-              <div className="step-icon">{step.icon}</div>
-              <div className="step-content">
-                <h4 className="step-title">{step.title}</h4>
-                <p className="step-description">{step.description}</p>
-              </div>
-            </div>
+      <div className="card-content">
+        <p className="card-description">
+          Discover tech companies actively hiring and track your applications
+        </p>
+        
+        <ul className="card-bullets">
+          {steps.map(step => (
+            <li key={step.id} className="bullet-item">
+              <span className="bullet-icon">{step.icon}</span>
+              <span className="bullet-text">{step.title}</span>
+            </li>
           ))}
+          {/* Fill remaining bullets if less than 4 */}
+          {steps.length < 4 && Array.from({ length: 4 - steps.length }, (_, index) => (
+            <li key={`filler-${index}`} className="bullet-item">
+              <span className="bullet-icon">✓</span>
+              <span className="bullet-text">Track application status</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      
+      <div className="card-actions">
+        <Link to="/companies" className="card-button primary">
+          Browse Companies
+        </Link>
+        <Link to="/register" className="card-link">
+          Create Account →
+        </Link>
       </div>
     </div>
   );
 };
 
-const RecruiterSection = ({ section }) => {
+const RecruiterCard = ({ section }) => {
   const isExternalLink = section.button_link.startsWith('http');
-  
-  const buttonStyle = {
-    backgroundColor: section.button_color,
-    color: '#ffffff',
-  };
-  
-  const sectionStyle = {
-    backgroundColor: section.background_color,
-    color: section.text_color,
-  };
 
   return (
-    <div className="recruiter-section" style={sectionStyle}>
-      <h2 className="recruiter-title" style={{ color: section.text_color }}>
-        {section.title}
-      </h2>
-      <p className="recruiter-description" style={{ color: section.text_color }}>
-        {section.description}
-      </p>
+    <div className="role-navigation-card recruiter-card">
+      <div className="card-header">
+        <div className="card-icon">💼</div>
+        <h3 className="card-title">For Recruiters</h3>
+      </div>
       
-      {isExternalLink ? (
-        <a
-          href={section.button_link}
-          className="recruiter-button"
-          style={buttonStyle}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {section.button_text}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M7 17L17 7" />
-            <path d="M7 7h10v10" />
-          </svg>
-        </a>
-      ) : (
-        <Link
-          to={section.button_link}
-          className="recruiter-button"
-          style={buttonStyle}
-        >
-          {section.button_text}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+      <div className="card-content">
+        <p className="card-description">
+          Add your company and get discovered by candidates tracking active hiring signals
+        </p>
+        
+        <ul className="card-bullets">
+          <li className="bullet-item">
+            <span className="bullet-icon">🎯</span>
+            <span className="bullet-text">Target active job seekers</span>
+          </li>
+          <li className="bullet-item">
+            <span className="bullet-icon">📈</span>
+            <span className="bullet-text">Track company visibility</span>
+          </li>
+          <li className="bullet-item">
+            <span className="bullet-icon">⚡</span>
+            <span className="bullet-text">Post jobs instantly</span>
+          </li>
+          <li className="bullet-item">
+            <span className="bullet-icon">🔍</span>
+            <span className="bullet-text">Browse candidate profiles</span>
+          </li>
+        </ul>
+      </div>
+      
+      <div className="card-actions">
+        {isExternalLink ? (
+          <a
+            href={section.button_link}
+            className="card-button outline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {section.button_text}
+          </a>
+        ) : (
+          <Link to={section.button_link} className="card-button outline">
+            {section.button_text}
+          </Link>
+        )}
+        <Link to="/recruiter/register" className="card-link">
+          Sign Up →
         </Link>
-      )}
+      </div>
     </div>
   );
 };
@@ -85,29 +112,19 @@ const HomepageSections = ({ sections }) => {
 
   const { how_it_works_sections = [], recruiter_sections = [] } = sections;
 
-  // Combine and sort all sections by order
-  const allSections = [
-    ...how_it_works_sections.filter(section => section.is_active).map(section => ({
-      ...section,
-      type: 'how_it_works'
-    })),
-    ...recruiter_sections.filter(section => section.is_active).map(section => ({
-      ...section,
-      type: 'recruiter'
-    }))
-  ].sort((a, b) => a.order - b.order);
+  // Get the first active section of each type
+  const jobSeekerSection = how_it_works_sections.find(section => section.is_active);
+  const recruiterSection = recruiter_sections.find(section => section.is_active);
+
+  // Only render if we have at least one section
+  if (!jobSeekerSection && !recruiterSection) return null;
 
   return (
     <div className="homepage-sections">
-      {allSections.map(section => (
-        <div key={`${section.type}-${section.id}`}>
-          {section.type === 'how_it_works' ? (
-            <HowItWorksSection section={section} />
-          ) : (
-            <RecruiterSection section={section} />
-          )}
-        </div>
-      ))}
+      <div className="role-navigation-container">
+        {jobSeekerSection && <JobSeekerCard section={jobSeekerSection} />}
+        {recruiterSection && <RecruiterCard section={recruiterSection} />}
+      </div>
     </div>
   );
 };

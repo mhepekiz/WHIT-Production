@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { RecruiterAuthProvider, useRecruiterAuth } from './contexts/RecruiterAuthContext'
 import Header from './components/Header'
+import Footer from './components/Footer'
 import CompanyList from './pages/CompanyList'
 import CompanyBrowse from './pages/CompanyBrowse'
 import AddCompany from './pages/AddCompany'
@@ -161,6 +162,7 @@ function App() {
               <Route path="messages" element={<div>Messages Component Coming Soon</div>} />
             </Route>
           </Routes>
+          <Footer />
           </div>
         </RecruiterAuthProvider>
       </AuthProvider>

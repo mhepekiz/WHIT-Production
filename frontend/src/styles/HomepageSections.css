@@ -1,195 +1,297 @@
-/* How It Works Section Styles */
-.how-it-works-section {
+/* Role Navigation Cards - 50:50 Split Layout */
+.homepage-sections {
   margin: 40px 0;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
-  color: white;
-  text-align: center;
+  width: 100%;
 }
 
-.how-it-works-section .section-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: white;
+.role-navigation-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: stretch;
 }
 
-.how-it-works-section .section-subtitle {
-  font-size: 1.1rem;
-  margin-bottom: 12px;
-  opacity: 0.9;
-  color: white;
-}
-
-.how-it-works-section .section-header {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #ffd700;
-}
-
-.how-it-works-section .section-description {
-  font-size: 1rem;
-  margin-bottom: 32px;
-  opacity: 0.85;
-  color: white;
-}
-
-.how-it-works-steps {
+/* Individual Card Base Styles */
+.role-navigation-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 32px 28px;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  margin-top: 32px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  min-height: 260px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.how-it-works-step {
+.role-navigation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #dee2e6;
+}
+
+/* Card Header */
+.card-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  max-width: 280px;
-  text-align: left;
+  margin-bottom: 16px;
 }
 
-.how-it-works-step .step-icon {
-  font-size: 2rem;
+.card-icon {
+  font-size: 1.75rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 8px;
   flex-shrink: 0;
 }
 
-.how-it-works-step .step-content {
-  flex: 1;
-}
-
-.how-it-works-step .step-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-  color: white;
-}
-
-.how-it-works-step .step-description {
-  font-size: 0.85rem;
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
   margin: 0;
-  opacity: 0.8;
-  color: white;
+  color: #212529;
+}
+
+/* Card Content */
+.card-content {
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.card-description {
+  font-size: 1rem;
+  color: #6c757d;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.card-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bullet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: #495057;
   line-height: 1.4;
 }
 
-/* Recruiter Section Styles */
-.recruiter-section {
-  margin: 40px 0;
-  padding: 32px 20px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9ecef;
+.bullet-item:last-child {
+  margin-bottom: 0;
 }
 
-.recruiter-section .recruiter-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 12px;
+.bullet-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
 }
 
-.recruiter-section .recruiter-description {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 24px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+.bullet-text {
+  flex: 1;
 }
 
-.recruiter-section .recruiter-button {
+/* Card Actions */
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   padding: 12px 24px;
   border-radius: 8px;
-  text-decoration: none;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  text-decoration: none;
   transition: all 0.2s ease;
-  border: none;
+  border: 2px solid transparent;
   cursor: pointer;
+  text-align: center;
 }
 
-.recruiter-section .recruiter-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+/* Primary Button (Job Seeker) */
+.card-button.primary {
+  background: #007bff;
+  color: #ffffff;
+  border-color: #007bff;
+}
+
+.card-button.primary:hover {
+  background: #0056b3;
+  border-color: #0056b3;
   text-decoration: none;
+  color: #ffffff;
+}
+
+/* Outline Button (Recruiter) */
+.card-button.outline {
+  background: transparent;
+  color: #007bff;
+  border-color: #007bff;
+}
+
+.card-button.outline:hover {
+  background: #007bff;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.card-link {
+  text-align: center;
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.card-link:hover {
+  color: #007bff;
+  text-decoration: none;
+}
+
+/* Card Specific Styling */
+.job-seeker-card .card-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+}
+
+.recruiter-card .card-icon {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: #ffffff;
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .role-navigation-container {
+    gap: 24px;
+  }
+  
+  .role-navigation-card {
+    padding: 28px 24px;
+    min-height: 240px;
+  }
+}
+
+/* Tablet - Switch to Single Column */
 @media (max-width: 768px) {
-  .how-it-works-section {
-    margin: 20px 0;
-    padding: 24px 16px;
+  .homepage-sections {
+    margin: 32px 0;
   }
-
-  .how-it-works-section .section-title {
-    font-size: 1.5rem;
-  }
-
-  .how-it-works-section .section-subtitle {
-    font-size: 1rem;
-  }
-
-  .how-it-works-section .section-header {
-    font-size: 1.1rem;
-  }
-
-  .how-it-works-steps {
-    flex-direction: column;
+  
+  .role-navigation-container {
+    grid-template-columns: 1fr;
     gap: 20px;
-    align-items: stretch;
+    max-width: 680px;
+    margin: 0 auto;
   }
-
-  .how-it-works-step {
-    text-align: center;
-    flex-direction: column;
-    max-width: none;
+  
+  .role-navigation-card {
+    padding: 24px 20px;
+    min-height: 220px;
   }
-
-  .how-it-works-step .step-content {
-    text-align: center;
+  
+  .card-title {
+    font-size: 1.2rem;
   }
-
-  .recruiter-section {
-    margin: 20px 0;
-    padding: 24px 16px;
+  
+  .card-description {
+    font-size: 0.95rem;
   }
-
-  .recruiter-section .recruiter-title {
-    font-size: 1.5rem;
+  
+  .bullet-item {
+    font-size: 0.9rem;
   }
-
-  .recruiter-section .recruiter-description {
-    font-size: 1rem;
-  }
-
-  .recruiter-section .recruiter-button {
+  
+  .card-button {
     padding: 10px 20px;
     font-size: 0.9rem;
   }
 }
 
+/* Mobile - Stack with Job Seeker First */
 @media (max-width: 480px) {
-  .how-it-works-steps {
+  .homepage-sections {
+    margin: 24px 0;
+  }
+  
+  .role-navigation-container {
     gap: 16px;
   }
-
-  .how-it-works-step .step-icon {
+  
+  .role-navigation-card {
+    padding: 20px 16px;
+    min-height: 200px;
+  }
+  
+  .card-header {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  
+  .card-icon {
+    width: 40px;
+    height: 40px;
     font-size: 1.5rem;
   }
-
-  .how-it-works-step .step-title {
-    font-size: 0.9rem;
+  
+  .card-title {
+    font-size: 1.1rem;
   }
-
-  .how-it-works-step .step-description {
+  
+  .card-description {
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+  
+  .bullet-item {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+  }
+  
+  .bullet-icon {
+    width: 16px;
+    height: 16px;
     font-size: 0.8rem;
+  }
+  
+  .card-actions {
+    gap: 10px;
+  }
+  
+  .card-button {
+    padding: 9px 18px;
+    font-size: 0.85rem;
+  }
+  
+  .card-link {
+    font-size: 0.85rem;
+  }
+}
+
+/* Ensure Job Seeker appears first on mobile */
+@media (max-width: 768px) {
+  .job-seeker-card {
+    order: 1;
+  }
+  
+  .recruiter-card {
+    order: 2;
   }
 }

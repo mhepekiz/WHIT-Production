@@ -2,6 +2,15 @@
   padding: 20px 0;
 }
 
+/* Main Content Container - Consistent Width for All Sections */
+.main-content-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -243,7 +252,7 @@
 
 /* Homepage Preview Styles */
 .homepage-preview {
-  margin-bottom: 40px;
+  margin-bottom: 0;
 }
 
 .preview-header {
@@ -341,4 +350,23 @@
   color: var(--text-muted);
   font-size: 0.9rem;
   margin: 0;
+}
+
+/* Responsive Design for Main Container */
+@media (max-width: 1024px) {
+  .main-content-container {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-container {
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-container {
+    padding: 0 8px;
+  }
 }
