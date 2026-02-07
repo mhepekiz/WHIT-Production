@@ -38,7 +38,15 @@ export const RecruiterAuthProvider = ({ children }) => {
       setRecruiterUser(data.user);
       return data;
     } catch (err) {
-      const errorMessage = err.response?.data?.error || 'Login failed';
+      console.error('DEBUG: Login error details:', {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        headers: err.response?.headers,
+        url: err.config?.url
+      });
+      
+      const errorMessage = err.response?.data?.error || err.response?.data?.detail || 'Login failed';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {

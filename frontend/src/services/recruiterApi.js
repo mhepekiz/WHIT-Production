@@ -26,12 +26,38 @@ export const registerRecruiter = async (data) => {
 };
 
 export const loginRecruiter = async (email, password) => {
-  const response = await axios.post(`${API_URL}/login/`, { email, password });
-  if (response.data.token) {
-    localStorage.setItem('recruiterToken', response.data.token);
-    localStorage.setItem('recruiterUser', JSON.stringify(response.data.user));
+  console.log('DEBUG: API_URL:', API_URL);
+  console.log('DEBUG: Full login URL:', `${API_URL}/login/`);
+  console.log('DEBUG: Login request data:', { email, password });
+  
+  try {
+    const response = await axios.post(`${API_URL}/login/`, 
+      { email, password },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    console.log('DEBUG: Login response status:', response.status);
+    console.log('DEBUG: Login response data:', response.data);
+    
+    if (response.data.token) {
+      localStorage.setItem('recruiterToken', response.data.token);
+      localStorage.setItem('recruiterUser', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  } catch (error) {
+    console.error('DEBUG: Login request failed:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      headers: error.response?.headers,
+      url: error.config?.url,
+      method: error.config?.method
+    });
+    throw error;
   }
-  return response.data;
 };
 
 export const logoutRecruiter = () => {
