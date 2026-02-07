@@ -66,11 +66,29 @@ fi
 
 # Kill any conflicting processes on port 8003
 echo "Checking for port conflicts..."
+
+# More aggressive cleanup - kill any python processes running on port 8003
+sudo pkill -f "gunicorn.*8003" || true
+sudo pkill -f "python.*8003" || true
+sudo pkill -f ":8003" || true
+
+# Also kill any processes by name
+sudo pkill -f "whit.wsgi:application" || true
+
+# Wait for processes to fully terminate
+sleep 3
+
+# Check again and force kill if needed
 if lsof -i :8003 >/dev/null 2>&1; then
-    echo "⚠️ Port 8003 is in use. Killing conflicting processes..."
-    sudo pkill -f "gunicorn.*8003" || true
+    echo "⚠️ Port 8003 still in use. Force killing processes..."
+    lsof -ti :8003 | xargs sudo kill -9 2>/dev/null || true
     sleep 2
 fi
+
+# Stop the systemd service to ensure clean slate
+echo "Stopping whit service to ensure clean startup..."
+sudo systemctl stop whit 2>/dev/null || true
+sleep 2
 
 # Reload systemd and restart service
 echo "Reloading systemd configuration..."
