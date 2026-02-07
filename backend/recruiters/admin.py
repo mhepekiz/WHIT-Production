@@ -1,4 +1,12 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import AdminPasswordChangeForm
+from django.contrib.auth.models import User
+from django.urls import path, reverse
+from django.utils.html import format_html
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 from .models import (
     RecruiterPackage, Recruiter, RecruiterUsage,
     JobOpening, JobApplication, CandidateSearch, RecruiterMessage
@@ -47,16 +55,17 @@ class RecruiterUsageInline(admin.TabularInline):
 class RecruiterAdmin(admin.ModelAdmin):
     list_display = [
         'company_name', 'get_email', 'package', 'is_verified',
-        'is_active', 'subscription_start_date', 'created_at'
+        'is_active', 'subscription_start_date', 'created_at', 'password_change_link'
     ]
     list_filter = ['is_verified', 'is_active', 'package', 'created_at']
     search_fields = ['company_name', 'user__email', 'contact_email', 'city', 'country']
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'password_change_link']
     inlines = [RecruiterUsageInline]
+    actions = ['change_password_action']
     
     fieldsets = (
         ('Account Information', {
-            'fields': ('user', 'package', 'is_verified', 'is_active')
+            'fields': ('user', 'package', 'is_verified', 'is_active', 'password_change_link')
         }),
         ('Company Information', {
             'fields': ('company_name', 'company_website', 'company_logo', 'company_description')
@@ -80,6 +89,46 @@ class RecruiterAdmin(admin.ModelAdmin):
         return obj.user.email
     get_email.short_description = 'Email'
     get_email.admin_order_field = 'user__email'
+
+    def password_change_link(self, obj):
+        if obj.pk:
+            url = reverse('admin:auth_user_password_change', args=[obj.user.pk])
+            return format_html('<a href="{}" class="button">Change Password</a>', url)
+        return "-"
+    password_change_link.short_description = 'Password'
+    password_change_link.allow_tags = True
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<int:recruiter_id>/change-password/',
+                self.admin_site.admin_view(self.change_password_view),
+                name='recruiters_recruiter_change_password',
+            ),
+        ]
+        return custom_urls + urls
+
+    def change_password_view(self, request, recruiter_id):
+        recruiter = self.get_object(request, recruiter_id)
+        if recruiter is None:
+            messages.error(request, 'Recruiter not found.')
+            return redirect('admin:recruiters_recruiter_changelist')
+        
+        # Redirect to the user's password change form
+        url = reverse('admin:auth_user_password_change', args=[recruiter.user.pk])
+        return HttpResponseRedirect(url)
+
+    def change_password_action(self, request, queryset):
+        """Admin action to change password for selected recruiters"""
+        if queryset.count() == 1:
+            recruiter = queryset.first()
+            url = reverse('admin:auth_user_password_change', args=[recruiter.user.pk])
+            return HttpResponseRedirect(url)
+        else:
+            messages.error(request, 'Please select only one recruiter to change password.')
+            return None
+    change_password_action.short_description = "Change password for selected recruiter"
 
 
 @admin.register(RecruiterUsage)
