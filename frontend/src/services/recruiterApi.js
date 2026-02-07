@@ -26,21 +26,24 @@ export const registerRecruiter = async (data) => {
 };
 
 export const loginRecruiter = async (email, password) => {
-  console.log('DEBUG: API_URL:', API_URL);
-  console.log('DEBUG: Full login URL:', `${API_URL}/login/`);
-  console.log('DEBUG: Login request data:', { email, password });
-  
   try {
-    const response = await axios.post(`${API_URL}/login/`, 
-      { email, password },
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+    const loginData = {
+      email: email,
+      password: password
+    };
+
+    console.log('🔐 Login attempt starting...');
+    console.log('📧 Email:', email);
+    console.log('🌐 API URL:', `${API_URL}/login/`);
+    console.log('📦 Request data:', loginData);
+
+    const response = await axios.post(`${API_URL}/login/`, loginData, {
+      headers: {
+        'Content-Type': 'application/json'
       }
-    );
-    console.log('DEBUG: Login response status:', response.status);
-    console.log('DEBUG: Login response data:', response.data);
+    });
+
+    console.log('✅ Login successful!', response.data);
     
     if (response.data.token) {
       localStorage.setItem('recruiterToken', response.data.token);
@@ -48,14 +51,14 @@ export const loginRecruiter = async (email, password) => {
     }
     return response.data;
   } catch (error) {
-    console.error('DEBUG: Login request failed:', {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      headers: error.response?.headers,
-      url: error.config?.url,
-      method: error.config?.method
-    });
+    console.error('❌ Login error:', error);
+    console.error('📊 Error status:', error.response?.status);
+    console.error('📄 Error headers:', error.response?.headers);
+    console.error('📝 Error data:', error.response?.data);
+    console.error('🌐 Error config URL:', error.config?.url);
+    console.error('🔧 Error config method:', error.config?.method);
+    console.error('📋 Error config headers:', error.config?.headers);
+    
     throw error;
   }
 };
