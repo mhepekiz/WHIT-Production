@@ -92,7 +92,12 @@ class CompanyViewSet(viewsets.ModelViewSet):
             if sponsored_campaign:
                 response_data[0]['sponsored_campaign_id'] = sponsored_campaign.id
                 
-            return self.get_paginated_response(response_data)
+            paginated_response = self.get_paginated_response(response_data)
+            # Add cache busting headers
+            paginated_response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            paginated_response['Pragma'] = 'no-cache'
+            paginated_response['Expires'] = '0'
+            return paginated_response
         
         # Non-paginated fallback (e.g., homepage preview)
         page_key = SponsorSelector.build_page_key(request, filters, 1)
@@ -123,7 +128,12 @@ class CompanyViewSet(viewsets.ModelViewSet):
         if sponsored_campaign and response_data:
             response_data[0]['sponsored_campaign_id'] = sponsored_campaign.id
             
-        return Response(response_data)
+        response = Response(response_data)
+        # Add cache busting headers
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        return response
     
     @action(detail=False, methods=['get'])
     def filters(self, request):
