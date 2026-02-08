@@ -57,8 +57,24 @@ class CompanyAdmin(admin.ModelAdmin):
     
     readonly_fields = ['created_at', 'updated_at', 'logo_preview']
     
-    # Temporarily comment out filter_horizontal to test if this fixes the issue
-    # filter_horizontal = ['functions']
+    def get_fields(self, request, obj=None):
+        """Override get_fields to exclude M2M fields when adding new objects."""
+        fields = list(super().get_fields(request, obj))
+        if obj is None:  # Adding new object
+            # Exclude functions field to avoid M2M error
+            if 'functions' in fields:
+                fields.remove('functions')
+        return fields
+    
+    def get_form(self, request, obj=None, **kwargs):
+        """Override get_form to handle M2M fields properly."""
+        form = super().get_form(request, obj, **kwargs)
+        # Only show filter_horizontal for existing objects
+        if obj is not None:
+            self.filter_horizontal = ['functions']
+        else:
+            self.filter_horizontal = []
+        return form
     
     def save_model(self, request, obj, form, change):
         # Check sponsored limit before saving
@@ -68,6 +84,13 @@ class CompanyAdmin(admin.ModelAdmin):
                 messages.error(request, "Maximum of 3 sponsored companies allowed. Please unmark another company as sponsored first.")
                 return
         super().save_model(request, obj, form, change)
+    
+    def response_add(self, request, obj, post_url_continue=None):
+        """Override response_add to redirect to change form after adding so user can set functions."""
+        if obj:
+            # Add a success message mentioning they can now set functions
+            messages.success(request, f'Company "{obj.name}" was added successfully. You can now set functions and other details.')
+        return super().response_add(request, obj, post_url_continue)
     
     fieldsets = (
         ('Basic Information', {
