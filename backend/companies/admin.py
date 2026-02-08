@@ -17,7 +17,7 @@ class CompanyAdminForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make functions field not required during creation
+        # Make functions field not required
         if 'functions' in self.fields:
             self.fields['functions'].required = False
 
@@ -57,7 +57,8 @@ class CompanyAdmin(admin.ModelAdmin):
     
     readonly_fields = ['created_at', 'updated_at', 'logo_preview']
     
-    filter_horizontal = ['functions']
+    # Temporarily comment out filter_horizontal to test if this fixes the issue
+    # filter_horizontal = ['functions']
     
     def save_model(self, request, obj, form, change):
         # Check sponsored limit before saving
