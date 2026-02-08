@@ -1,15 +1,32 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django import forms
 from .models import (
     Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout,
     HowItWorksSection, HowItWorksStep, RecruiterSection
 )
 
 
+class CompanyAdminForm(forms.ModelForm):
+    """Custom form for Company admin to handle M2M fields properly."""
+    
+    class Meta:
+        model = Company
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make functions field not required during creation
+        if 'functions' in self.fields:
+            self.fields['functions'].required = False
+
+
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     """Admin interface for Company model."""
+    
+    form = CompanyAdminForm
     
     list_display = [
         'name',
