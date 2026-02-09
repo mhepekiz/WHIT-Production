@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /var/www/whit-release
+cd /var/www/whit
 echo 'VITE_API_URL=https://staging.whoishiringintech.com/api' > frontend/.env
 cd frontend
 export VITE_API_URL=https://staging.whoishiringintech.com/api

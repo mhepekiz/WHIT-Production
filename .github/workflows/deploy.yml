@@ -144,7 +144,7 @@ jobs:
         password: ${{ secrets.STAGING_PASSWORD }}
         script: |
           # Navigate to project directory
-          cd /var/www/whit-release || exit 1
+          cd /var/www/whit || exit 1
           
           # Set staging environment variables
           echo 'VITE_API_URL=https://staging.whoishiringintech.com/api' > frontend/.env
@@ -185,7 +185,7 @@ server {
     server_name staging.whoishiringintech.com 45.79.211.144;
 
     location / {
-        root /var/www/whit-release/frontend/dist;
+        root /var/www/whit/frontend/dist;
         try_files $uri $uri/ /index.html;
     }
 
@@ -214,11 +214,11 @@ server {
     }
 
     location /media/ {
-        alias /var/www/whit-release/backend/media/;
+        alias /var/www/whit/backend/media/;
     }
 
     location /static/ {
-        alias /var/www/whit-release/backend/staticfiles/;
+        alias /var/www/whit/backend/staticfiles/;
     }
 }
 NGINX_EOF
