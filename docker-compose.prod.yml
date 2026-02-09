@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: whit_db
+      POSTGRES_USER: whit_user
+      POSTGRES_PASSWORD: whit_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U whit_user -d whit_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - whit_network
+
+  # Redis (for caching/sessions)
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - whit_network
+
+  # Backend Django API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - DEBUG=False
+      - DATABASE_URL=postgresql://whit_user:whit_password@db:5432/whit_db
+      - REDIS_URL=redis://redis:6379/0
+      - ALLOWED_HOSTS=staging.whoishiringintech.com,localhost,127.0.0.1
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-in-production}
+    volumes:
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/companies/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - whit_network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  # Frontend Nginx + React
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - media_data:/usr/share/nginx/html/media:ro
+      - static_data:/usr/share/nginx/html/static:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - whit_network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  # Load Balancer (HAProxy for zero downtime)
+  loadbalancer:
+    image: haproxy:2.8-alpine
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./ssl:/etc/ssl/certs:ro
+    depends_on:
+      - frontend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/stats"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - whit_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  postgres_data:
+  redis_data:
+  media_data:
+  static_data:
+
+networks:
+  whit_network:
+    driver: bridge

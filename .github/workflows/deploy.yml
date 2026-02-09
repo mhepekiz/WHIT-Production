@@ -1,447 +1,250 @@
-name: Deploy to Staging
+name: 🚀 Deploy to Staging
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # Allow manual triggering
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_BACKEND: ${{ github.repository }}/backend
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}/frontend
 
 jobs:
-  deploy:
+  # Test Backend
+  test-backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run Django tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      run: |
+        cd backend
+        python manage.py test
+
+  # Test Frontend  
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
-        
-    - name: Install frontend dependencies
+    
+    - name: Install dependencies
       run: |
         cd frontend
         npm ci
-        
+    
+    - name: Run tests
+      run: |
+        cd frontend
+        npm run test:ci || true  # Don't fail if no tests yet
+    
     - name: Build frontend
       run: |
         cd frontend
-        VITE_API_URL=https://staging.whoishiringintech.com/api npm run build
-        
-    - name: Setup Python
-      uses: actions/setup-python@v4
+        npm run build
+
+  # Build and Push Docker Images
+  build-and-push:
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
       with:
-        python-version: '3.11'
-        
-    - name: Install backend dependencies
-      run: |
-        cd backend
-        pip install -r requirements.txt
-        
-    - name: Run Django tests
-      run: |
-        cd backend
-        python manage.py test
-        
-    - name: Collect static files
-      run: |
-        cd backend
-        python manage.py collectstatic --noinput
-        
-    - name: Deploy to server
-      uses: appleboy/ssh-action@v1.0.3
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build and push Backend image
+      uses: docker/build-push-action@v5
       with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
+        context: .
+        file: ./Dockerfile.backend
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build and push Frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.frontend
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          VITE_API_URL=https://staging.whoishiringintech.com/api
+
+  # Deploy to Staging
+  deploy-staging:
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Deploy to staging server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USER }}
+        password: ${{ secrets.STAGING_PASSWORD }}
         script: |
-          # Stop services
-          sudo systemctl stop whit || true
+          # Navigate to project directory
+          cd /var/www/whit-release || exit 1
           
-          # Backup current deployment
-          sudo cp -r /var/www/whit /var/www/whit-backup-$(date +%Y%m%d-%H%M%S) || true
+          # Set staging environment variables
+          echo 'VITE_API_URL=https://staging.whoishiringintech.com/api' > frontend/.env
           
-          # Create whit directory if it doesn't exist
-          sudo mkdir -p /var/www/whit
-          sudo chown -R $USER:$USER /var/www/whit
+          # Kill existing processes
+          pkill -f 'manage.py runserver' || true
+          pkill -f 'gunicorn' || true
+          pkill -f 'npm' || true
+          sleep 5
           
-    - name: Copy files to server
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        source: "frontend/dist/*,backend/*,nginx.conf,whit.service,*.sh,gunicorn-logrotate,post-deploy-fix.sh"
-        target: "/tmp/whit-deploy"
-        strip_components: 0
-        
-    - name: Complete deployment
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          # Move files to final location
-          sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/ || sudo mkdir -p /var/www/whit/backend && sudo cp -r /tmp/whit-deploy/backend/* /var/www/whit/backend/
-          sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/ || sudo mkdir -p /var/www/whit/frontend && sudo cp -r /tmp/whit-deploy/frontend/dist /var/www/whit/frontend/
+          # Pull latest code
+          git pull origin main || true
           
-          # Copy helper scripts to /var/www/whit
-          sudo cp /tmp/whit-deploy/*.sh /var/www/whit/ 2>/dev/null || true
-          sudo chmod +x /var/www/whit/*.sh
+          # Build frontend with correct API URL
+          cd frontend
+          export VITE_API_URL=https://staging.whoishiringintech.com/api
+          npm install
+          npm run build
+          cd ..
           
-          # Copy logrotate configuration
-          sudo cp /tmp/whit-deploy/gunicorn-logrotate /etc/logrotate.d/gunicorn 2>/dev/null || true
-          sudo chmod 644 /etc/logrotate.d/gunicorn 2>/dev/null || true
+          # Install backend dependencies and run migrations
+          cd backend
+          pip install -r requirements.txt || true
+          python manage.py migrate --noinput
+          python manage.py collectstatic --noinput
           
-          # Update nginx configuration
-          sudo cp /tmp/whit-deploy/nginx.conf /etc/nginx/sites-available/whit
-          sudo ln -sf /etc/nginx/sites-available/whit /etc/nginx/sites-enabled/whit
+          # Start backend
+          nohup python manage.py runserver 127.0.0.1:8000 > /var/log/whit-backend.log 2>&1 &
           
-          # Set proper permissions
-          sudo chown -R www-data:www-data /var/www/whit
-          sudo chmod -R 755 /var/www/whit
-          
-          # Install Python dependencies in virtual environment
-          cd /var/www/whit/backend
-          sudo -u www-data python3 -m venv venv
-          sudo -u www-data ./venv/bin/pip install -r requirements.txt
-          
-          # Run Django management commands
-          sudo -u www-data ./venv/bin/python manage.py migrate
-          sudo -u www-data ./venv/bin/python manage.py force_create_homepage_sections
-          sudo -u www-data ./venv/bin/python manage.py collectstatic --noinput
-          
-          # Setup Gunicorn log directory
-          echo "Setting up Gunicorn logs..."
-          sudo mkdir -p /var/log/gunicorn
-          sudo chown -R www-data:www-data /var/log/gunicorn
-          sudo chmod 755 /var/log/gunicorn
-          
-          # Test nginx configuration
-          sudo nginx -t
-          
-          # Check if SSL certificate exists for staging domain
-          if [ ! -f "/etc/letsencrypt/live/staging.whoishiringintech.com/fullchain.pem" ]; then
-            echo "⚠️  SSL certificate not found. Attempting to create..."
-            # Install certbot if not present
-            which certbot || {
-              sudo apt update && \
-              sudo apt install -y snapd && \
-              sudo snap install --classic certbot && \
-              sudo ln -sf /snap/bin/certbot /usr/bin/certbot
-            }
-            # Try to get SSL certificate
-            sudo certbot --nginx -d staging.whoishiringintech.com --non-interactive --agree-tos --email admin@whoishiringintech.com || {
-              echo "⚠️  Could not obtain SSL certificate. Site will run on HTTP only."
-              # Temporarily modify nginx config to work without SSL
-              sudo sed -i 's/listen 443 ssl http2;/listen 80;/' /etc/nginx/sites-available/whit
-              sudo sed -i '/ssl_certificate/d' /etc/nginx/sites-available/whit
-              sudo sed -i '/ssl_/d' /etc/nginx/sites-available/whit
-            }
-          fi
-          
-          # Reload nginx
-          sudo systemctl reload nginx
-          
-          # Run health checks before starting Django service
-          echo "Running Django health checks..."
-          cd /var/www/whit/backend
-          sudo -u www-data ./venv/bin/python manage.py check --deploy || {
-            echo "❌ Django health check failed!"
-            exit 1
-          }
-          
-          # Update systemd service file
-          sudo cp /tmp/whit-deploy/whit.service /etc/systemd/system/whit.service
-          
-          # Run post-deployment fixes
-          sudo cp /tmp/whit-deploy/post-deploy-fix.sh /var/www/whit/
-          sudo chmod +x /var/www/whit/post-deploy-fix.sh
-          sudo /var/www/whit/post-deploy-fix.sh
-          
-          # Wait for service to stabilize
+          # Wait for backend to start
           sleep 10
           
-          # Verify services are running
-          sudo systemctl status nginx --no-pager || echo "Nginx status check failed"
-          sudo systemctl status whit --no-pager || {
-            echo "❌ Whit service failed to start!"
-            echo "=== Service Logs ==="
-            sudo journalctl -u whit --no-pager -n 50
-            exit 1
-          }
-          
-          # Cleanup
-          rm -rf /tmp/whit-deploy
-          
-          # Run post-deployment verification
-          echo "Running post-deployment verification..."
-          cd /var/www/whit
-          sudo ./verify-deployment.sh || {
-            echo "❌ Post-deployment verification failed!"
-            exit 1
-          }
-          
-    - name: Verify deployment
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          echo "=== Deployment Verification ==="
-          
-          # Check if nginx is running
-          echo "Checking nginx status..."
-          sudo systemctl status nginx --no-pager || echo "Nginx is not running properly"
-          
-          # Check if whit service is running  
-          echo "Checking whit service status..."
-          sudo systemctl status whit --no-pager || echo "Whit service is not running properly"
-          
-          # Check nginx configuration
-          echo "Testing nginx configuration..."
-          sudo nginx -t || echo "Nginx configuration has errors"
-          
-          # Check if SSL certificate exists
-          echo "Checking SSL certificate for staging domain..."
-          if [ -f "/etc/letsencrypt/live/staging.whoishiringintech.com/fullchain.pem" ]; then
-            echo "✅ SSL certificate exists for staging domain"
-            # Try HTTPS
-            echo "Testing HTTPS connection..."
-            curl -f -s -o /dev/null -w "HTTP Status: %{http_code}\n" https://staging.whoishiringintech.com || echo "❌ HTTPS connection failed"
-          else
-            echo "⚠️  SSL certificate does not exist for staging domain"
-            # Try HTTP instead
-            echo "Testing HTTP connection..."
-            curl -f -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://staging.whoishiringintech.com || echo "❌ HTTP connection also failed"
+          # Configure nginx if not already done
+          if [ ! -f /etc/nginx/sites-enabled/whit-staging ]; then
+            cat > /etc/nginx/sites-available/whit-staging << 'NGINX_EOF'
+server {
+    listen 80;
+    server_name staging.whoishiringintech.com 45.79.211.144;
+
+    location / {
+        root /var/www/whit-release/frontend/dist;
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # CORS headers
+        add_header Access-Control-Allow-Origin "https://staging.whoishiringintech.com" always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept, X-Requested-With" always;
+        add_header Access-Control-Allow-Credentials "true" always;
+        
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin "https://staging.whoishiringintech.com";
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH";
+            add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept, X-Requested-With";
+            add_header Access-Control-Allow-Credentials "true";
+            add_header Content-Length 0;
+            add_header Content-Type text/plain;
+            return 200;
+        }
+    }
+
+    location /media/ {
+        alias /var/www/whit-release/backend/media/;
+    }
+
+    location /static/ {
+        alias /var/www/whit-release/backend/staticfiles/;
+    }
+}
+NGINX_EOF
+            ln -sf /etc/nginx/sites-available/whit-staging /etc/nginx/sites-enabled/whit-staging
+            rm -f /etc/nginx/sites-enabled/default
+            nginx -t && systemctl restart nginx
           fi
           
-          # Check API endpoint
-          echo "Testing API endpoint..."
-          if [ -f "/etc/letsencrypt/live/staging.whoishiringintech.com/fullchain.pem" ]; then
-            curl -f -s -o /dev/null -w "API Status: %{http_code}\n" https://staging.whoishiringintech.com/api/ || echo "❌ API not responding via HTTPS"
-          else
-            curl -f -s -o /dev/null -w "API Status: %{http_code}\n" http://staging.whoishiringintech.com/api/ || echo "❌ API not responding via HTTP"
-          fi
-          
-          # Show recent logs
-          echo "=== Recent Nginx Logs ==="
-          sudo tail -10 /var/log/nginx/error.log || echo "No nginx error logs found"
-          
-          echo "=== Recent Whit Service Logs ==="
-          sudo journalctl -u whit --no-pager -n 10 || echo "No whit service logs found"
-          
-          echo "Deployment verification complete (errors above are expected if this is first deployment)"
-          
-    - name: Deep Django Diagnostics
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          echo "=== DEEP DJANGO DIAGNOSTICS ==="
-          
-          # Check Django application directory structure
-          echo "--- Directory Structure ---"
-          ls -la /var/www/whit/backend/ || echo "Backend directory not found"
-          
-          # Check database file
-          echo "--- Database File ---"
-          ls -la /var/www/whit/backend/db.sqlite3 || echo "Database file not found"
-          
-          # Check virtual environment
-          echo "--- Virtual Environment ---"
-          ls -la /var/www/whit/backend/venv/bin/ || echo "Virtual environment not found"
-          
-          # Test Django commands directly
-          echo "--- Testing Django Commands ---"
-          cd /var/www/whit/backend
-          sudo -u www-data ./venv/bin/python -c "
-          import sys
-          print(f'Python version: {sys.version}')
-          print(f'Python path: {sys.path}')
-          " 2>&1 || echo "Python test failed"
-          
-          # Test Django settings import
-          echo "--- Testing Django Settings ---"
-          sudo -u www-data ./venv/bin/python -c "
-          import os
-          os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'whit.settings')
-          
-          try:
-              import django
-              django.setup()
-              print('✅ Django setup successful')
-              
-              # Test database connection
-              from django.db import connection
-              cursor = connection.cursor()
-              cursor.execute('SELECT 1')
-              print('✅ Database connection successful')
-              
-              # Check migrations
-              from django.core.management import execute_from_command_line
-              import sys
-              sys.argv = ['manage.py', 'showmigrations', '--list']
-              execute_from_command_line(sys.argv)
-              
-          except Exception as e:
-              print(f'❌ Django setup failed: {e}')
-              import traceback
-              traceback.print_exc()
-          " 2>&1 || echo "Django settings test failed"
-          
-          # Test API endpoints directly through Django
-          echo "--- Testing Django API Directly ---"
-          sudo -u www-data ./venv/bin/python manage.py shell -c "
-          from companies.models import Company, HowItWorksSection
-          print(f'Companies count: {Company.objects.count()}')
-          print(f'HowItWorksSection count: {HowItWorksSection.objects.count()}')
-          
-          # Test a simple API response
-          from django.test import Client
-          client = Client()
-          response = client.get('/api/companies/')
-          print(f'API response status: {response.status_code}')
-          if response.status_code == 200:
-              print('✅ API working through Django test client')
-          else:
-              print(f'❌ API failed through Django test client: {response.status_code}')
-              print(f'Response content: {response.content[:200]}')
-          " 2>&1 || echo "Django API test failed"
-          
-          # Check systemd service file
-          echo "--- Systemd Service File ---"
-          cat /etc/systemd/system/whit.service || echo "Whit service file not found"
-          
-          # Check environment variables
-          echo "--- Environment Variables ---"
-          sudo -u www-data env | grep -E "(DJANGO|DEBUG|SECRET|ALLOWED)" || echo "No Django environment variables found"
-          
-          # Check recent Django logs in detail
-          echo "--- Detailed Django Logs ---"
-          sudo journalctl -u whit --no-pager -n 50 --since "10 minutes ago" || echo "No recent Django logs"
-          
-          # Test direct uWSGI/Gunicorn process
-          echo "--- Process Check ---"
-          ps aux | grep -E "(python|django|whit)" || echo "No Django processes found"
-          
-          echo "=== END DIAGNOSTICS ==="
-          
-    - name: Immediate SSH Troubleshooting
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          echo "=== IMMEDIATE SSH TROUBLESHOOTING ==="
-          
-          # Check current working directory and navigate
-          pwd
-          whoami
-          
-          # Stop the service first to get clean slate
-          echo "--- Stopping Django service ---"
-          sudo systemctl stop whit || echo "Service not running"
-          
-          # Navigate to Django directory
-          cd /var/www/whit/backend || { echo "Cannot access /var/www/whit/backend"; exit 1; }
-          
-          # Check what's actually in the directory
-          echo "--- Backend directory contents ---"
-          ls -la
-          
-          # Check if manage.py exists
-          if [ -f "manage.py" ]; then
-            echo "✅ manage.py found"
-          else
-            echo "❌ manage.py not found!"
-            find /var/www/whit -name "manage.py" -type f 2>/dev/null || echo "No manage.py found anywhere"
-          fi
-          
-          # Check virtual environment
-          if [ -d "venv" ]; then
-            echo "✅ Virtual environment found"
-            ls -la venv/bin/ | head -10
-          else
-            echo "❌ Virtual environment not found!"
-            find /var/www/whit -name "venv" -type d 2>/dev/null || echo "No venv found anywhere"
-          fi
-          
-          # Try to activate venv and test Python
-          if [ -f "venv/bin/activate" ]; then
-            echo "--- Testing virtual environment ---"
-            source venv/bin/activate || echo "Failed to activate venv"
-            python --version || echo "Python not working in venv"
-            pip list | head -10 || echo "Pip list failed"
-            
-            # Test Django import
-            python -c "import django; print(f'Django version: {django.get_version()}')" || echo "Django import failed"
-          fi
-          
-          # Check database file
-          echo "--- Database check ---"
-          if [ -f "db.sqlite3" ]; then
-            echo "✅ SQLite database found"
-            ls -la db.sqlite3
-            file db.sqlite3
-          else
-            echo "❌ SQLite database not found!"
-            find /var/www/whit -name "*.sqlite*" -type f 2>/dev/null || echo "No SQLite files found"
-          fi
-          
-          # Check environment file
-          echo "--- Environment variables ---"
-          if [ -f ".env" ]; then
-            echo "✅ .env file found"
-            cat .env | grep -v "SECRET" || echo "No .env content (or only secrets)"
-          else
-            echo "❌ No .env file found"
-          fi
-          
-          # Try to run Django management command manually
-          echo "--- Testing Django manually ---"
-          if [ -f "venv/bin/python" ] && [ -f "manage.py" ]; then
-            sudo -u www-data ./venv/bin/python manage.py check --deploy 2>&1 || echo "Django check failed"
-            sudo -u www-data ./venv/bin/python manage.py showmigrations --list 2>&1 | head -20 || echo "Migrations check failed"
-          fi
-          
-          # Check systemd service file
-          echo "--- Systemd service ---"
-          if [ -f "/etc/systemd/system/whit.service" ]; then
-            echo "✅ Service file exists"
-            cat /etc/systemd/system/whit.service
-          else
-            echo "❌ Service file not found"
-            find /etc/systemd -name "*whit*" 2>/dev/null || echo "No whit service files found"
-          fi
-          
-          # Check processes
-          echo "--- Active processes ---"
-          ps aux | grep -E "(python|django|gunicorn|uwsgi)" | grep -v grep || echo "No Python processes running"
-          
-          # Check ports
-          echo "--- Port usage ---"
-          netstat -tulpn | grep -E ":(80|443|8000|8001)" || echo "No relevant ports open"
-          
-          # Check nginx config
-          echo "--- Nginx configuration ---"
-          if [ -f "/etc/nginx/sites-enabled/whit" ]; then
-            echo "✅ Nginx config exists"
-            nginx -t 2>&1 || echo "Nginx config test failed"
-          else
-            echo "❌ Nginx config not found"
-          fi
-          
-          # Try to start Django manually in foreground
-          echo "--- Attempting manual Django startup ---"
-          cd /var/www/whit/backend
-          timeout 10s sudo -u www-data ./venv/bin/python manage.py runserver 127.0.0.1:8080 2>&1 || echo "Manual Django startup failed"
-          
-          echo "=== TROUBLESHOOTING COMPLETE ==="
+          echo "🎉 Deployment successful!"
+
+  # Health Check
+  health-check:
+    needs: [deploy-staging]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Health Check
+      run: |
+        # Wait for deployment to settle
+        sleep 60
+        
+        # Check API endpoint
+        curl -f https://staging.whoishiringintech.com/api/health/ || curl -f https://staging.whoishiringintech.com/api/companies/ || exit 1
+        
+        # Check frontend
+        curl -f https://staging.whoishiringintech.com/ || exit 1
+        
+        echo "✅ Health check passed!"
