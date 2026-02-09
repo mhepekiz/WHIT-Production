@@ -74,10 +74,10 @@ const JobPreferences = () => {
   const fetchData = async () => {
     try {
       const [prefsRes, filtersRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/accounts/job-preferences/me/`, {
+        fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/accounts/job-preferences/me/`, {
           headers: { 'Authorization': `Token ${token}` },
         }),
-        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/companies/filters/`)
+        fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/companies/filters/`)
       ]);
 
       if (prefsRes.ok) {
@@ -206,7 +206,7 @@ const JobPreferences = () => {
     try {
       const locationString = serializeLocations();
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/accounts/job-preferences/me/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/accounts/job-preferences/me/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,

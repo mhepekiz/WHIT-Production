@@ -9,7 +9,7 @@ const FormPageLayout = ({ children, pageName }) => {
     const fetchLayout = async () => {
       try {
         console.log('Fetching layout for page:', pageName);
-        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
         const response = await fetch(
           `${API_BASE_URL}/form-layouts/by_page/?page=${pageName}`
         );

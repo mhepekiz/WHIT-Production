@@ -605,7 +605,7 @@ function JobApplications() {
                   <h4>Resume</h4>
                   {(() => {
                     const resumeUrl = selectedApplication.resume_file || selectedApplication.profile_resume;
-                    const fullUrl = resumeUrl?.startsWith('http') ? resumeUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/../${resumeUrl}`;
+                    const fullUrl = resumeUrl?.startsWith('http') ? resumeUrl : `${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/../${resumeUrl}`;
                     return (
                       <a href={fullUrl} target="_blank" rel="noopener noreferrer" className="resume-link">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
