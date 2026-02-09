@@ -2,6 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Outlet, NavLink } from 'react-router-dom';
 import { useRecruiterAuth } from '../contexts/RecruiterAuthContext';
 import { getRecruiterProfile, getRecruiterUsage } from '../services/recruiterApi';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faChartLine, 
+  faUser, 
+  faBriefcase, 
+  faChartBar, 
+  faSearch, 
+  faClipboardList, 
+  faEnvelope, 
+  faSignOutAlt,
+  faTachometerAlt
+} from '@fortawesome/free-solid-svg-icons';
 import './RecruiterDashboard.css';
 
 function RecruiterDashboard() {
@@ -64,32 +76,46 @@ function RecruiterDashboard() {
 
         <nav className="sidebar-nav">
           <NavLink to="/recruiter/dashboard" end className="nav-item">
-            <span className="nav-icon">📊</span>
+            <span className="nav-icon">
+              <FontAwesomeIcon icon={faTachometerAlt} />
+            </span>
             <span>Overview</span>
           </NavLink>
           <NavLink to="/recruiter/dashboard/profile" className="nav-item">
-            <span className="nav-icon">👤</span>
+            <span className="nav-icon">
+              <FontAwesomeIcon icon={faUser} />
+            </span>
             <span>Profile</span>
           </NavLink>
           <NavLink to="/recruiter/dashboard/jobs" className="nav-item">
-            <span className="nav-icon">💼</span>
+            <span className="nav-icon">
+              <FontAwesomeIcon icon={faBriefcase} />
+            </span>
             <span>Job Openings</span>
           </NavLink>
           <NavLink to="/recruiter/dashboard/analytics" className="nav-item">
-            <span className="nav-icon">📈</span>
+            <span className="nav-icon">
+              <FontAwesomeIcon icon={faChartLine} />
+            </span>
             <span>Analytics</span>
           </NavLink>
           <NavLink to="/recruiter/dashboard/candidates" className="nav-item">
-            <span className="nav-icon">🔍</span>
+            <span className="nav-icon">
+              <FontAwesomeIcon icon={faSearch} />
+            </span>
             <span>Search Candidates</span>
           </NavLink>
           <NavLink to="/recruiter/dashboard/applications" className="nav-item">
-            <span className="nav-icon">📋</span>
+            <span className="nav-icon">
+              <FontAwesomeIcon icon={faClipboardList} />
+            </span>
             <span>Applications</span>
           </NavLink>
           {profile?.package?.messaging_enabled && (
             <NavLink to="/recruiter/dashboard/messages" className="nav-item">
-              <span className="nav-icon">💬</span>
+              <span className="nav-icon">
+                <FontAwesomeIcon icon={faEnvelope} />
+              </span>
               <span>Messages</span>
             </NavLink>
           )}
@@ -97,7 +123,9 @@ function RecruiterDashboard() {
 
         <div className="sidebar-footer">
           <button onClick={handleLogout} className="logout-btn">
-            <span className="nav-icon">🚪</span>
+            <span className="nav-icon">
+              <FontAwesomeIcon icon={faSignOutAlt} />
+            </span>
             <span>Logout</span>
           </button>
         </div>

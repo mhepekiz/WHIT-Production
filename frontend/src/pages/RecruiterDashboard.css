@@ -1,43 +1,66 @@
 .recruiter-dashboard {
   display: flex;
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #f7fafc;
 }
 
 /* Sidebar */
 .dashboard-sidebar {
   width: 280px;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #8B5FBF 0%, #6366F1 50%, #4F46E5 100%);
+  color: white !important;
   display: flex;
   flex-direction: column;
   position: fixed;
   height: 100vh;
   overflow-y: auto;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Override any default text colors in sidebar */
+.dashboard-sidebar * {
+  color: white !important;
+}
+
+.dashboard-sidebar h2,
+.dashboard-sidebar h3,
+.dashboard-sidebar p,
+.dashboard-sidebar span {
+  color: white !important;
 }
 
 .sidebar-header {
   padding: 2rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: white !important;
 }
 
-.sidebar-header h2 {
+.dashboard-sidebar .sidebar-header h2 {
   margin: 0 0 1.5rem 0;
   font-size: 1.5rem;
+  color: white !important;
+  font-weight: 600;
 }
 
-.company-info h3 {
+.dashboard-sidebar .company-info h3 {
   font-size: 1.1rem;
   margin: 0 0 0.5rem 0;
+  color: white !important;
+  font-weight: 500;
 }
 
 .package-badge {
   background: rgba(255, 255, 255, 0.2);
+  color: white;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.75rem;
   display: inline-block;
   font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .sidebar-nav {
@@ -50,31 +73,40 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
   transition: all 0.3s;
   border-left: 3px solid transparent;
+  font-weight: 500;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.nav-item.active {
   background: rgba(255, 255, 255, 0.15);
   color: white;
   border-left-color: white;
+  backdrop-filter: blur(10px);
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-left-color: white;
   font-weight: 600;
+  backdrop-filter: blur(10px);
 }
 
 .nav-icon {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .sidebar-footer {
   padding: 1rem 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .logout-btn {
@@ -83,17 +115,21 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   color: white;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s;
   font-size: 1rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Main Content */
@@ -135,23 +171,26 @@
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  background: #f8f9ff;
-  border-radius: 8px;
+  background: white;
+  border-radius: 12px;
   min-width: 120px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .usage-label {
   font-size: 0.75rem;
-  color: #666;
+  color: #718096;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .usage-value {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #667eea;
+  color: #4299e1;
 }
 
 .dashboard-content {

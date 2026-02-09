@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 const API_URL = `${API_BASE_URL.replace('/api', '')}/api/recruiters`;
 
 // Create axios instance with auth header
@@ -214,4 +214,60 @@ export const markMessageRead = async (id) => {
     headers: getAuthHeader()
   });
   return response.data;
+};
+
+// Dashboard APIs
+export const getAccessibleCompanies = async () => {
+  const response = await axios.get(`${API_URL}/dashboard/accessible_companies/`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getCompanyStatistics = async (companyId = null, days = 30) => {
+  const params = new URLSearchParams();
+  if (companyId) params.append('company_id', companyId);
+  params.append('days', days);
+  
+  const response = await axios.get(`${API_URL}/dashboard/company_statistics/?${params}`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getDashboardOverview = async () => {
+  const response = await axios.get(`${API_URL}/dashboard/dashboard_overview/`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const exportCompanyData = async (companyId, days = 30) => {
+  const response = await axios.get(`${API_URL}/export/${companyId}/?days=${days}`, {
+    headers: getAuthHeader(),
+    responseType: 'blob'
+  });
+  
+  // Create download link
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  
+  // Get filename from response headers or create default
+  const contentDisposition = response.headers['content-disposition'];
+  let filename = `campaign_data_${companyId}.csv`;
+  if (contentDisposition) {
+    const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+    if (filenameMatch) {
+      filename = filenameMatch[1];
+    }
+  }
+  
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+  
+  return { success: true, filename };
 };

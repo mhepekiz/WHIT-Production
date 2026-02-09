@@ -20,6 +20,7 @@ import RecruiterProfile from './pages/RecruiterProfile'
 import JobOpenings from './pages/JobOpenings'
 import JobOpeningForm from './pages/JobOpeningForm'
 import RecruiterAnalytics from './pages/RecruiterAnalytics'
+import CompanyAnalyticsDashboard from './pages/CompanyAnalyticsDashboard'
 import CandidateSearch from './pages/CandidateSearch'
 import JobApplications from './pages/JobApplications'
 import './App.css'
@@ -156,7 +157,7 @@ function App() {
               <Route path="jobs" element={<JobOpenings />} />
               <Route path="jobs/new" element={<JobOpeningForm />} />
               <Route path="jobs/:id/edit" element={<JobOpeningForm />} />
-              <Route path="analytics" element={<RecruiterAnalytics />} />
+              <Route path="analytics" element={<CompanyAnalyticsDashboard />} />
               <Route path="candidates" element={<CandidateSearch />} />
               <Route path="applications" element={<JobApplications />} />
               <Route path="messages" element={<div>Messages Component Coming Soon</div>} />

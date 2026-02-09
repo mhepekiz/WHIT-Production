@@ -4,7 +4,8 @@ from django.core.exceptions import ValidationError
 from django import forms
 from .models import (
     Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout,
-    HowItWorksSection, HowItWorksStep, RecruiterSection
+    HowItWorksSection, HowItWorksStep, RecruiterSection, CompanyRecruiterAccess,
+    CampaignStatistics
 )
 
 
@@ -22,11 +23,41 @@ class CompanyAdminForm(forms.ModelForm):
             self.fields['functions'].required = False
 
 
+class CompanyRecruiterAccessInline(admin.TabularInline):
+    """Inline for managing recruiter access to companies"""
+    model = CompanyRecruiterAccess
+    extra = 0
+    fields = (
+        'recruiter', 'access_level', 'can_see_sponsored_stats',
+        'can_manage_campaigns', 'can_view_analytics', 'can_export_data', 'notes'
+    )
+    readonly_fields = ('created_at', 'updated_at')
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('recruiter__user')
+
+
+class CampaignStatisticsInline(admin.TabularInline):
+    """Inline for viewing campaign statistics"""
+    model = CampaignStatistics
+    extra = 0
+    fields = (
+        'date', 'page_views', 'unique_visitors', 'job_page_clicks',
+        'profile_views', 'application_clicks', 'contact_clicks',
+        'click_through_rate', 'engagement_rate'
+    )
+    readonly_fields = ('created_at', 'updated_at')
+    
+    def has_add_permission(self, request, obj=None):
+        return False  # Don't allow adding through inline
+
+
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     """Admin interface for Company model."""
     
     form = CompanyAdminForm
+    inlines = [CompanyRecruiterAccessInline, CampaignStatisticsInline]
     
     list_display = [
         'name',
@@ -488,6 +519,111 @@ class RecruiterSectionAdmin(admin.ModelAdmin):
         ('Styling', {
             'fields': ('background_color', 'text_color', 'button_color'),
             'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+
+
+@admin.register(CompanyRecruiterAccess)
+class CompanyRecruiterAccessAdmin(admin.ModelAdmin):
+    """Admin interface for managing recruiter access to companies"""
+    
+    list_display = [
+        'company',
+        'recruiter',
+        'access_level',
+        'can_see_sponsored_stats',
+        'can_manage_campaigns',
+        'can_view_analytics',
+        'can_export_data',
+        'created_at'
+    ]
+    
+    list_filter = [
+        'access_level',
+        'can_see_sponsored_stats',
+        'can_manage_campaigns',
+        'can_view_analytics',
+        'can_export_data'
+    ]
+    
+    search_fields = [
+        'company__name',
+        'recruiter__company_name',
+        'recruiter__user__email'
+    ]
+    
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Assignment', {
+            'fields': ('company', 'recruiter')
+        }),
+        ('Access Level', {
+            'fields': ('access_level', 'can_see_sponsored_stats')
+        }),
+        ('Detailed Permissions', {
+            'fields': ('can_manage_campaigns', 'can_view_analytics', 'can_export_data'),
+            'classes': ('collapse',)
+        }),
+        ('Notes', {
+            'fields': ('notes',),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related(
+            'company', 'recruiter__user'
+        )
+
+
+@admin.register(CampaignStatistics)
+class CampaignStatisticsAdmin(admin.ModelAdmin):
+    """Admin interface for campaign statistics"""
+    
+    list_display = [
+        'company',
+        'date',
+        'page_views',
+        'unique_visitors',
+        'job_page_clicks',
+        'profile_views',
+        'click_through_rate',
+        'engagement_rate'
+    ]
+    
+    list_filter = [
+        'date',
+        'company__is_sponsored'
+    ]
+    
+    search_fields = [
+        'company__name'
+    ]
+    
+    readonly_fields = ['created_at', 'updated_at']
+    date_hierarchy = 'date'
+    
+    fieldsets = (
+        ('Basic Info', {
+            'fields': ('company', 'date')
+        }),
+        ('Traffic Metrics', {
+            'fields': ('page_views', 'unique_visitors', 'job_page_clicks')
+        }),
+        ('Engagement Metrics', {
+            'fields': ('profile_views', 'application_clicks', 'contact_clicks')
+        }),
+        ('Performance Metrics', {
+            'fields': ('click_through_rate', 'engagement_rate')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),

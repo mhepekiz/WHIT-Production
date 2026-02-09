@@ -3,7 +3,8 @@ from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count
-from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout, SponsorCampaign, HowItWorksSection, RecruiterSection
+from django.utils import timezone
+from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout, SponsorCampaign, HowItWorksSection, RecruiterSection, CampaignStatistics
 from .serializers import (
     CompanySerializer,
     CompanyListSerializer,
@@ -266,6 +267,112 @@ class CompanyViewSet(viewsets.ModelViewSet):
             )
             
             return Response({'success': True})
+            
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=False, methods=['post'], url_path='track-job-click')
+    def track_job_click(self, request):
+        """Track job page clicks for analytics."""
+        try:
+            company_id = request.data.get('company_id')
+            
+            if not company_id:
+                return Response(
+                    {'error': 'company_id is required'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get company
+            try:
+                company = Company.objects.get(id=company_id)
+            except Company.DoesNotExist:
+                return Response(
+                    {'error': 'Company not found'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get or create today's statistics
+            today = timezone.now().date()
+            stats, created = CampaignStatistics.objects.get_or_create(
+                company=company,
+                date=today,
+                defaults={
+                    'page_views': 0,
+                    'unique_visitors': 0,
+                    'job_page_clicks': 0,
+                    'profile_views': 0,
+                    'application_clicks': 0,
+                    'contact_clicks': 0,
+                    'click_through_rate': 0.00,
+                    'engagement_rate': 0.00,
+                }
+            )
+            
+            # Increment job page clicks
+            stats.job_page_clicks += 1
+            stats.save()
+            
+            return Response({
+                'success': True, 
+                'job_page_clicks': stats.job_page_clicks
+            })
+            
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=False, methods=['post'], url_path='track-page-view')
+    def track_page_view(self, request):
+        """Track page views for analytics (when companies are displayed)."""
+        try:
+            company_id = request.data.get('company_id')
+            
+            if not company_id:
+                return Response(
+                    {'error': 'company_id is required'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get company
+            try:
+                company = Company.objects.get(id=company_id)
+            except Company.DoesNotExist:
+                return Response(
+                    {'error': 'Company not found'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get or create today's statistics
+            today = timezone.now().date()
+            stats, created = CampaignStatistics.objects.get_or_create(
+                company=company,
+                date=today,
+                defaults={
+                    'page_views': 0,
+                    'unique_visitors': 0,
+                    'job_page_clicks': 0,
+                    'profile_views': 0,
+                    'application_clicks': 0,
+                    'contact_clicks': 0,
+                    'click_through_rate': 0.00,
+                    'engagement_rate': 0.00,
+                }
+            )
+            
+            # Increment page views
+            stats.page_views += 1
+            stats.save()
+            
+            return Response({
+                'success': True, 
+                'page_views': stats.page_views
+            })
             
         except Exception as e:
             return Response(

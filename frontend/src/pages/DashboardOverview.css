@@ -13,36 +13,45 @@
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   gap: 1rem;
-  transition: transform 0.3s;
+  transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border-color: #cbd5e0;
 }
 
 .stat-icon {
   font-size: 2.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #4299e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: #ebf8ff;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .stat-content h3 {
   font-size: 2rem;
   margin: 0 0 0.25rem 0;
-  color: #333;
+  color: #1a202c;
+  font-weight: 700;
 }
 
 .stat-content p {
   margin: 0;
-  color: #666;
+  color: #718096;
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .package-info-card {
@@ -86,8 +95,9 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: #4299e1;
   transition: width 0.3s;
+  border-radius: 4px;
 }
 
 .limit-text {

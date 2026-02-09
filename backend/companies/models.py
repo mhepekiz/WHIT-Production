@@ -620,3 +620,94 @@ class RecruiterSection(models.Model):
     
     def __str__(self):
         return f"Recruiter Section - {self.title}"
+
+
+class CompanyRecruiterAccess(models.Model):
+    """Manage recruiter access to company sponsor data"""
+    
+    ACCESS_LEVEL_CHOICES = [
+        ('view', 'View Only'),
+        ('manage', 'Manage Campaigns'),
+        ('analytics', 'Analytics Only'),
+        ('full', 'Full Access'),
+    ]
+    
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='recruiter_accesses')
+    recruiter = models.ForeignKey('recruiters.Recruiter', on_delete=models.CASCADE, related_name='company_accesses')
+    
+    # Access permissions
+    can_see_sponsored_stats = models.BooleanField(
+        default=False, 
+        help_text='Allow this recruiter to view sponsor campaign statistics'
+    )
+    access_level = models.CharField(
+        max_length=10, 
+        choices=ACCESS_LEVEL_CHOICES, 
+        default='view',
+        help_text='Level of access to company sponsor data'
+    )
+    
+    # Additional permissions
+    can_manage_campaigns = models.BooleanField(default=False, help_text='Can create and modify campaigns')
+    can_view_analytics = models.BooleanField(default=True, help_text='Can view campaign analytics')
+    can_export_data = models.BooleanField(default=False, help_text='Can export campaign data')
+    
+    # Notes and timestamps
+    notes = models.TextField(blank=True, help_text='Optional notes about this recruiter access')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ('company', 'recruiter')
+        verbose_name = 'Company Recruiter Access'
+        verbose_name_plural = 'Company Recruiter Accesses'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.recruiter.company_name} -> {self.company.name} ({self.access_level})"
+    
+    def get_permissions_summary(self):
+        """Return a summary of permissions for this access"""
+        permissions = []
+        if self.can_see_sponsored_stats:
+            permissions.append('View Stats')
+        if self.can_manage_campaigns:
+            permissions.append('Manage Campaigns')
+        if self.can_view_analytics:
+            permissions.append('View Analytics')
+        if self.can_export_data:
+            permissions.append('Export Data')
+        return ', '.join(permissions) if permissions else 'No permissions'
+
+
+class CampaignStatistics(models.Model):
+    """Store campaign statistics for sponsored companies"""
+    
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='campaign_stats')
+    date = models.DateField(default=timezone.now)
+    
+    # Traffic metrics
+    page_views = models.PositiveIntegerField(default=0)
+    unique_visitors = models.PositiveIntegerField(default=0)
+    job_page_clicks = models.PositiveIntegerField(default=0)
+    
+    # Engagement metrics
+    profile_views = models.PositiveIntegerField(default=0)
+    application_clicks = models.PositiveIntegerField(default=0)
+    contact_clicks = models.PositiveIntegerField(default=0)
+    
+    # Performance metrics
+    click_through_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    engagement_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ('company', 'date')
+        verbose_name = 'Campaign Statistics'
+        verbose_name_plural = 'Campaign Statistics'
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"{self.company.name} - {self.date}"
