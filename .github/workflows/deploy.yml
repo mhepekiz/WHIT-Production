@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME_BACKEND: ${{ github.repository }}/backend
-  IMAGE_NAME_FRONTEND: ${{ github.repository }}/frontend
+  IMAGE_NAME_BACKEND: ghcr.io/mhepekiz/whit-production/backend
+  IMAGE_NAME_FRONTEND: ghcr.io/mhepekiz/whit-production/frontend
 
 jobs:
   # Test Backend
@@ -107,8 +107,8 @@ jobs:
         file: ./Dockerfile.backend
         push: true
         tags: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+          ${{ env.IMAGE_NAME_BACKEND }}:latest
+          ${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
     
@@ -119,8 +119,8 @@ jobs:
         file: ./Dockerfile.frontend
         push: true
         tags: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+          ${{ env.IMAGE_NAME_FRONTEND }}:latest
+          ${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
         build-args: |
