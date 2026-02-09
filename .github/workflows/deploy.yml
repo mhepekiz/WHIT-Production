@@ -141,7 +141,7 @@ jobs:
       with:
         host: ${{ secrets.STAGING_HOST }}
         username: ${{ secrets.STAGING_USER }}
-        password: ${{ secrets.STAGING_PASSWORD }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
         script: |
           # Navigate to project directory
           cd /var/www/whit || exit 1
