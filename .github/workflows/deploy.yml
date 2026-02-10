@@ -144,39 +144,53 @@ jobs:
         key: ${{ secrets.STAGING_SSH_KEY }}
         port: 22
         timeout: 30s
-        command_timeout: 5m
+        command_timeout: 2m
         script: |
           echo "🚀 Starting deployment..."
           
-          # Navigate directly to project directory
-          cd /var/www/whit
-          echo "📍 In directory: $(pwd)"
-          
-          # Pull latest code first
-          echo "📥 Pulling latest code..."
-          git pull origin main || echo "⚠️ Git pull failed, continuing..."
-          
-          # Kill processes with timeout protection
-          echo "🔄 Stopping old processes..."
-          timeout 10 pkill -f 'manage.py runserver' || echo "No Django processes to stop"
-          timeout 10 pkill -f 'gunicorn' || echo "No Gunicorn processes to stop"
-          
-          # Start backend directly
-          echo "🚀 Starting Django backend..."
-          cd backend
-          nohup python3 manage.py runserver 127.0.0.1:8000 > /var/log/whit-backend.log 2>&1 &
-          
-          # Give it a moment to start
-          sleep 3
-          echo "✅ Backend started (check /var/log/whit-backend.log for status)"
-          
-          # Quick nginx reload if available
-          if command -v nginx >/dev/null 2>&1; then
-            echo "🔄 Reloading nginx..."
-            sudo systemctl reload nginx || echo "⚠️ Nginx reload failed"
+          # Find the actual git repository
+          echo "🔍 Looking for git repository..."
+          if [ -d "/var/www/whit/.git" ]; then
+            cd /var/www/whit
+            echo "✅ Using /var/www/whit"
+          else
+            echo "❌ /var/www/whit is not a git repo, checking alternatives..."
+            for dir in /var/www/whit-* /var/www/*whit* /var/www/staging-*; do
+              if [ -d "$dir/.git" ]; then
+                cd "$dir"
+                echo "✅ Found git repo at: $(pwd)"
+                break
+              fi
+            done
           fi
           
+          # Pull code only if we're in a git repo
+          if [ -d ".git" ]; then
+            echo "📥 Pulling latest code..."
+            git pull origin main || echo "⚠️ Git pull failed"
+          else
+            echo "⚠️ No git repository found, skipping git pull"
+          fi
+          
+          # Kill Django processes without timeout (simple approach)
+          echo "🔄 Stopping Django processes..."
+          ps aux | grep "manage.py runserver" | grep -v grep | awk '{print $2}' | xargs -r kill -9 || echo "No Django processes found"
+          
+          # Navigate to backend and start Django
+          echo "🚀 Starting Django backend..."
+          if [ -d "backend" ]; then
+            cd backend
+            nohup python3 manage.py runserver 127.0.0.1:8000 > /var/log/whit-backend.log 2>&1 &
+            echo "✅ Django started from $(pwd)"
+          else
+            # Try direct Django start if we're already in backend
+            nohup python3 manage.py runserver 127.0.0.1:8000 > /var/log/whit-backend.log 2>&1 &
+            echo "✅ Django started"
+          fi
+          
+          sleep 2
           echo "🎉 Deployment completed!"
+          echo "📋 Check /var/log/whit-backend.log for Django status"
   # Health Check
   health-check:
     needs: [deploy-staging]
