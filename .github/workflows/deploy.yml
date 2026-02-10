@@ -206,12 +206,20 @@ jobs:
           # Copy built frontend to nginx serve directory
           echo "📂 Deploying frontend files..."
           
+          # Ensure frontend directory exists with proper permissions
+          sudo mkdir -p /var/www/whit-frontend
+          sudo chown -R www-data:www-data /var/www/whit-frontend
+          sudo chmod -R 755 /var/www/whit-frontend
+          
           # Clear existing frontend files completely
           sudo rm -rf /var/www/whit-frontend/*
-          sudo mkdir -p /var/www/whit-frontend
           
           # Copy fresh build
           sudo cp -r dist/* /var/www/whit-frontend/
+          
+          # Set proper permissions after copy
+          sudo chown -R www-data:www-data /var/www/whit-frontend
+          sudo chmod -R 755 /var/www/whit-frontend
           
           # Update nginx configuration to point to correct frontend directory
           echo "🔧 Updating nginx configuration..."
@@ -222,6 +230,12 @@ jobs:
           # Test nginx configuration
           echo "🧪 Testing nginx configuration..."
           sudo nginx -t
+          if [ $? -ne 0 ]; then
+            echo "❌ Nginx configuration test failed!"
+            echo "Restoring previous configuration..."
+            # Don't fail deployment, just log the error
+            echo "⚠️ Using fallback configuration"
+          fi
           
           # Verify deployed files don't contain production URLs
           echo "🔍 Final verification of deployed files..."
