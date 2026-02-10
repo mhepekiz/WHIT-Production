@@ -5,9 +5,26 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 from .health import health_check
 
+def root_handler(request):
+    """
+    Root endpoint handler - returns API information
+    """
+    return JsonResponse({
+        "message": "Who Is Hiring In Tech API",
+        "version": "1.0.0",
+        "status": "operational",
+        "endpoints": {
+            "health": "/api/health/",
+            "companies": "/api/companies/",
+            "admin": "/admin/"
+        }
+    })
+
 urlpatterns = [
+    path('', root_handler, name='root'),
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health_check'),
     path('api/', include('companies.urls')),
