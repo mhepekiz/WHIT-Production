@@ -174,8 +174,12 @@ jobs:
           echo "🏗️  Building frontend..."
           cd ../frontend
           
+          # Clean any existing builds and caches
+          rm -rf dist/ node_modules/.vite/ .env.production .env.local .env
+          
           # Set staging API URL for production build
           echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.production
+          echo "Environment set: $(cat .env.production)"
           
           npm install
           npm run build
