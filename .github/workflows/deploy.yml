@@ -173,6 +173,10 @@ jobs:
           # Build frontend
           echo "🏗️  Building frontend..."
           cd ../frontend
+          
+          # Set staging API URL for production build
+          echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.production
+          
           npm install
           npm run build
           
