@@ -23,13 +23,13 @@
   transform: translateY(-2px);
 }
 
-/* Sponsored Badge */
+/* Sponsored Badge - Force gray background */
 .sponsored-badge {
   position: absolute;
   bottom: -1px;
   right: -1px;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
   padding: 4px 10px;
   font-size: 8px;
   font-weight: 600;

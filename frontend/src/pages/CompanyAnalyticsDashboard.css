@@ -194,8 +194,8 @@
 }
 
 .sponsored-badge {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
   padding: 3px 10px;
   border-radius: 12px;
   font-size: 0.64rem;
