@@ -213,6 +213,16 @@ jobs:
           # Copy fresh build
           sudo cp -r dist/* /var/www/whit-frontend/
           
+          # Update nginx configuration to point to correct frontend directory
+          echo "🔧 Updating nginx configuration..."
+          cd /var/www/whit
+          sudo cp nginx.conf /etc/nginx/sites-available/staging.whoishiringintech.com
+          sudo ln -sf /etc/nginx/sites-available/staging.whoishiringintech.com /etc/nginx/sites-enabled/
+          
+          # Test nginx configuration
+          echo "🧪 Testing nginx configuration..."
+          sudo nginx -t
+          
           # Verify deployed files don't contain production URLs
           echo "🔍 Final verification of deployed files..."
           if sudo find /var/www/whit-frontend -name "*.js" -exec grep -l "https://whoishiringintech\.com" {} \; 2>/dev/null | grep -q .; then
