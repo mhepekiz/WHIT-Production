@@ -8,6 +8,20 @@
 			"isBackground": true,
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"label": "Django Backend",
+			"type": "shell",
+			"command": "cd backend && python manage.py runserver",
+			"isBackground": true,
+			"group": "build"
+		},
+		{
+			"label": "Frontend Dev Server",
+			"type": "shell",
+			"command": "cd frontend && npm run dev",
+			"isBackground": true,
+			"group": "build"
 		}
 	]
 }

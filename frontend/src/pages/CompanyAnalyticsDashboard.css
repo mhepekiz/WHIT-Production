@@ -194,13 +194,14 @@
 }
 
 .sponsored-badge {
-  background: linear-gradient(135deg, #28a745, #20c997);
-  color: white;
+  background: #f3f4f6;
+  color: #6b7280;
   padding: 3px 10px;
   border-radius: 12px;
-  font-size: 0.8rem;
+  font-size: 0.64rem;
   font-weight: 600;
   display: inline-block;
+  border: 1px solid #e5e7eb;
 }
 
 .access-level {

@@ -18,8 +18,18 @@ trap cleanup INT TERM
 # Start backend
 echo "Starting Django backend..."
 cd backend
-source venv/bin/activate
-python manage.py runserver &
+if [ -f "../.venv/bin/activate" ]; then
+    source ../.venv/bin/activate
+elif [ -f "./venv/bin/activate" ]; then
+    source ./venv/bin/activate
+elif [ -f "./venv_new/bin/activate" ]; then
+    source ./venv_new/bin/activate
+else
+    echo "No Python virtual environment found."
+    echo "Expected one of: ../.venv, ./venv, ./venv_new"
+    exit 1
+fi
+python manage.py runserver 8001 &
 BACKEND_PID=$!
 cd ..
 
@@ -36,9 +46,9 @@ cd ..
 echo ""
 echo "✨ Application is starting..."
 echo ""
-echo "Backend: http://localhost:8000"
-echo "Frontend: http://localhost:5173"
-echo "Admin: http://localhost:8000/admin"
+echo "Backend: http://localhost:8001"
+echo "Frontend: http://localhost:3000"
+echo "Admin: http://localhost:8001/admin"
 echo ""
 echo "Press Ctrl+C to stop both servers"
 

@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async (authToken) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/accounts/dashboard/`, {
+      const response = await fetch('/api/accounts/dashboard/', {
         headers: {
           'Authorization': `Token ${authToken}`,
           'Content-Type': 'application/json',

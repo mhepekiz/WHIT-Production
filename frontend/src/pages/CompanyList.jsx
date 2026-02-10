@@ -51,8 +51,7 @@ function CompanyList() {
 
     const fetchAdSlots = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
-        const response = await fetch(`${API_URL}/ad-slots/active/`);
+        const response = await fetch('/api/ad-slots/active/');
         if (response.ok) {
           const data = await response.json();
           console.log('Ad slots data:', data);
@@ -67,8 +66,7 @@ function CompanyList() {
 
     const fetchSiteSettings = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
-        const response = await fetch(`${API_URL}/site-settings/current/`);
+        const response = await fetch('/api/site-settings/current/');
         if (response.ok) {
           const data = await response.json();
           console.log('Site settings loaded:', data);

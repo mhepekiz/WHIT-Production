@@ -19,7 +19,7 @@ const ResumeUpload = () => {
 
   const fetchCurrentResume = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/accounts/profile/me/`, {
+      const response = await fetch('/api/accounts/profile/me/', {
         headers: {
           'Authorization': `Token ${token}`,
         },
@@ -98,7 +98,7 @@ const ResumeUpload = () => {
     formData.append('resume', selectedFile);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/accounts/profile/me/`, {
+      const response = await fetch('/api/accounts/profile/me/', {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,

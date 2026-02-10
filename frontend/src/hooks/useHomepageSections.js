@@ -8,9 +8,8 @@ const useHomepageSections = () => {
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        // Use the same API URL logic as other components
-        const API_URL = import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api';
-        const response = await fetch(`${API_URL}/homepage-sections/`);
+        // Use relative URL for local development
+        const response = await fetch('/api/homepage-sections/');
 
         if (!response.ok) {
           // If the endpoint doesn't exist or fails, just return empty sections

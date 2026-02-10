@@ -40,7 +40,7 @@ function AddCompany() {
     setSubmitStatus(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/companies/`, {
+      const response = await fetch('/api/companies/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
