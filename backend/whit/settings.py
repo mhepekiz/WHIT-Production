@@ -140,7 +140,7 @@ REST_FRAMEWORK = {
 # CORS settings
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,https://staging.whoishiringintech.com,https://whoishiringintech.com'
+    default='http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,https://staging.whoishiringintech.com'
 ).split(',')
 
 CORS_ALLOW_CREDENTIALS = True
@@ -184,7 +184,6 @@ LOGGING = {
 # CSRF Trusted Origins for cross-origin requests
 CSRF_TRUSTED_ORIGINS = [
     'https://staging.whoishiringintech.com',
-    'https://whoishiringintech.com',
     'http://localhost:3000',
     'http://localhost:5173',
     'http://localhost:5174',
