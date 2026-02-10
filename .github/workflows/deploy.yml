@@ -144,94 +144,47 @@ jobs:
         key: ${{ secrets.STAGING_SSH_KEY }}
         port: 22
         timeout: 30s
-        command_timeout: 15m
+        command_timeout: 5m
         script: |
-          # Navigate to project directory
-          cd /var/www/whit || exit 1
+          set -e
           
-          # Set staging environment variables
-          echo 'VITE_API_URL=https://staging.whoishiringintech.com/api' > frontend/.env
+          # Navigate to project directory
+          cd /var/www/whit || { echo "Project directory not found"; exit 1; }
           
           # Kill existing processes
           pkill -f 'manage.py runserver' || true
           pkill -f 'gunicorn' || true
           pkill -f 'npm' || true
-          sleep 5
+          sleep 3
           
           # Pull latest code
-          git pull origin main || true
+          git pull origin main || echo "Git pull failed, continuing..."
           
-          # Build frontend with correct API URL
-          cd frontend
-          export VITE_API_URL=https://staging.whoishiringintech.com/api
-          npm install
-          npm run build
+          # Set staging environment variables
+          echo 'VITE_API_URL=https://staging.whoishiringintech.com/api' > frontend/.env
+          
+          # Build frontend
+          cd frontend || { echo "Frontend directory not found"; exit 1; }
+          npm install --no-optional --no-audit || { echo "npm install failed"; exit 1; }
+          npm run build || { echo "Frontend build failed"; exit 1; }
           cd ..
           
-          # Install backend dependencies and run migrations
-          cd backend
-          pip install -r requirements.txt || true
-          python manage.py migrate --noinput
-          python manage.py collectstatic --noinput
+          # Backend setup
+          cd backend || { echo "Backend directory not found"; exit 1; }
+          pip3 install -r requirements.txt --no-cache-dir || echo "pip install failed, continuing..."
+          python3 manage.py migrate --noinput || echo "Migrations failed, continuing..."
+          python3 manage.py collectstatic --noinput || echo "Collectstatic failed, continuing..."
           
           # Start backend
-          nohup python manage.py runserver 127.0.0.1:8000 > /var/log/whit-backend.log 2>&1 &
+          nohup python3 manage.py runserver 127.0.0.1:8000 > /var/log/whit-backend.log 2>&1 &
+          cd ..
           
-          # Wait for backend to start
-          sleep 10
-          
-          # Configure nginx if not already done
-          if [ ! -f /etc/nginx/sites-enabled/whit-staging ]; then
-            cat > /etc/nginx/sites-available/whit-staging << 'NGINX_EOF'
-          server {
-              listen 80;
-              server_name staging.whoishiringintech.com 45.79.211.144;
-
-              location / {
-                  root /var/www/whit/frontend/dist;
-                  try_files $uri $uri/ /index.html;
-              }
-
-              location /api/ {
-                  proxy_pass http://127.0.0.1:8000;
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                  proxy_set_header X-Forwarded-Proto $scheme;
-                  
-                  # CORS headers
-                  add_header Access-Control-Allow-Origin "https://staging.whoishiringintech.com" always;
-                  add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH" always;
-                  add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept, X-Requested-With" always;
-                  add_header Access-Control-Allow-Credentials "true" always;
-                  
-                  if ($request_method = OPTIONS) {
-                      add_header Access-Control-Allow-Origin "https://staging.whoishiringintech.com";
-                      add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH";
-                      add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept, X-Requested-With";
-                      add_header Access-Control-Allow-Credentials "true";
-                      add_header Content-Length 0;
-                      add_header Content-Type text/plain;
-                      return 200;
-                  }
-              }
-
-              location /media/ {
-                  alias /var/www/whit/backend/media/;
-              }
-
-              location /static/ {
-                  alias /var/www/whit/backend/staticfiles/;
-              }
-          }
-          NGINX_EOF
-            ln -sf /etc/nginx/sites-available/whit-staging /etc/nginx/sites-enabled/whit-staging
-            rm -f /etc/nginx/sites-enabled/default
-            nginx -t && systemctl restart nginx
+          # Simple nginx check and restart
+          if command -v nginx >/dev/null 2>&1; then
+            nginx -t && systemctl reload nginx || echo "Nginx reload failed"
           fi
           
-          echo "🎉 Deployment successful!"
-
+          echo "✅ Deployment completed!"
   # Health Check
   health-check:
     needs: [deploy-staging]
