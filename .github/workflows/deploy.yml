@@ -144,7 +144,7 @@ jobs:
         key: ${{ secrets.STAGING_SSH_KEY }}
         port: 22
         timeout: 30s
-        command_timeout: 10m
+        command_timeout: 15m
         script: |
           # Navigate to project directory
           cd /var/www/whit || exit 1
