@@ -177,16 +177,50 @@ jobs:
           # Clean any existing builds and caches - FORCE REBUILD
           rm -rf dist/ node_modules/.vite/ .env.production .env.local .env
           
+          # Also clear npm cache completely
+          npm cache clean --force
+          
+          # Remove node_modules and reinstall from scratch
+          rm -rf node_modules/
+          
           # Set staging API URL for production build
           echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.production
           echo "Environment set: $(cat .env.production)"
           
+          # Fresh install
           npm install
-          npm run build
+          
+          # Force clean build with no cache
+          npx vite build --force
+          
+          # Verify the build contains only staging URLs
+          echo "🔍 Verifying built JS contains only staging URLs..."
+          if grep -q "https://whoishiringintech\.com" dist/assets/*.js; then
+            echo "❌ ERROR: Production URLs found in built JS files!"
+            grep -o 'https://[^"]*whoishiringintech\.com[^"]*' dist/assets/*.js
+            exit 1
+          else
+            echo "✅ Clean build verified - only staging URLs found"
+          fi
           
           # Copy built frontend to nginx serve directory
           echo "📂 Deploying frontend files..."
-          sudo cp -r dist/* /var/www/whit-frontend/ 2>/dev/null || sudo mkdir -p /var/www/whit-frontend && sudo cp -r dist/* /var/www/whit-frontend/
+          
+          # Clear existing frontend files completely
+          sudo rm -rf /var/www/whit-frontend/*
+          sudo mkdir -p /var/www/whit-frontend
+          
+          # Copy fresh build
+          sudo cp -r dist/* /var/www/whit-frontend/
+          
+          # Verify deployed files don't contain production URLs
+          echo "🔍 Final verification of deployed files..."
+          if sudo grep -r "https://whoishiringintech\.com" /var/www/whit-frontend/ --include="*.js" 2>/dev/null; then
+            echo "❌ ERROR: Production URLs found in deployed files!"
+            exit 1
+          else
+            echo "✅ Deployment verified clean"
+          fi
           
           # Restart the application service
           echo "🔄 Restarting WHIT service..."
