@@ -174,7 +174,7 @@ jobs:
           echo "🏗️  Building frontend..."
           cd ../frontend
           
-          # Clean any existing builds and caches
+          # Clean any existing builds and caches - FORCE REBUILD
           rm -rf dist/ node_modules/.vite/ .env.production .env.local .env
           
           # Set staging API URL for production build
