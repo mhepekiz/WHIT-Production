@@ -138,92 +138,53 @@ jobs:
     
     - name: Deploy to staging server
       uses: appleboy/ssh-action@v1.1.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         host: ${{ secrets.STAGING_HOST }}
         username: ${{ secrets.STAGING_USER }}
         key: ${{ secrets.STAGING_SSH_KEY }}
         port: 22
-        timeout: 60s
-        command_timeout: 10m
-        envs: GITHUB_TOKEN
+        timeout: 30s
+        command_timeout: 5m
         script: |
           set -e
           
-          echo "🚀 Starting deployment..."
-          
           # Navigate to project directory
-          cd /var/www/whit || { echo "❌ Project directory not found"; exit 1; }
+          cd /var/www/whit || { echo "Project directory not found"; exit 1; }
           
-          # Kill existing processes
-          echo "🔄 Stopping existing processes..."
+          # Kill existing processes quickly
           pkill -f 'manage.py runserver' || true
           pkill -f 'gunicorn' || true
           pkill -f 'npm' || true
-          docker compose down || true
-          sleep 3
+          sleep 2
           
           # Pull latest code
-          echo "📥 Pulling latest code..."
-          git pull origin main || echo "⚠️ Git pull failed, continuing..."
+          git pull origin main || echo "Git pull failed, continuing..."
           
-          # Log into GitHub Container Registry
-          echo "🔐 Logging into GitHub Container Registry..."
-          echo "$GITHUB_TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          # Set staging environment variables
+          echo 'VITE_API_URL=https://staging.whoishiringintech.com/api' > frontend/.env
           
-          # Pull latest Docker images
-          echo "📦 Pulling latest Docker images..."
-          docker pull ${{ env.IMAGE_NAME_BACKEND }}:latest || echo "⚠️ Backend image pull failed"
-          docker pull ${{ env.IMAGE_NAME_FRONTEND }}:latest || echo "⚠️ Frontend image pull failed"
+          # Build frontend (simplified)
+          cd frontend || { echo "Frontend directory not found"; exit 1; }
+          npm ci --prefer-offline --no-audit || { echo "npm install failed"; exit 1; }
+          npm run build || { echo "Frontend build failed"; exit 1; }
+          cd ..
           
-          # Update docker-compose.yml with latest images
-          echo "🔧 Updating docker-compose configuration..."
-          cat > docker-compose.prod.yml << 'EOF'
-          version: '3.8'
+          # Backend setup
+          cd backend || { echo "Backend directory not found"; exit 1; }
+          pip3 install -r requirements.txt --no-cache-dir || echo "pip install failed, continuing..."
+          python3 manage.py migrate --noinput || echo "Migrations failed, continuing..."
+          python3 manage.py collectstatic --noinput || echo "Collectstatic failed, continuing..."
           
-          services:
-            backend:
-              image: ${{ env.IMAGE_NAME_BACKEND }}:latest
-              ports:
-                - "8000:8000"
-              environment:
-                - DEBUG=False
-                - ALLOWED_HOSTS=staging.whoishiringintech.com,localhost,127.0.0.1
-                - DATABASE_URL=sqlite:///db.sqlite3
-              volumes:
-                - ./backend/db.sqlite3:/app/db.sqlite3
-                - ./backend/media:/app/media
-              restart: unless-stopped
+          # Start backend
+          nohup python3 manage.py runserver 127.0.0.1:8000 > /var/log/whit-backend.log 2>&1 &
+          cd ..
           
-            frontend:
-              image: ${{ env.IMAGE_NAME_FRONTEND }}:latest
-              ports:
-                - "3000:80"
-              restart: unless-stopped
-          EOF
-          
-          # Start services with Docker Compose
-          echo "🚀 Starting services..."
-          docker compose -f docker-compose.prod.yml up -d
-          
-          # Wait for services to start
-          echo "⏳ Waiting for services to start..."
-          sleep 10
-          
-          # Simple nginx check and restart
-          echo "🔄 Reloading nginx..."
+          # Nginx reload
           if command -v nginx >/dev/null 2>&1; then
-            nginx -t && systemctl reload nginx || echo "⚠️ Nginx reload failed"
+            nginx -t && systemctl reload nginx || echo "Nginx reload failed"
           fi
           
-          # Clean up old images
-          echo "🧹 Cleaning up old Docker images..."
-          docker image prune -f || true
-          
-          echo "✅ Deployment completed successfully!"
-          echo "🌐 Frontend: http://staging.whoishiringintech.com"
-          echo "🔗 API: http://staging.whoishiringintech.com/api"
+          echo "✅ Deployment completed!"
   # Health Check
   health-check:
     needs: [deploy-staging]
@@ -234,35 +195,12 @@ jobs:
     - name: Health Check
       run: |
         # Wait for deployment to settle
-        echo "⏳ Waiting for services to start up..."
-        sleep 90
+        sleep 60
         
-        # Check API endpoint with retries
-        echo "🔍 Checking API health..."
-        for i in {1..5}; do
-          if curl -f -s https://staging.whoishiringintech.com/api/health/ || curl -f -s https://staging.whoishiringintech.com/api/companies/ ; then
-            echo "✅ API is responding"
-            break
-          fi
-          echo "⏳ Attempt $i failed, retrying in 30s..."
-          sleep 30
-        done
+        # Check API endpoint
+        curl -f https://staging.whoishiringintech.com/api/health/ || curl -f https://staging.whoishiringintech.com/api/companies/ || exit 1
         
-        # Check frontend with retries
-        echo "🔍 Checking frontend..."
-        for i in {1..5}; do
-          if curl -f -s https://staging.whoishiringintech.com/ > /dev/null; then
-            echo "✅ Frontend is responding"
-            break
-          fi
-          echo "⏳ Attempt $i failed, retrying in 30s..."
-          sleep 30
-        done
+        # Check frontend
+        curl -f https://staging.whoishiringintech.com/ || exit 1
         
-        # Final verification
-        if curl -f https://staging.whoishiringintech.com/api/companies/ && curl -f https://staging.whoishiringintech.com/; then
-          echo "🎉 All health checks passed!"
-        else
-          echo "❌ Health checks failed"
-          exit 1
-        fi
+        echo "✅ Health check passed!"
