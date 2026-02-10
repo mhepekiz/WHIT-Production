@@ -148,39 +148,35 @@ jobs:
         script: |
           echo "🚀 Starting deployment..."
           
-          # Check current directory and permissions
-          echo "Current directory: $(pwd)"
-          echo "User: $(whoami)"
-          ls -la /var/www/ || echo "Cannot list /var/www/"
+          # Navigate directly to project directory
+          cd /var/www/whit
+          echo "📍 In directory: $(pwd)"
           
-          # Navigate to project directory with more flexible path checking
-          if [ -d "/var/www/whit" ]; then
-            cd /var/www/whit
-            echo "✅ Found project directory: $(pwd)"
-          else
-            echo "❌ /var/www/whit not found, trying alternatives..."
-            find /var -name "whit" -type d 2>/dev/null || echo "No whit directories found"
-            exit 1
-          fi
+          # Pull latest code first
+          echo "📥 Pulling latest code..."
+          git pull origin main || echo "⚠️ Git pull failed, continuing..."
           
-          # Kill existing processes quickly (ignore errors)
-          echo "🔄 Stopping processes..."
-          pkill -f 'manage.py runserver' 2>/dev/null || true
-          pkill -f 'gunicorn' 2>/dev/null || true
-          pkill -f 'npm' 2>/dev/null || true
-          sleep 2
+          # Kill processes with timeout protection
+          echo "🔄 Stopping old processes..."
+          timeout 10 pkill -f 'manage.py runserver' || echo "No Django processes to stop"
+          timeout 10 pkill -f 'gunicorn' || echo "No Gunicorn processes to stop"
           
-          # Pull latest code
-          echo "📥 Pulling code..."
-          git pull origin main || echo "⚠️ Git pull failed"
-          
-          # Quick deployment without building
-          echo "🚀 Starting backend directly..."
+          # Start backend directly
+          echo "🚀 Starting Django backend..."
           cd backend
           nohup python3 manage.py runserver 127.0.0.1:8000 > /var/log/whit-backend.log 2>&1 &
-          echo "✅ Backend started"
           
-          echo "✅ Basic deployment completed!"
+          # Give it a moment to start
+          sleep 3
+          echo "✅ Backend started (check /var/log/whit-backend.log for status)"
+          
+          # Quick nginx reload if available
+          if command -v nginx >/dev/null 2>&1; then
+            echo "🔄 Reloading nginx..."
+            sudo systemctl reload nginx || echo "⚠️ Nginx reload failed"
+          fi
+          
+          echo "🎉 Deployment completed!"
   # Health Check
   health-check:
     needs: [deploy-staging]
