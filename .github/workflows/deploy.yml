@@ -183,15 +183,20 @@ jobs:
           # Remove node_modules and reinstall from scratch
           rm -rf node_modules/
           
-          # Set staging API URL for production build
+          # Set staging API URL for all possible environment files
           echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.production
-          echo "Environment set: $(cat .env.production)"
+          echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.staging
+          echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env
+          echo "Environment files created:"
+          echo "  .env.production: $(cat .env.production)"
+          echo "  .env.staging: $(cat .env.staging)"
+          echo "  .env: $(cat .env)"
           
           # Fresh install
           npm install
           
-          # Force clean build with no cache
-          npx vite build --force
+          # Force clean build with no cache and explicit environment
+          VITE_API_URL=https://staging.whoishiringintech.com/api npx vite build --force
           
           # Verify the build contains only staging URLs
           echo "🔍 Verifying built JS contains only staging URLs..."
