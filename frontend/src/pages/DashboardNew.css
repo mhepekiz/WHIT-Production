@@ -109,24 +109,28 @@
   margin-bottom: 2rem;
 }
 
-.dashboard-new .action-card {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 1.5rem;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  border: 1px solid #e9ecef;
+.dashboard-new .action-card,
+.dashboard-new .action-card:link,
+.dashboard-new .action-card:visited,
+.dashboard-new .action-card:hover,
+.dashboard-new .action-card:active {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  padding: 2rem !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 1.5rem !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+  color: #2c3e50 !important;
+  cursor: pointer !important;
+  border: 1px solid #e9ecef !important;
 }
 
 .dashboard-new .action-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
 }
 
 .dashboard-new .card-icon {

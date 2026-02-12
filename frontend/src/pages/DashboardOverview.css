@@ -136,11 +136,11 @@
   gap: 1rem;
 }
 
-.action-card,
-.action-card:link,
-.action-card:visited,
-.action-card:hover,
-.action-card:active {
+.dashboard-overview .action-card,
+.dashboard-overview .action-card:link,
+.dashboard-overview .action-card:visited,
+.dashboard-overview .action-card:hover,
+.dashboard-overview .action-card:active {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -153,49 +153,49 @@
   font-weight: 500;
 }
 
-.action-card span,
-.action-card .action-icon,
-.action-card svg {
+.dashboard-overview .action-card span,
+.dashboard-overview .action-card .action-icon,
+.dashboard-overview .action-card svg {
   color: #ffffff !important;
 }
 
-.action-card.action-post {
+.dashboard-overview .action-card.action-post {
   background: #2b6cb0;
 }
 
-.action-card.action-post:hover {
+.dashboard-overview .action-card.action-post:hover {
   box-shadow: 0 4px 12px rgba(43, 108, 176, 0.4);
 }
 
-.action-card.action-search {
+.dashboard-overview .action-card.action-search {
   background: #2c5282;
 }
 
-.action-card.action-search:hover {
+.dashboard-overview .action-card.action-search:hover {
   box-shadow: 0 4px 12px rgba(44, 82, 130, 0.4);
 }
 
-.action-card.action-apps {
+.dashboard-overview .action-card.action-apps {
   background: #3182ce;
 }
 
-.action-card.action-apps:hover {
+.dashboard-overview .action-card.action-apps:hover {
   box-shadow: 0 4px 12px rgba(49, 130, 206, 0.4);
 }
 
-.action-card.action-analytics {
+.dashboard-overview .action-card.action-analytics {
   background: #4299e1;
 }
 
-.action-card.action-analytics:hover {
+.dashboard-overview .action-card.action-analytics:hover {
   box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
 }
 
-.action-card:hover {
+.dashboard-overview .action-card:hover {
   transform: translateY(-2px);
 }
 
-.action-icon {
+.dashboard-overview .action-icon {
   font-size: 1.5rem;
   color: #ffffff !important;
 }
