@@ -294,6 +294,7 @@ jobs:
           fi
           
           # Ensure frontend directory exists with proper permissions
+          # Ensure frontend directory exists with proper permissions
           echo "🔍 DEBUG: Creating /var/www/whit/frontend/ directory..."
           sudo mkdir -p /var/www/whit/frontend
           sudo chown -R www-data:www-data /var/www/whit/frontend
@@ -304,19 +305,21 @@ jobs:
           sudo ls -la /var/www/whit/frontend/
           echo ""
           
-          # Clear existing frontend files completely
+          # First, copy built files to a temp location to preserve them
+          echo "💾 Preserving built files during directory clear..."
+          sudo cp -r dist /tmp/whit-dist-backup
+          
+          # Clear existing frontend files completely but preserve our backup
           echo "🗑️ Clearing existing frontend files..."
           sudo rm -rf /var/www/whit/frontend/*
           
-          # Fix permissions on dist directory first
-          echo "🔧 Fixing permissions on dist directory..."
-          sudo chown -R www-data:www-data dist/
-          
-          # Copy built frontend files (index.html, assets/, etc.) - NOT source files
-          echo "📋 Copying built React application files from dist/ to /var/www/whit/frontend/..."
-          sudo -u www-data cp -rv dist/* /var/www/whit/frontend/ || \
-          sudo cp -rv dist/. /var/www/whit/frontend/
+          # Copy built frontend files from backup
+          echo "📋 Copying built React application files to /var/www/whit/frontend/..."
+          sudo cp -rv /tmp/whit-dist-backup/* /var/www/whit/frontend/
           COPY_EXIT_CODE=$?
+          
+          # Clean up temp backup
+          sudo rm -rf /tmp/whit-dist-backup
           
           echo "🔍 DEBUG: Copy exit code: $COPY_EXIT_CODE"
           if [ $COPY_EXIT_CODE -ne 0 ]; then
