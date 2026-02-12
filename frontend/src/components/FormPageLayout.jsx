@@ -63,44 +63,42 @@ const FormPageLayout = ({ children, pageName }) => {
           maxWidth: `${imageWidthPct}%`,
           backgroundColor: layout.background_color,
           color: layout.text_color,
+          ...(layout.side_image_url ? {
+            backgroundImage: `url(${layout.side_image_url})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          } : {}),
         }}
       >
-        <div className="side-panel-content">
-          {layout.side_image_url && (
-            <div className="side-image">
-              <img src={layout.side_image_url} alt={layout.side_heading} />
-            </div>
-          )}
+        {/* Text overlay on image */}
+        {(layout.side_heading || layout.side_subheading || layout.side_text) && (
+          <div className={`text-overlay ${layout.text_overlay_position || 'center-center'}`}>
+            {layout.side_heading && 
+              React.createElement(
+                layout.side_heading_tag || 'h1',
+                { className: 'side-heading' },
+                layout.side_heading
+              )
+            }
 
-          {/* Text overlay on image */}
-          {(layout.side_heading || layout.side_subheading || layout.side_text) && (
-            <div className={`text-overlay ${layout.text_overlay_position || 'center-center'}`}>
-              {layout.side_heading && 
-                React.createElement(
-                  layout.side_heading_tag || 'h1',
-                  { className: 'side-heading' },
-                  layout.side_heading
-                )
-              }
+            {layout.side_subheading && 
+              React.createElement(
+                layout.side_subheading_tag || 'h2',
+                { className: 'side-subheading' },
+                layout.side_subheading
+              )
+            }
 
-              {layout.side_subheading && 
-                React.createElement(
-                  layout.side_subheading_tag || 'h2',
-                  { className: 'side-subheading' },
-                  layout.side_subheading
-                )
-              }
-
-              {layout.side_text && 
-                React.createElement(
-                  layout.side_text_tag || 'p',
-                  { className: 'side-text' },
-                  layout.side_text
-                )
-              }
-            </div>
-          )}
-        </div>
+            {layout.side_text && 
+              React.createElement(
+                layout.side_text_tag || 'p',
+                { className: 'side-text' },
+                layout.side_text
+              )
+            }
+          </div>
+        )}
       </div>
     </div>
   );
