@@ -174,6 +174,14 @@ jobs:
           echo "🏗️  Building frontend..."
           cd ../frontend
           
+          # Debug: Check current working directory and contents  
+          echo "🔍 DEBUG: Current directory: $(pwd)"
+          echo "🔍 DEBUG: Directory contents:"
+          ls -la
+          echo "🔍 DEBUG: Node.js version: $(node --version || echo 'Node.js not found')"
+          echo "🔍 DEBUG: npm version: $(npm --version || echo 'npm not found')"
+          echo ""
+          
           # Clean any existing builds and caches - FORCE REBUILD
           rm -rf dist/ node_modules/.vite/ .env.production .env.local .env
           
@@ -191,13 +199,38 @@ jobs:
           echo "  .env.production: $(cat .env.production)"
           echo "  .env.staging: $(cat .env.staging)"
           echo "  .env: $(cat .env)"
+          echo ""
           
-          # Fresh install
-          npm install
+          # Fresh install with verbose logging
+          echo "📦 npm install --verbose..."
+          npm install --verbose
+          
+          echo "🔍 DEBUG: package.json exists: $(test -f package.json && echo 'YES' || echo 'NO')"
+          echo "🔍 DEBUG: node_modules exists: $(test -d node_modules && echo 'YES' || echo 'NO')"
+          echo "🔍 DEBUG: vite command available: $(command -v npx > /dev/null && echo 'YES' || echo 'NO')"
           
           # Force clean build with no cache and explicit environment
           echo "🏗️ Building frontend with Vite..."
-          VITE_API_URL=https://staging.whoishiringintech.com/api npx vite build --force
+          echo "🔍 DEBUG: About to run Vite build..."
+          echo "🔍 DEBUG: Current directory: $(pwd)"
+          echo "🔍 DEBUG: Pre-build directory contents:"
+          ls -la
+          echo ""
+          
+          # Run Vite build with maximum verbosity and error handling
+          set -e  # Exit on any error
+          VITE_API_URL=https://staging.whoishiringintech.com/api npx vite build --force --logLevel info
+          BUILD_EXIT_CODE=$?
+          
+          echo "🔍 DEBUG: Vite build exit code: $BUILD_EXIT_CODE"
+          echo "🔍 DEBUG: Post-build directory contents:"
+          ls -la
+          echo ""
+          
+          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+            echo "❌ CRITICAL ERROR: Vite build failed with exit code $BUILD_EXIT_CODE"
+            exit 1
+          fi
           
           # Verify build succeeded and created necessary files
           echo "🔍 Verifying Vite build output:"
@@ -230,23 +263,43 @@ jobs:
           
           # First, verify built files exist and show what we're copying
           echo "🔍 Checking built files in dist/ directory:"
-          ls -la dist/
-          echo ""
-          echo "Files to copy:"
-          ls -la dist/*
-          echo ""
+          if [ -d "dist" ]; then
+            ls -la dist/
+            echo ""
+            echo "Files to copy (dist/* contents):"
+            find dist/ -type f | head -20  # Show first 20 files
+            echo ""
+          else
+            echo "❌ CRITICAL ERROR: dist/ directory does not exist after build!"
+            echo "Something went wrong with the Vite build process."
+            exit 1
+          fi
           
           # Ensure frontend directory exists with proper permissions
+          echo "🔍 DEBUG: Creating /var/www/whit/frontend/ directory..."
           sudo mkdir -p /var/www/whit/frontend
           sudo chown -R www-data:www-data /var/www/whit/frontend
           sudo chmod -R 755 /var/www/whit/frontend
           
+          # Show what's currently in the frontend directory before clearing
+          echo "🔍 DEBUG: Current contents of /var/www/whit/frontend/ before clearing:"
+          sudo ls -la /var/www/whit/frontend/
+          echo ""
+          
           # Clear existing frontend files completely
+          echo "🗑️ Clearing existing frontend files..."
           sudo rm -rf /var/www/whit/frontend/*
           
           # Copy built frontend files (index.html, assets/, etc.) - NOT source files
-          echo "Copying built React application files..."
-          sudo cp -r dist/* /var/www/whit/frontend/
+          echo "📋 Copying built React application files from dist/ to /var/www/whit/frontend/..."
+          sudo cp -rv dist/* /var/www/whit/frontend/
+          COPY_EXIT_CODE=$?
+          
+          echo "🔍 DEBUG: Copy exit code: $COPY_EXIT_CODE"
+          if [ $COPY_EXIT_CODE -ne 0 ]; then
+            echo "❌ CRITICAL ERROR: File copy failed with exit code $COPY_EXIT_CODE"
+            exit 1
+          fi
           
           # Verify what was copied
           echo "📋 Files copied to /var/www/whit/frontend/:"
