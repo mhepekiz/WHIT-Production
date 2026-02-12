@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getApiUrl } from '../services/api';
 import './DashboardNew.css';
+import './DashboardIconFix.css';
 
 const DashboardNew = () => {
   const navigate = useNavigate();
@@ -109,7 +110,7 @@ const DashboardNew = () => {
         {/* Welcome Header */}
         <div className="welcome-header">
           <h1>Welcome back, {fullName}! 👋</h1>
-          <p className="subtitle">INLINE STYLES APPLIED - NO MORE COLORS!</p>
+          <p className="subtitle">FORCED CSS OVERRIDE FILE ADDED!</p>
         </div>
 
         {/* Profile Completion Card */}
