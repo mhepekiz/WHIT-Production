@@ -110,7 +110,7 @@ const DashboardNew = () => {
         {/* Welcome Header */}
         <div className="welcome-header">
           <h1>Welcome back, {fullName}! 👋</h1>
-          <p className="subtitle">FORCED CSS OVERRIDE FILE ADDED!</p>
+          <p className="subtitle">DEPLOYMENT TEST v4.2 - CHECKING DEPLOY STATUS</p>
         </div>
 
         {/* Profile Completion Card */}
