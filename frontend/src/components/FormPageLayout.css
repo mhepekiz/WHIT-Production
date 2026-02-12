@@ -53,6 +53,7 @@
   background: #ffffff;
   height: 100vh;
   overflow-y: auto;
+  min-height: 100vh;
 }
 
 .form-wrapper {
@@ -66,9 +67,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 4rem 3rem;
+  padding: 0;
   height: 100vh;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .side-panel-content {
@@ -290,10 +291,14 @@
     flex-direction: column;
   }
 
-  .form-section,
-  .side-panel {
+  .form-section {
     min-height: auto;
     padding: 2rem 1.5rem;
+  }
+
+  .side-panel {
+    min-height: auto;
+    padding: 0;
   }
 
   .side-panel {
