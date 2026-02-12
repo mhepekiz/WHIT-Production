@@ -109,7 +109,7 @@ const DashboardNew = () => {
         {/* Welcome Header */}
         <div className="welcome-header">
           <h1>Welcome back, {fullName}! 👋</h1>
-          <p className="subtitle">Manage your profile and job search preferences - Updated</p>
+          <p className="subtitle">Dashboard redesigned with SIMPLE ICONS! v3.0</p>
         </div>
 
         {/* Profile Completion Card */}

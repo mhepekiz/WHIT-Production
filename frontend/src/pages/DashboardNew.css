@@ -1,3 +1,4 @@
+/* CACHE BUST - Dashboard Icons Fix v2.0 */
 .dashboard-new {
   min-height: 100vh;
   background-color: #f5f5f5;
@@ -132,18 +133,18 @@
   width: 50px;
   height: 50px;
   min-width: 50px;
-  background: #2c3e50;
+  background: #2c3e50 !important;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: white !important;
   font-size: 24px;
 }
 
 .card-icon .icon-symbol {
-  font-size: 24px;
-  color: white;
+  font-size: 24px !important;
+  color: white !important;
 }
 
 .card-icon svg {
