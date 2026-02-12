@@ -51,7 +51,7 @@ const FormPageLayout = ({ children, pageName }) => {
   return (
     <div className={`form-page-container form-split form-${formPosition}`}>
       {/* Form Section */}
-      <div className="form-section" style={{ flex: `0 0 ${formWidthPct}%`, maxWidth: `${formWidthPct}%` }}>
+      <div className="form-section" style={{ width: `${formWidthPct}%` }}>
         <div className="form-wrapper">{children}</div>
       </div>
 
@@ -59,18 +59,18 @@ const FormPageLayout = ({ children, pageName }) => {
       <div
         className="side-panel"
         style={{
-          flex: `0 0 ${imageWidthPct}%`,
-          maxWidth: `${imageWidthPct}%`,
-          backgroundColor: layout.background_color,
-          color: layout.text_color,
-          ...(layout.side_image_url ? {
-            backgroundImage: `url(${layout.side_image_url})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          } : {}),
+          width: `${imageWidthPct}%`,
+          backgroundColor: layout.background_color || '#ffffff',
+          color: layout.text_color || '#000000',
         }}
       >
+        {layout.side_image_url && (
+          <img
+            src={layout.side_image_url}
+            alt={layout.side_heading || 'Side panel'}
+            className="side-panel-image"
+          />
+        )}
         {/* Text overlay on image */}
         {(layout.side_heading || layout.side_subheading || layout.side_text) && (
           <div className={`text-overlay ${layout.text_overlay_position || 'center-center'}`}>
