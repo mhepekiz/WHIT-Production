@@ -134,51 +134,51 @@ const DashboardNew = () => {
         {/* Quick Actions Grid */}
         <div className="actions-grid">
           {/* Personal Info Card */}
-          <Link to="/dashboard/profile" className="action-card">
+          <Link to="/dashboard/profile" className="action-card" style={{background: '#ffffff', color: '#2c3e50', border: '1px solid #e9ecef', textDecoration: 'none'}}>
             <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
               <span style={{color: 'white', fontSize: '24px'}}>👤</span>
             </div>
             <div className="card-content">
-              <h3>Personal Info</h3>
-              <p>Update your name, location, and contact details</p>
+              <h3 style={{color: '#2c3e50'}}>Personal Info</h3>
+              <p style={{color: '#495057'}}>Update your name, location, and contact details</p>
             </div>
-            <div className="card-arrow">→</div>
+            <div className="card-arrow" style={{color: '#2c3e50'}}>→</div>
           </Link>
 
           {/* Job Preferences Card */}
-          <Link to="/dashboard/preferences" className="action-card">
+          <Link to="/dashboard/preferences" className="action-card" style={{background: '#ffffff', color: '#2c3e50', border: '1px solid #e9ecef', textDecoration: 'none'}}>
             <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
               <span style={{color: 'white', fontSize: '24px'}}>⚙️</span>
             </div>
             <div className="card-content">
-              <h3>Job Preferences</h3>
-              <p>Set your preferred job functions and work environment</p>
+              <h3 style={{color: '#2c3e50'}}>Job Preferences</h3>
+              <p style={{color: '#495057'}}>Set your preferred job functions and work environment</p>
             </div>
-            <div className="card-arrow">→</div>
+            <div className="card-arrow" style={{color: '#2c3e50'}}>→</div>
           </Link>
 
           {/* Resume Card */}
-          <Link to="/dashboard/resume" className="action-card">
+          <Link to="/dashboard/resume" className="action-card" style={{background: '#ffffff', color: '#2c3e50', border: '1px solid #e9ecef', textDecoration: 'none'}}>
             <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
               <span style={{color: 'white', fontSize: '24px'}}>📄</span>
             </div>
             <div className="card-content">
-              <h3>Resume</h3>
-              <p>Upload and manage your resume</p>
+              <h3 style={{color: '#2c3e50'}}>Resume</h3>
+              <p style={{color: '#495057'}}>Upload and manage your resume</p>
             </div>
-            <div className="card-arrow">→</div>
+            <div className="card-arrow" style={{color: '#2c3e50'}}>→</div>
           </Link>
 
           {/* Browse Companies Card */}
-          <Link to="/companies" className="action-card">
+          <Link to="/companies" className="action-card" style={{background: '#ffffff', color: '#2c3e50', border: '1px solid #e9ecef', textDecoration: 'none'}}>
             <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
               <span style={{color: 'white', fontSize: '24px'}}>🔍</span>
             </div>
             <div className="card-content">
-              <h3>Browse Companies</h3>
-              <p>Explore tech companies that are hiring</p>
+              <h3 style={{color: '#2c3e50'}}>Browse Companies</h3>
+              <p style={{color: '#495057'}}>Explore tech companies that are hiring</p>
             </div>
-            <div className="card-arrow">→</div>
+            <div className="card-arrow" style={{color: '#2c3e50'}}>→</div>
           </Link>
         </div>
 
