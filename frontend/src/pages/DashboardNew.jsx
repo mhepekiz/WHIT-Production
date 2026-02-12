@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getApiUrl } from '../services/api';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCog, faFileAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
 import './DashboardNew.css';
 
 const DashboardNew = () => {
@@ -137,7 +135,7 @@ const DashboardNew = () => {
           {/* Personal Info Card */}
           <Link to="/dashboard/profile" className="action-card">
             <div className="card-icon">
-              <FontAwesomeIcon icon={faUser} />
+              <span className="icon-symbol">👤</span>
             </div>
             <div className="card-content">
               <h3>Personal Info</h3>
@@ -149,7 +147,7 @@ const DashboardNew = () => {
           {/* Job Preferences Card */}
           <Link to="/dashboard/preferences" className="action-card">
             <div className="card-icon">
-              <FontAwesomeIcon icon={faCog} />
+              <span className="icon-symbol">⚙️</span>
             </div>
             <div className="card-content">
               <h3>Job Preferences</h3>
@@ -161,7 +159,7 @@ const DashboardNew = () => {
           {/* Resume Card */}
           <Link to="/dashboard/resume" className="action-card">
             <div className="card-icon">
-              <FontAwesomeIcon icon={faFileAlt} />
+              <span className="icon-symbol">📄</span>
             </div>
             <div className="card-content">
               <h3>Resume</h3>
@@ -173,7 +171,7 @@ const DashboardNew = () => {
           {/* Browse Companies Card */}
           <Link to="/companies" className="action-card">
             <div className="card-icon">
-              <FontAwesomeIcon icon={faSearch} />
+              <span className="icon-symbol">🔍</span>
             </div>
             <div className="card-content">
               <h3>Browse Companies</h3>
