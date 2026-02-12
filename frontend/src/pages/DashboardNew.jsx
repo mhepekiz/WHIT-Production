@@ -21,6 +21,7 @@ const DashboardNew = () => {
   }, [token, navigate]);
 
   const fetchDashboardData = async () => {
+    console.log('🔥 DASHBOARD v5.0 LOADING - TIMESTAMP:', new Date().toISOString());
     try {
       const [profileRes, prefsRes] = await Promise.all([
         fetch(getApiUrl('accounts/profile/me/'), {
@@ -110,7 +111,7 @@ const DashboardNew = () => {
         {/* Welcome Header */}
         <div className="welcome-header">
           <h1>Welcome back, {fullName}! 👋</h1>
-          <p className="subtitle">DEPLOYMENT TEST v4.2 - CHECKING DEPLOY STATUS</p>
+          <p className="subtitle">v5.0 CACHE BUST - {new Date().toISOString()}</p>
         </div>
 
         {/* Profile Completion Card */}
