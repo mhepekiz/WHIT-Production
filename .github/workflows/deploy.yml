@@ -196,6 +196,10 @@ jobs:
           echo "📁 Collecting static files..."
           python manage.py collectstatic --noinput --clear
           
+          # Populate analytics data for Sourthings LLC
+          echo "📊 Populating analytics data..."
+          python manage.py populate_sourthings_analytics || echo "⚠️ Analytics population skipped"
+          
           # Build frontend
           echo "🏗️  Building frontend..."
           cd ../frontend
