@@ -214,15 +214,10 @@ jobs:
           # Remove node_modules and reinstall from scratch
           rm -rf node_modules/
           
-          # Set staging API URL for all possible environment files 
+          # Set staging API URL for production build
           echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.production
-          echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.staging
           echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env
-          echo "Environment files created:"
-          echo "  .env.production: $(cat .env.production)"
-          echo "  .env.staging: $(cat .env.staging)"
-          echo "  .env: $(cat .env)"
-          echo ""
+          echo "Environment configured for staging deployment"
           
           # Fresh install with verbose logging
           echo "📦 npm install --verbose..."
@@ -313,9 +308,14 @@ jobs:
           echo "🗑️ Clearing existing frontend files..."
           sudo rm -rf /var/www/whit/frontend/*
           
+          # Fix permissions on dist directory first
+          echo "🔧 Fixing permissions on dist directory..."
+          sudo chown -R www-data:www-data dist/
+          
           # Copy built frontend files (index.html, assets/, etc.) - NOT source files
           echo "📋 Copying built React application files from dist/ to /var/www/whit/frontend/..."
-          sudo cp -rv dist/* /var/www/whit/frontend/
+          sudo -u www-data cp -rv dist/* /var/www/whit/frontend/ || \
+          sudo cp -rv dist/. /var/www/whit/frontend/
           COPY_EXIT_CODE=$?
           
           echo "🔍 DEBUG: Copy exit code: $COPY_EXIT_CODE"
