@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { getJobOpenings, getJobAnalytics, getJobApplications } from '../services/recruiterApi';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBriefcase, faEye, faFileAlt, faCheckCircle, faPlus, faSearch, faClipboardList, faChartBar } from '@fortawesome/free-solid-svg-icons';
 import './DashboardOverview.css';
 
 function DashboardOverview() {
@@ -41,7 +43,7 @@ function DashboardOverview() {
       {/* Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon">💼</div>
+          <div className="stat-icon"><FontAwesomeIcon icon={faBriefcase} /></div>
           <div className="stat-content">
             <h3>{analytics?.total_jobs || 0}</h3>
             <p>Total Job Postings</p>
@@ -49,7 +51,7 @@ function DashboardOverview() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">👁️</div>
+          <div className="stat-icon"><FontAwesomeIcon icon={faEye} /></div>
           <div className="stat-content">
             <h3>{analytics?.total_views || 0}</h3>
             <p>Total Views</p>
@@ -57,7 +59,7 @@ function DashboardOverview() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">📄</div>
+          <div className="stat-icon"><FontAwesomeIcon icon={faFileAlt} /></div>
           <div className="stat-content">
             <h3>{analytics?.total_applications || 0}</h3>
             <p>Total Applications</p>
@@ -65,7 +67,7 @@ function DashboardOverview() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">✅</div>
+          <div className="stat-icon"><FontAwesomeIcon icon={faCheckCircle} /></div>
           <div className="stat-content">
             <h3>{analytics?.active_jobs || 0}</h3>
             <p>Active Jobs</p>
@@ -134,19 +136,19 @@ function DashboardOverview() {
         <h3>Quick Actions</h3>
         <div className="actions-grid">
           <Link to="/recruiter/dashboard/jobs/new" className="action-card">
-            <span className="action-icon">➕</span>
+            <span className="action-icon"><FontAwesomeIcon icon={faPlus} /></span>
             <span>Post New Job</span>
           </Link>
           <Link to="/recruiter/dashboard/candidates" className="action-card">
-            <span className="action-icon">🔍</span>
+            <span className="action-icon"><FontAwesomeIcon icon={faSearch} /></span>
             <span>Search Candidates</span>
           </Link>
           <Link to="/recruiter/dashboard/applications" className="action-card">
-            <span className="action-icon">📋</span>
+            <span className="action-icon"><FontAwesomeIcon icon={faClipboardList} /></span>
             <span>View Applications</span>
           </Link>
           <Link to="/recruiter/dashboard/analytics" className="action-card">
-            <span className="action-icon">📊</span>
+            <span className="action-icon"><FontAwesomeIcon icon={faChartBar} /></span>
             <span>View Analytics</span>
           </Link>
         </div>
