@@ -52,14 +52,12 @@
   padding: 2rem 1rem;
   background: #ffffff;
   height: 100%;
-  overflow-y: auto;
   box-sizing: border-box;
 }
 
 .form-wrapper {
   width: 100%;
   max-width: 450px;
-  margin: auto;
 }
 
 /* Side Panel */
