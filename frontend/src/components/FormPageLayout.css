@@ -1,7 +1,7 @@
 .form-page-container {
-  min-height: 100vh;
-  height: 100vh;
-  width: 100vw;
+  min-height: calc(100vh - 60px);
+  height: calc(100vh - 60px);
+  width: 100%;
   margin: 0;
   padding: 0;
   position: relative;
@@ -31,8 +31,8 @@
 .form-split {
   display: flex;
   flex-direction: row;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 }
 
 .form-left {
@@ -51,14 +51,15 @@
   align-items: center;
   padding: 2rem 1rem;
   background: #ffffff;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
-  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .form-wrapper {
   width: 100%;
   max-width: 450px;
+  margin: auto;
 }
 
 /* Side Panel */
@@ -68,7 +69,7 @@
   justify-content: center;
   align-items: center;
   padding: 0;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
