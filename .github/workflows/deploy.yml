@@ -148,13 +148,39 @@ jobs:
         script: |
           echo "🚀 Starting deployment..."
           
-          # Navigate to the correct directory
+          # Navigate to the correct directory and ensure git repo is set up
           cd /var/www/whit
           echo "✅ Working directory: $(pwd)"
           
-          # Pull latest code
+          # Initialize git repository if it doesn't exist
+          if [ ! -d ".git" ]; then
+            echo "📁 Initializing git repository..."
+            sudo git init
+            sudo git remote add origin https://github.com/mhepekiz/WHIT-Production.git
+            sudo chown -R www-data:www-data /var/www/whit
+          fi
+          
+          # Ensure git is configured for the user
+          sudo -u www-data git config --global user.email "deploy@whoishiringintech.com"
+          sudo -u www-data git config --global user.name "Deployment Bot"
+          
+          # Pull latest code with checkout to ensure all files are present
           echo "📥 Pulling latest code..."
-          git pull origin main
+          sudo -u www-data git fetch origin main
+          sudo -u www-data git reset --hard origin/main
+          
+          # Verify all source files exist
+          echo "🔍 Verifying source files..."
+          if [ ! -f "frontend/package.json" ]; then
+            echo "❌ ERROR: frontend/package.json missing after git pull!"
+            echo "Repository contents:"
+            sudo ls -la
+            echo "Frontend directory:"
+            sudo ls -la frontend/
+            exit 1
+          fi
+          
+          echo "✅ Source files verified present"
           
           # Install/update backend dependencies
           echo "📦 Installing Python dependencies..."
@@ -182,16 +208,13 @@ jobs:
           echo "🔍 DEBUG: npm version: $(npm --version || echo 'npm not found')"
           echo ""
           
-          # Clean any existing builds and caches - FORCE REBUILD
+          # Clean any existing builds and caches
           rm -rf dist/ node_modules/.vite/ .env.production .env.local .env
-          
-          # Also clear npm cache completely
-          npm cache clean --force
           
           # Remove node_modules and reinstall from scratch
           rm -rf node_modules/
           
-          # Set staging API URL for all possible environment files
+          # Set staging API URL for all possible environment files 
           echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.production
           echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env.staging
           echo "VITE_API_URL=https://staging.whoishiringintech.com/api" > .env
@@ -219,7 +242,7 @@ jobs:
           
           # Run Vite build with maximum verbosity and error handling
           set -e  # Exit on any error
-          VITE_API_URL=https://staging.whoishiringintech.com/api npx vite build --force --logLevel info
+          VITE_API_URL=https://staging.whoishiringintech.com/api npm run build
           BUILD_EXIT_CODE=$?
           
           echo "🔍 DEBUG: Vite build exit code: $BUILD_EXIT_CODE"
