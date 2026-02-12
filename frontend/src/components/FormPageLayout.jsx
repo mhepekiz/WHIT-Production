@@ -39,6 +39,8 @@ const FormPageLayout = ({ children, pageName }) => {
   }
 
   const formPosition = layout?.form_position || 'center';
+  const imageWidthPct = layout?.image_width_percentage || 50;
+  const formWidthPct = 100 - imageWidthPct;
 
   // Center layout - original style
   if (formPosition === 'center') {
@@ -49,7 +51,7 @@ const FormPageLayout = ({ children, pageName }) => {
   return (
     <div className={`form-page-container form-split form-${formPosition}`}>
       {/* Form Section */}
-      <div className="form-section">
+      <div className="form-section" style={{ flex: `0 0 ${formWidthPct}%`, maxWidth: `${formWidthPct}%` }}>
         <div className="form-wrapper">{children}</div>
       </div>
 
@@ -57,6 +59,8 @@ const FormPageLayout = ({ children, pageName }) => {
       <div
         className="side-panel"
         style={{
+          flex: `0 0 ${imageWidthPct}%`,
+          maxWidth: `${imageWidthPct}%`,
           backgroundColor: layout.background_color,
           color: layout.text_color,
         }}

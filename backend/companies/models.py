@@ -253,6 +253,14 @@ class FormLayout(models.Model):
         ('bottom-right', 'Bottom Right'),
     ]
     
+    IMAGE_WIDTH_CHOICES = [
+        (50, '50% - Equal Split'),
+        (60, '60% Image / 40% Form'),
+        (70, '70% Image / 30% Form'),
+        (80, '80% Image / 20% Form'),
+        (90, '90% Image / 10% Form'),
+    ]
+    
     HTML_TAG_CHOICES = [
         ('h1', 'H1 - Main Heading'),
         ('h2', 'H2 - Subheading'),
@@ -323,6 +331,11 @@ class FormLayout(models.Model):
         choices=TEXT_OVERLAY_CHOICES,
         default='center-center',
         help_text='Position of text overlay on the image'
+    )
+    image_width_percentage = models.IntegerField(
+        choices=IMAGE_WIDTH_CHOICES,
+        default=50,
+        help_text='Percentage of screen width the image/side panel should occupy'
     )
     
     # Styling

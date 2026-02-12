@@ -491,6 +491,7 @@ class FormLayoutViewSet(viewsets.ReadOnlyModelViewSet):
                 'side_text_tag': layout.side_text_tag,
                 'side_image_url': image_url,
                 'text_overlay_position': layout.text_overlay_position,
+                'image_width_percentage': layout.image_width_percentage,
                 'background_color': layout.background_color,
                 'text_color': layout.text_color,
             }
@@ -508,6 +509,7 @@ class FormLayoutViewSet(viewsets.ReadOnlyModelViewSet):
                 'side_text_tag': 'p',
                 'side_image_url': None,
                 'text_overlay_position': 'center-center',
+                'image_width_percentage': 50,
                 'background_color': '#ffffff',
                 'text_color': '#000000',
             })

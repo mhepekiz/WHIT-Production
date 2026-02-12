@@ -244,7 +244,7 @@ class FormLayoutAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Page Configuration', {
-            'fields': ('page_name', 'form_position')
+            'fields': ('page_name', 'form_position', 'image_width_percentage')
         }),
         ('Side Panel Content', {
             'fields': (
