@@ -212,19 +212,19 @@ jobs:
           echo "📂 Deploying frontend files..."
           
           # Ensure frontend directory exists with proper permissions
-          sudo mkdir -p /var/www/whit-frontend
-          sudo chown -R www-data:www-data /var/www/whit-frontend
-          sudo chmod -R 755 /var/www/whit-frontend
+          sudo mkdir -p /var/www/whit/frontend
+          sudo chown -R www-data:www-data /var/www/whit/frontend
+          sudo chmod -R 755 /var/www/whit/frontend
           
           # Clear existing frontend files completely
-          sudo rm -rf /var/www/whit-frontend/*
+          sudo rm -rf /var/www/whit/frontend/*
           
           # Copy fresh build
-          sudo cp -r dist/* /var/www/whit-frontend/
+          sudo cp -r dist/* /var/www/whit/frontend/
           
           # Set proper permissions after copy
-          sudo chown -R www-data:www-data /var/www/whit-frontend
-          sudo chmod -R 755 /var/www/whit-frontend
+          sudo chown -R www-data:www-data /var/www/whit/frontend
+          sudo chmod -R 755 /var/www/whit/frontend
           
           # Update nginx configuration to point to correct frontend directory
           echo "🔧 Updating nginx configuration..."
@@ -244,9 +244,9 @@ jobs:
           
           # Verify deployed files don't contain production URLs
           echo "🔍 Final verification of deployed files..."
-          if sudo find /var/www/whit-frontend -name "*.js" -exec grep -l "https://whoishiringintech\.com" {} \; 2>/dev/null | grep -q .; then
+          if sudo find /var/www/whit/frontend -name "*.js" -exec grep -l "https://whoishiringintech\.com" {} \; 2>/dev/null | grep -q .; then
             echo "⚠️ WARNING: Production URLs found in deployed files"
-            sudo find /var/www/whit-frontend -name "*.js" -exec grep -o 'https://[^"]*whoishiringintech\.com[^"]*' {} \; 2>/dev/null || true
+            sudo find /var/www/whit/frontend -name "*.js" -exec grep -o 'https://[^"]*whoishiringintech\.com[^"]*' {} \; 2>/dev/null || true
           else
             echo "✅ Deployment verified clean"
           fi
