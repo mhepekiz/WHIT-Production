@@ -109,7 +109,7 @@ const DashboardNew = () => {
         {/* Welcome Header */}
         <div className="welcome-header">
           <h1>Welcome back, {fullName}! 👋</h1>
-          <p className="subtitle">Dashboard redesigned with SIMPLE ICONS! v3.0</p>
+          <p className="subtitle">INLINE STYLES APPLIED - NO MORE COLORS!</p>
         </div>
 
         {/* Profile Completion Card */}
@@ -134,8 +134,8 @@ const DashboardNew = () => {
         <div className="actions-grid">
           {/* Personal Info Card */}
           <Link to="/dashboard/profile" className="action-card">
-            <div className="card-icon">
-              <span className="icon-symbol">👤</span>
+            <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
+              <span style={{color: 'white', fontSize: '24px'}}>👤</span>
             </div>
             <div className="card-content">
               <h3>Personal Info</h3>
@@ -146,8 +146,8 @@ const DashboardNew = () => {
 
           {/* Job Preferences Card */}
           <Link to="/dashboard/preferences" className="action-card">
-            <div className="card-icon">
-              <span className="icon-symbol">⚙️</span>
+            <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
+              <span style={{color: 'white', fontSize: '24px'}}>⚙️</span>
             </div>
             <div className="card-content">
               <h3>Job Preferences</h3>
@@ -158,8 +158,8 @@ const DashboardNew = () => {
 
           {/* Resume Card */}
           <Link to="/dashboard/resume" className="action-card">
-            <div className="card-icon">
-              <span className="icon-symbol">📄</span>
+            <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
+              <span style={{color: 'white', fontSize: '24px'}}>📄</span>
             </div>
             <div className="card-content">
               <h3>Resume</h3>
@@ -170,8 +170,8 @@ const DashboardNew = () => {
 
           {/* Browse Companies Card */}
           <Link to="/companies" className="action-card">
-            <div className="card-icon">
-              <span className="icon-symbol">🔍</span>
+            <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
+              <span style={{color: 'white', fontSize: '24px'}}>🔍</span>
             </div>
             <div className="card-content">
               <h3>Browse Companies</h3>
