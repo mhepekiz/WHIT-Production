@@ -45,7 +45,7 @@ class SponsoredTrackingService {
 
       const pageNumber = parseInt(urlParams.get('page')) || 1;
 
-      const response = await fetch('/api/companies/sponsored/impression/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/companies/sponsored/impression/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ class SponsoredTrackingService {
 
       const pageNumber = parseInt(urlParams.get('page')) || 1;
 
-      const response = await fetch('/api/companies/sponsored/click/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/companies/sponsored/click/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

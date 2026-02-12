@@ -1,6 +1,6 @@
-// Centralized API configuration
-const API_BASE_URL = '/api';
-const BASE_URL = '';
+// Centralized API configuration - environment aware
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export const getApiUrl = (endpoint) => {
   // Remove leading slash if present to avoid double slashes

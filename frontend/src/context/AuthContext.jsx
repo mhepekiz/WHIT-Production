@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async (authToken) => {
     try {
-      const response = await fetch('/api/accounts/dashboard/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/accounts/dashboard/`, {
         headers: {
           'Authorization': `Token ${authToken}`,
           'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/accounts/login/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/accounts/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       console.log('AuthContext: Sending registration request with:', userData);
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://staging.whoishiringintech.com/api'}/accounts/register/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/accounts/register/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

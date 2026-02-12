@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getApiUrl } from '../services/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faCog, faFileAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
 import './DashboardNew.css';
 
 const DashboardNew = () => {
@@ -135,10 +137,7 @@ const DashboardNew = () => {
           {/* Personal Info Card */}
           <Link to="/dashboard/profile" className="action-card">
             <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
+              <FontAwesomeIcon icon={faUser} />
             </div>
             <div className="card-content">
               <h3>Personal Info</h3>
@@ -150,11 +149,7 @@ const DashboardNew = () => {
           {/* Job Preferences Card */}
           <Link to="/dashboard/preferences" className="action-card">
             <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v6m0 6v6m-9-9h6m6 0h6" />
-                <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
-              </svg>
+              <FontAwesomeIcon icon={faCog} />
             </div>
             <div className="card-content">
               <h3>Job Preferences</h3>
@@ -166,13 +161,7 @@ const DashboardNew = () => {
           {/* Resume Card */}
           <Link to="/dashboard/resume" className="action-card">
             <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
+              <FontAwesomeIcon icon={faFileAlt} />
             </div>
             <div className="card-content">
               <h3>Resume</h3>
@@ -184,10 +173,7 @@ const DashboardNew = () => {
           {/* Browse Companies Card */}
           <Link to="/companies" className="action-card">
             <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
+              <FontAwesomeIcon icon={faSearch} />
             </div>
             <div className="card-content">
               <h3>Browse Companies</h3>

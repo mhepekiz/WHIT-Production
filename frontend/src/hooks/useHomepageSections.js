@@ -8,8 +8,9 @@ const useHomepageSections = () => {
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        // Use relative URL for local development
-        const response = await fetch('/api/homepage-sections/');
+        // Use environment variable for API URL
+        const apiUrl = import.meta.env.VITE_API_URL || '/api';
+        const response = await fetch(`${apiUrl}/homepage-sections/`);
 
         if (!response.ok) {
           // If the endpoint doesn't exist or fails, just return empty sections

@@ -206,7 +206,7 @@ const JobPreferences = () => {
     try {
       const locationString = serializeLocations();
       
-      const response = await fetch('/api/accounts/job-preferences/me/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/accounts/job-preferences/me/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,

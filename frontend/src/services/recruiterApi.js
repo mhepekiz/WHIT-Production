@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = '/api';
-const API_URL = `${API_BASE_URL.replace('/api', '')}/api/recruiters`;
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = `${API_BASE_URL}/recruiters`;
 
 // Create axios instance with auth header
 const getAuthHeader = () => {
