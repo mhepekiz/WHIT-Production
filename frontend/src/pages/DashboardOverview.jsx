@@ -135,19 +135,19 @@ function DashboardOverview() {
       <div className="quick-actions">
         <h3>Quick Actions</h3>
         <div className="actions-grid">
-          <Link to="/recruiter/dashboard/jobs/new" className="action-card">
+          <Link to="/recruiter/dashboard/jobs/new" className="action-card action-post">
             <span className="action-icon"><FontAwesomeIcon icon={faPlus} /></span>
             <span>Post New Job</span>
           </Link>
-          <Link to="/recruiter/dashboard/candidates" className="action-card">
+          <Link to="/recruiter/dashboard/candidates" className="action-card action-search">
             <span className="action-icon"><FontAwesomeIcon icon={faSearch} /></span>
             <span>Search Candidates</span>
           </Link>
-          <Link to="/recruiter/dashboard/applications" className="action-card">
+          <Link to="/recruiter/dashboard/applications" className="action-card action-apps">
             <span className="action-icon"><FontAwesomeIcon icon={faClipboardList} /></span>
             <span>View Applications</span>
           </Link>
-          <Link to="/recruiter/dashboard/analytics" className="action-card">
+          <Link to="/recruiter/dashboard/analytics" className="action-card action-analytics">
             <span className="action-icon"><FontAwesomeIcon icon={faChartBar} /></span>
             <span>View Analytics</span>
           </Link>
