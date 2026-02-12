@@ -136,17 +136,27 @@
   gap: 1rem;
 }
 
-.action-card {
+.action-card,
+.action-card:link,
+.action-card:visited,
+.action-card:hover,
+.action-card:active {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1.25rem;
   background: #3182ce;
-  color: white;
+  color: #ffffff !important;
   border-radius: 8px;
-  text-decoration: none;
+  text-decoration: none !important;
   transition: transform 0.3s, box-shadow 0.3s;
   font-weight: 500;
+}
+
+.action-card span,
+.action-card .action-icon,
+.action-card svg {
+  color: #ffffff !important;
 }
 
 .action-card.action-post {
@@ -187,6 +197,7 @@
 
 .action-icon {
   font-size: 1.5rem;
+  color: #ffffff !important;
 }
 
 .recent-section {
