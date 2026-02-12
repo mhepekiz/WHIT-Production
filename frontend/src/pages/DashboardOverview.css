@@ -141,7 +141,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1.25rem;
-  background: #4299e1;
+  background: #3182ce;
   color: white;
   border-radius: 8px;
   text-decoration: none;
@@ -150,35 +150,35 @@
 }
 
 .action-card.action-post {
-  background: #3182ce;
+  background: #2b6cb0;
 }
 
 .action-card.action-post:hover {
-  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.4);
+  box-shadow: 0 4px 12px rgba(43, 108, 176, 0.4);
 }
 
 .action-card.action-search {
-  background: #38a169;
+  background: #2c5282;
 }
 
 .action-card.action-search:hover {
-  box-shadow: 0 4px 12px rgba(56, 161, 105, 0.4);
+  box-shadow: 0 4px 12px rgba(44, 82, 130, 0.4);
 }
 
 .action-card.action-apps {
-  background: #dd6b20;
+  background: #3182ce;
 }
 
 .action-card.action-apps:hover {
-  box-shadow: 0 4px 12px rgba(221, 107, 32, 0.4);
+  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.4);
 }
 
 .action-card.action-analytics {
-  background: #805ad5;
+  background: #4299e1;
 }
 
 .action-card.action-analytics:hover {
-  box-shadow: 0 4px 12px rgba(128, 90, 213, 0.4);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
 }
 
 .action-card:hover {
