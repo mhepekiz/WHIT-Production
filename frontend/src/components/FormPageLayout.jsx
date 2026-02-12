@@ -52,7 +52,9 @@ const FormPageLayout = ({ children, pageName }) => {
     <div className={`form-page-container form-split form-${formPosition}`}>
       {/* Form Section */}
       <div className="form-section" style={{ width: `${formWidthPct}%` }}>
-        <div className="form-wrapper">{children}</div>
+        <div className="form-section-inner">
+          <div className="form-wrapper">{children}</div>
+        </div>
       </div>
 
       {/* Side Panel Section */}
