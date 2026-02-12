@@ -196,7 +196,24 @@ jobs:
           npm install
           
           # Force clean build with no cache and explicit environment
+          echo "🏗️ Building frontend with Vite..."
           VITE_API_URL=https://staging.whoishiringintech.com/api npx vite build --force
+          
+          # Verify build succeeded and created necessary files
+          echo "🔍 Verifying Vite build output:"
+          if [ ! -d "dist" ]; then
+            echo "❌ CRITICAL ERROR: dist/ directory not created by Vite build!"
+            exit 1
+          fi
+          
+          if [ ! -f "dist/index.html" ]; then
+            echo "❌ CRITICAL ERROR: dist/index.html not created by Vite build!"
+            exit 1
+          fi
+          
+          echo "✅ Build successful - dist/ directory contents:"
+          ls -la dist/
+          echo ""
           
           # Verify the build contains only staging URLs
           echo "🔍 Verifying built JS contains only staging URLs..."
@@ -211,6 +228,14 @@ jobs:
           # Copy built frontend to nginx serve directory
           echo "📂 Deploying frontend files..."
           
+          # First, verify built files exist and show what we're copying
+          echo "🔍 Checking built files in dist/ directory:"
+          ls -la dist/
+          echo ""
+          echo "Files to copy:"
+          ls -la dist/*
+          echo ""
+          
           # Ensure frontend directory exists with proper permissions
           sudo mkdir -p /var/www/whit/frontend
           sudo chown -R www-data:www-data /var/www/whit/frontend
@@ -219,8 +244,23 @@ jobs:
           # Clear existing frontend files completely
           sudo rm -rf /var/www/whit/frontend/*
           
-          # Copy fresh build
+          # Copy built frontend files (index.html, assets/, etc.) - NOT source files
+          echo "Copying built React application files..."
           sudo cp -r dist/* /var/www/whit/frontend/
+          
+          # Verify what was copied
+          echo "📋 Files copied to /var/www/whit/frontend/:"
+          sudo ls -la /var/www/whit/frontend/
+          echo ""
+          
+          # Ensure we have index.html (critical for SPA)
+          if [ ! -f "/var/www/whit/frontend/index.html" ]; then
+            echo "❌ CRITICAL ERROR: index.html not found in deployed files!"
+            echo "Build may have failed. Aborting deployment."
+            exit 1
+          else
+            echo "✅ index.html found - frontend files deployed correctly"
+          fi
           
           # Set proper permissions after copy
           sudo chown -R www-data:www-data /var/www/whit/frontend
