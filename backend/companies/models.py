@@ -200,6 +200,10 @@ class SiteSettings(models.Model):
         ('random', 'Random'),
     ]
     
+    jobs_per_page = models.IntegerField(
+        default=20,
+        help_text='Number of job openings to display per page on the Jobs listing page'
+    )
     companies_per_page = models.IntegerField(
         default=30,
         help_text='Number of companies to display per page on the All Companies listing page'

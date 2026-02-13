@@ -284,6 +284,33 @@ class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PublicJobOpeningSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_page_size(self):
+        """Get page size from SiteSettings."""
+        try:
+            from companies.models import SiteSettings
+            settings = SiteSettings.load()
+            return settings.jobs_per_page
+        except Exception:
+            return 20
+
+    def list(self, request, *args, **kwargs):
+        """Override list to apply configurable pagination."""
+        queryset = self.filter_queryset(self.get_queryset())
+        page_size = self.get_page_size()
+        page = int(request.query_params.get('page', 1))
+        total = queryset.count()
+        start = (page - 1) * page_size
+        end = start + page_size
+        jobs = queryset[start:end]
+        serializer = self.get_serializer(jobs, many=True)
+        return Response({
+            'results': serializer.data,
+            'count': total,
+            'page': page,
+            'page_size': page_size,
+            'total_pages': (total + page_size - 1) // page_size,
+        })
+
     def get_queryset(self):
         qs = JobOpening.objects.filter(status='active').select_related('recruiter', 'company')
 

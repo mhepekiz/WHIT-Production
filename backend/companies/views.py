@@ -482,6 +482,7 @@ class SiteSettingsViewSet(viewsets.ReadOnlyModelViewSet):
             'homepage_companies': settings.homepage_companies,
             'homepage_sort_order': settings.homepage_sort_order,
             'companies_per_group': settings.companies_per_group,
+            'jobs_per_page': settings.jobs_per_page,
             'label_size': settings.label_size,
         })
 

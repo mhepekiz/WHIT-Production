@@ -11,6 +11,11 @@ function JobBoard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
   // Filter state
   const [search, setSearch] = useState('');
   const [employmentType, setEmploymentType] = useState('');
@@ -56,6 +61,7 @@ function JobBoard() {
       if (location) params.set('location', location);
       if (remoteOnly) params.set('remote', 'true');
       if (ordering) params.set('ordering', ordering);
+      params.set('page', page);
 
       const url = `${getApiUrl('recruiters/job-board/')}?${params.toString()}`;
       const res = await fetch(url, {
@@ -64,13 +70,21 @@ function JobBoard() {
       if (!res.ok) throw new Error('Failed to fetch jobs');
       const data = await res.json();
       // DRF can return paginated or list
-      setJobs(Array.isArray(data) ? data : data.results || []);
+      if (data.results) {
+        setJobs(data.results);
+        setTotalPages(data.total_pages || 1);
+        setTotalCount(data.count || data.results.length);
+      } else {
+        setJobs(Array.isArray(data) ? data : []);
+        setTotalPages(1);
+        setTotalCount(Array.isArray(data) ? data.length : 0);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [searchDebounced, employmentType, experienceLevel, location, remoteOnly, ordering]);
+  }, [searchDebounced, employmentType, experienceLevel, location, remoteOnly, ordering, page]);
 
   useEffect(() => {
     fetchJobs();
@@ -83,7 +97,13 @@ function JobBoard() {
     setLocation('');
     setRemoteOnly(false);
     setOrdering('-published_at');
+    setPage(1);
   };
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchDebounced, employmentType, experienceLevel, location, remoteOnly, ordering]);
 
   const hasActiveFilters = search || employmentType || experienceLevel || location || remoteOnly;
 
@@ -205,13 +225,54 @@ function JobBoard() {
         ) : (
           <>
             <div className="job-board-count">
-              {jobs.length} job{jobs.length !== 1 ? 's' : ''} found
+              {totalCount} job{totalCount !== 1 ? 's' : ''} found
+              {totalPages > 1 && <span className="job-board-page-info"> — Page {page} of {totalPages}</span>}
             </div>
             <div className="job-board-grid">
               {jobs.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
             </div>
+            {totalPages > 1 && (
+              <div className="job-board-pagination">
+                <button
+                  className="job-board-page-btn"
+                  onClick={() => { setPage(p => p - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  disabled={page <= 1}
+                >
+                  ← Previous
+                </button>
+                <div className="job-board-page-numbers">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+                    .reduce((acc, p, idx, arr) => {
+                      if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...');
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((p, idx) =>
+                      p === '...' ? (
+                        <span key={`dots-${idx}`} className="job-board-page-dots">...</span>
+                      ) : (
+                        <button
+                          key={p}
+                          className={`job-board-page-num ${p === page ? 'active' : ''}`}
+                          onClick={() => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
+                </div>
+                <button
+                  className="job-board-page-btn"
+                  onClick={() => { setPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  disabled={page >= totalPages}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
