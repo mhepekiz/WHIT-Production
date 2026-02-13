@@ -39,7 +39,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'status', 'is_sponsored', 'sponsor_order', 'created_at', 'updated_at']
     
     def get_functions_list(self, obj):
         return obj.get_functions_list()

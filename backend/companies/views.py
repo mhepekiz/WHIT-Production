@@ -1,6 +1,7 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count
@@ -31,11 +32,21 @@ class CompanyViewSet(viewsets.ModelViewSet):
     
     Provides list, retrieve, create, update, and delete operations.
     Supports filtering, searching, and ordering.
+    
+    Permissions:
+    - list/retrieve: public (AllowAny)
+    - create: requires job seeker authentication (IsAuthenticated)
+    - update/delete: requires authentication (IsAuthenticated)
     """
     
     queryset = Company.objects.all().prefetch_related('functions')
     serializer_class = CompanySerializer
     pagination_class = CompanyPagination
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = CompanyFilter
     search_fields = ['name', 'city', 'functions__name', 'country']

@@ -81,9 +81,11 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/add-company" element={
-              <main className="main-content">
-                <AddCompany />
-              </main>
+              <ProtectedRoute>
+                <main className="main-content">
+                  <AddCompany />
+                </main>
+              </ProtectedRoute>
             } />
               <Route 
                 path="/dashboard" 

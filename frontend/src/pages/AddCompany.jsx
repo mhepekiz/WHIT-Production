@@ -4,9 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import './AddCompany.css';
 
 function AddCompany() {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, token } = useAuth();
   const navigate = useNavigate();
-  const [showLoginPrompt, setShowLoginPrompt] = useState(!isAuthenticated);
   const [formData, setFormData] = useState({
     name: '',
     jobs_page_url: '',
@@ -31,10 +30,6 @@ function AddCompany() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isAuthenticated) {
-      setShowLoginPrompt(true);
-      return;
-    }
 
     setIsSubmitting(true);
     setSubmitStatus(null);
@@ -44,7 +39,7 @@ function AddCompany() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Token ${localStorage.getItem('token')}`
+          'Authorization': `Token ${token}`
         },
         body: JSON.stringify(formData)
       });
@@ -72,53 +67,6 @@ function AddCompany() {
       setIsSubmitting(false);
     }
   };
-
-  const handleLoginPrompt = () => {
-    navigate('/login', { 
-      state: { from: '/add-company', message: 'Please log in to add a company.' }
-    });
-  };
-
-  if (showLoginPrompt && !isAuthenticated) {
-    return (
-      <div className="add-company-page">
-        <div className="add-company-container">
-          <div className="login-prompt">
-            <div className="login-prompt-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-            </div>
-            <h1>Add Your Company</h1>
-            <p>Help job seekers discover your company by adding it to our directory.</p>
-            <p className="login-required">You need to be logged in to add a company.</p>
-            
-            <div className="login-actions">
-              <button onClick={handleLoginPrompt} className="btn btn-primary">
-                Log In to Continue
-              </button>
-              <button onClick={() => navigate('/register')} className="btn btn-secondary">
-                Create Account
-              </button>
-            </div>
-            
-            <div className="benefits">
-              <h3>Why add your company?</h3>
-              <ul>
-                <li>Reach qualified tech talent actively looking for opportunities</li>
-                <li>Increase visibility in the tech community</li>
-                <li>Free listing with optional promotion options</li>
-                <li>Easy to manage and update your information</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="add-company-page">
