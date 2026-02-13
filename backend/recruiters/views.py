@@ -283,6 +283,7 @@ class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
     """API for browsing active job openings (requires authentication)"""
     serializer_class = PublicJobOpeningSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None  # Disable DRF default pagination; we handle it in list()
 
     def get_page_size(self):
         """Get page size from SiteSettings."""
