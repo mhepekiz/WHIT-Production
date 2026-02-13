@@ -33,6 +33,7 @@ function CompanyList() {
   const [labelSize, setLabelSize] = useState('medium');
   const [buttonStyles, setButtonStyles] = useState({ padding: '6px 12px', fontSize: '0.75rem' });
   const [homepageCompanyCount, setHomepageCompanyCount] = useState(10);
+  const [homepageSortOrder, setHomepageSortOrder] = useState('a-z');
   const [adSlots, setAdSlots] = useState({
     slot1: null,
     slot2: null,
@@ -73,6 +74,7 @@ function CompanyList() {
           console.log('Site settings loaded:', data);
           setLabelSize(data.label_size);
           if (data.homepage_companies) setHomepageCompanyCount(data.homepage_companies);
+          if (data.homepage_sort_order) setHomepageSortOrder(data.homepage_sort_order);
           document.documentElement.setAttribute('data-label-size', data.label_size);
           
           // Set button styles based on size
@@ -117,6 +119,17 @@ function CompanyList() {
         params.page = pagination.currentPage;
         params.page_size = homepageCompanyCount;
 
+        // Map sort order setting to API ordering param
+        const sortMap = {
+          'a-z': 'name',
+          'z-a': '-name',
+          'last-edited': '-updated_at',
+          'random': '?',
+        };
+        if (homepageSortOrder && sortMap[homepageSortOrder]) {
+          params.ordering = sortMap[homepageSortOrder];
+        }
+
         const data = await companyService.getCompanies(params);
         console.log('Companies API response:', data);
         setCompanies(data.results);
@@ -136,7 +149,7 @@ function CompanyList() {
     };
 
     fetchCompanies();
-  }, [filters, pagination.currentPage, homepageCompanyCount]);
+  }, [filters, pagination.currentPage, homepageCompanyCount, homepageSortOrder]);
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({

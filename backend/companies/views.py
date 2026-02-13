@@ -69,6 +69,11 @@ class CompanyViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         organic_companies = queryset.filter(is_sponsored=False)
         
+        # Handle random ordering (not supported by DRF's OrderingFilter)
+        ordering_param = request.query_params.get('ordering', '')
+        if ordering_param == '?':
+            organic_companies = organic_companies.order_by('?')
+        
         # Get pagination info
         page = self.paginate_queryset(organic_companies)
         if page is not None:
@@ -464,6 +469,7 @@ class SiteSettingsViewSet(viewsets.ReadOnlyModelViewSet):
         return Response({
             'companies_per_page': settings.companies_per_page,
             'homepage_companies': settings.homepage_companies,
+            'homepage_sort_order': settings.homepage_sort_order,
             'companies_per_group': settings.companies_per_group,
             'label_size': settings.label_size,
         })

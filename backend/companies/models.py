@@ -193,6 +193,13 @@ class SiteSettings(models.Model):
         ('extra-large', 'Extra Large (1.1rem)'),
     ]
     
+    HOMEPAGE_SORT_CHOICES = [
+        ('a-z', 'A-Z (Alphabetical)'),
+        ('z-a', 'Z-A (Reverse Alphabetical)'),
+        ('last-edited', 'Last Edited First'),
+        ('random', 'Random'),
+    ]
+    
     companies_per_page = models.IntegerField(
         default=30,
         help_text='Number of companies to display per page on the All Companies listing page'
@@ -204,6 +211,12 @@ class SiteSettings(models.Model):
     companies_per_group = models.IntegerField(
         default=10,
         help_text='Number of companies in each group (between ad slots)'
+    )
+    homepage_sort_order = models.CharField(
+        max_length=20,
+        choices=HOMEPAGE_SORT_CHOICES,
+        default='a-z',
+        help_text='Sort order of companies on the homepage'
     )
     label_size = models.CharField(
         max_length=20,
