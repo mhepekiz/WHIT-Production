@@ -180,6 +180,30 @@ const DashboardNew = () => {
             </div>
             <div className="card-arrow" style={{color: '#2c3e50'}}>→</div>
           </Link>
+
+          {/* Job Listings Card */}
+          <Link to="/jobs" className="action-card" style={{background: '#ffffff', color: '#2c3e50', border: '1px solid #e9ecef', textDecoration: 'none'}}>
+            <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
+              <span style={{color: 'white', fontSize: '24px'}}>💼</span>
+            </div>
+            <div className="card-content">
+              <h3 style={{color: '#2c3e50'}}>Job Listings</h3>
+              <p style={{color: '#495057'}}>Browse jobs matching your preferences</p>
+            </div>
+            <div className="card-arrow" style={{color: '#2c3e50'}}>→</div>
+          </Link>
+
+          {/* Add Company Card */}
+          <Link to="/add-company" className="action-card" style={{background: '#ffffff', color: '#2c3e50', border: '1px solid #e9ecef', textDecoration: 'none'}}>
+            <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
+              <span style={{color: 'white', fontSize: '24px'}}>➕</span>
+            </div>
+            <div className="card-content">
+              <h3 style={{color: '#2c3e50'}}>Add Company</h3>
+              <p style={{color: '#495057'}}>Submit a tech company to our directory</p>
+            </div>
+            <div className="card-arrow" style={{color: '#2c3e50'}}>→</div>
+          </Link>
         </div>
 
         {/* Account Information */}
