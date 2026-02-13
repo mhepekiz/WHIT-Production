@@ -23,6 +23,7 @@ import RecruiterAnalytics from './pages/RecruiterAnalytics'
 import CompanyAnalyticsDashboard from './pages/CompanyAnalyticsDashboard'
 import CandidateSearch from './pages/CandidateSearch'
 import JobApplications from './pages/JobApplications'
+import ScrollToTop from './components/ScrollToTop'
 import './App.css'
 
 // Protected Route Component for Users
@@ -50,6 +51,7 @@ const RecruiterProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <RecruiterAuthProvider>
           <div className="app">
