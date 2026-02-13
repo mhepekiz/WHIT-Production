@@ -16,6 +16,11 @@ function JobBoard() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
+  // Preferences
+  const [showAllJobs, setShowAllJobs] = useState(false);
+  const [hasPreferences, setHasPreferences] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+
   // Filter state
   const [search, setSearch] = useState('');
   const [employmentType, setEmploymentType] = useState('');
@@ -31,7 +36,7 @@ function JobBoard() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Fetch filter options
+  // Fetch filter options + user preferences
   useEffect(() => {
     const fetchFilters = async () => {
       try {
@@ -46,7 +51,23 @@ function JobBoard() {
         console.error('Failed to fetch filters:', err);
       }
     };
+    const fetchPreferences = async () => {
+      try {
+        const res = await fetch(getApiUrl('accounts/job-preferences/me/'), {
+          headers: { 'Authorization': `Token ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const hasFunctions = data.desired_functions && data.desired_functions.length > 0;
+          const hasEnvs = data.work_environments && data.work_environments.length > 0;
+          setHasPreferences(hasFunctions || hasEnvs);
+        }
+      } catch (err) {
+        console.error('Failed to fetch preferences:', err);
+      }
+    };
     fetchFilters();
+    fetchPreferences();
   }, []);
 
   // Fetch jobs
@@ -61,6 +82,7 @@ function JobBoard() {
       if (location) params.set('location', location);
       if (remoteOnly) params.set('remote', 'true');
       if (ordering) params.set('ordering', ordering);
+      if (hasPreferences && !showAllJobs) params.set('preferences', 'true');
       params.set('page', page);
 
       const url = `${getApiUrl('recruiters/job-board/')}?${params.toString()}`;
@@ -84,7 +106,7 @@ function JobBoard() {
     } finally {
       setLoading(false);
     }
-  }, [searchDebounced, employmentType, experienceLevel, location, remoteOnly, ordering, page]);
+  }, [searchDebounced, employmentType, experienceLevel, location, remoteOnly, ordering, page, showAllJobs, hasPreferences]);
 
   useEffect(() => {
     fetchJobs();
@@ -103,7 +125,7 @@ function JobBoard() {
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [searchDebounced, employmentType, experienceLevel, location, remoteOnly, ordering]);
+  }, [searchDebounced, employmentType, experienceLevel, location, remoteOnly, ordering, showAllJobs]);
 
   const hasActiveFilters = search || employmentType || experienceLevel || location || remoteOnly;
 
@@ -119,6 +141,37 @@ function JobBoard() {
 
       {/* Filters Bar */}
       <div className="job-board-filters">
+        {hasPreferences && (
+          <div className="job-board-pref-row">
+            <label className="job-board-pref-toggle">
+              <input
+                type="checkbox"
+                checked={showAllJobs}
+                onChange={(e) => setShowAllJobs(e.target.checked)}
+              />
+              <span className="job-board-pref-label">Show me all jobs</span>
+            </label>
+            <div
+              className="job-board-pref-tooltip-wrapper"
+              onMouseEnter={() => setTooltipVisible(true)}
+              onMouseLeave={() => setTooltipVisible(false)}
+            >
+              <svg className="job-board-pref-info-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M8 7V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="8" cy="5" r="0.75" fill="currentColor"/>
+              </svg>
+              {tooltipVisible && (
+                <div className="job-board-pref-tooltip">
+                  When unchecked, we show jobs matching your preferred job functions and work environment. Check this to browse all available openings.
+                </div>
+              )}
+            </div>
+            {!showAllJobs && (
+              <span className="job-board-pref-active-badge">Showing preferred jobs</span>
+            )}
+          </div>
+        )}
         <div className="job-board-search-row">
           <div className="job-board-search-wrapper">
             <svg className="job-board-search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">

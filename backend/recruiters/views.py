@@ -329,6 +329,41 @@ class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         qs = JobOpening.objects.filter(status='active').select_related('recruiter', 'company')
 
+        # Apply user preferences filter
+        use_preferences = self.request.query_params.get('preferences', '').lower() in ('true', '1')
+        if use_preferences and self.request.user.is_authenticated:
+            try:
+                from accounts.models import JobPreference
+                pref = JobPreference.objects.get(user=self.request.user)
+                pref_q = Q()
+
+                # Filter by desired functions → match against department
+                func_names = list(pref.desired_functions.values_list('name', flat=True))
+                if func_names:
+                    dept_q = Q()
+                    for fn in func_names:
+                        dept_q |= Q(department__icontains=fn)
+                    pref_q &= dept_q
+
+                # Filter by work environments
+                env_names = [e.lower() for e in pref.work_environments.values_list('name', flat=True)]
+                if env_names:
+                    env_q = Q()
+                    if 'remote' in env_names:
+                        env_q |= Q(remote_allowed=True)
+                    if 'on-site' in env_names:
+                        env_q |= Q(remote_allowed=False)
+                    if 'hybrid' in env_names:
+                        # Hybrid could be either; include all
+                        env_q |= Q(remote_allowed=True) | Q(remote_allowed=False)
+                    if env_q:
+                        pref_q &= env_q
+
+                if pref_q:
+                    qs = qs.filter(pref_q)
+            except Exception:
+                pass
+
         # Filter by employment type
         employment_type = self.request.query_params.get('employment_type')
         if employment_type:
