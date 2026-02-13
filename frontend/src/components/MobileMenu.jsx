@@ -105,7 +105,7 @@ function MobileMenu() {
         </div>
 
         <nav className="mobile-menu-nav">
-          <Link to="/companies" className="mobile-menu-link" onClick={closeMenu}>
+          <Link to="/all-companies" className="mobile-menu-link" onClick={closeMenu}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5"/>
               <path d="M6 9L10 13L14 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

@@ -27,6 +27,8 @@ function CompanyBrowse() {
   });
   const [labelSize, setLabelSize] = useState('medium');
   const [buttonStyles, setButtonStyles] = useState({ padding: '6px 12px', fontSize: '0.75rem' });
+  const [companiesPerPage, setCompaniesPerPage] = useState(30);
+  const [companiesPerGroup, setCompaniesPerGroup] = useState(10);
   const [adSlots, setAdSlots] = useState({
     slot1: null,
     slot2: null,
@@ -70,8 +72,32 @@ function CompanyBrowse() {
       }
     };
 
+    const fetchSiteSettings = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/site-settings/current/`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.companies_per_page) setCompaniesPerPage(data.companies_per_page);
+          if (data.companies_per_group) setCompaniesPerGroup(data.companies_per_group);
+          if (data.label_size) {
+            setLabelSize(data.label_size);
+            const sizeMap = {
+              'small': { padding: '4px 8px', fontSize: '0.65rem' },
+              'medium': { padding: '6px 12px', fontSize: '0.75rem' },
+              'large': { padding: '8px 16px', fontSize: '0.85rem' },
+              'extra-large': { padding: '10px 20px', fontSize: '0.95rem' }
+            };
+            setButtonStyles(sizeMap[data.label_size] || sizeMap['medium']);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch site settings:', err);
+      }
+    };
+
     fetchFilters();
     fetchAdSlots();
+    fetchSiteSettings();
   }, []);
 
   // Fetch companies when filters or page changes
@@ -90,7 +116,7 @@ function CompanyBrowse() {
         
         // Add pagination
         params.append('page', pagination.currentPage.toString());
-        params.append('page_size', '30');
+        params.append('page_size', companiesPerPage.toString());
         
         const data = await companyService.getCompanies(params);
         setCompanies(data.results || data);
@@ -109,7 +135,7 @@ function CompanyBrowse() {
     };
 
     fetchCompanies();
-  }, [filters, pagination.currentPage]);
+  }, [filters, pagination.currentPage, companiesPerPage]);
 
   const handleFilterChange = (filterType, value) => {
     setFilters(prev => ({
@@ -128,7 +154,7 @@ function CompanyBrowse() {
   };
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= Math.ceil(pagination.count / 30)) {
+    if (page >= 1 && page <= Math.ceil(pagination.count / companiesPerPage)) {
       setPagination(prev => ({ ...prev, currentPage: page }));
       // Scroll to top when changing pages
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -208,66 +234,67 @@ function CompanyBrowse() {
           {/* Results summary */}
           {companies.length > 0 && (
             <div className="results-summary">
-              <p>Showing {((pagination.currentPage - 1) * 30) + 1}-{Math.min(pagination.currentPage * 30, pagination.count)} of {pagination.count} companies</p>
+              <p>Showing {((pagination.currentPage - 1) * companiesPerPage) + 1}-{Math.min(pagination.currentPage * companiesPerPage, pagination.count)} of {pagination.count} companies</p>
             </div>
           )}
 
-          {/* First group of 10 companies */}
-          <CompanyTable companies={companies.slice(0, 10)} buttonStyles={buttonStyles} />
-
-          {/* First Ad Slot */}
-          {adSlots.slot1 && (
-            <div className="ad-slot">
-              {adSlots.slot1.type === 'image' ? (
-                <a 
-                  href={adSlots.slot1.link} 
-                  target={adSlots.slot1.open_in_new_tab ? '_blank' : '_self'}
-                  rel={adSlots.slot1.open_in_new_tab ? 'noopener noreferrer' : ''}
-                  className="ad-banner-link"
-                >
-                  <img 
-                    src={adSlots.slot1.image_url} 
-                    alt={adSlots.slot1.alt_text}
-                    className="ad-banner-image"
-                  />
-                </a>
-              ) : (
-                <div dangerouslySetInnerHTML={{ __html: adSlots.slot1.code }} />
-              )}
-            </div>
-          )}
-
-          {/* Second group of 10 companies */}
-          {companies.length > 10 && (
-            <CompanyTable companies={companies.slice(10, 20)} buttonStyles={buttonStyles} />
-          )}
-
-          {/* Second Ad Slot */}
-          {companies.length > 10 && adSlots.slot2 && (
-            <div className="ad-slot">
-              {adSlots.slot2.type === 'image' ? (
-                <a 
-                  href={adSlots.slot2.link} 
-                  target={adSlots.slot2.open_in_new_tab ? '_blank' : '_self'}
-                  rel={adSlots.slot2.open_in_new_tab ? 'noopener noreferrer' : ''}
-                  className="ad-banner-link"
-                >
-                  <img 
-                    src={adSlots.slot2.image_url} 
-                    alt={adSlots.slot2.alt_text}
-                    className="ad-banner-image"
-                  />
-                </a>
-              ) : (
-                <div dangerouslySetInnerHTML={{ __html: adSlots.slot2.code }} />
-              )}
-            </div>
-          )}
-
-          {/* Third group of 10 companies */}
-          {companies.length > 20 && (
-            <CompanyTable companies={companies.slice(20, 30)} buttonStyles={buttonStyles} />
-          )}
+          {/* Render companies in groups with ad slots between them */}
+          {(() => {
+            const groups = [];
+            const numGroups = Math.ceil(companies.length / companiesPerGroup);
+            for (let i = 0; i < numGroups; i++) {
+              const start = i * companiesPerGroup;
+              const end = start + companiesPerGroup;
+              groups.push(
+                <div key={`group-${i}`}>
+                  <CompanyTable companies={companies.slice(start, end)} buttonStyles={buttonStyles} />
+                  {/* Show ad slot after first group */}
+                  {i === 0 && adSlots.slot1 && (
+                    <div className="ad-slot">
+                      {adSlots.slot1.type === 'image' ? (
+                        <a 
+                          href={adSlots.slot1.link} 
+                          target={adSlots.slot1.open_in_new_tab ? '_blank' : '_self'}
+                          rel={adSlots.slot1.open_in_new_tab ? 'noopener noreferrer' : ''}
+                          className="ad-banner-link"
+                        >
+                          <img 
+                            src={adSlots.slot1.image_url} 
+                            alt={adSlots.slot1.alt_text}
+                            className="ad-banner-image"
+                          />
+                        </a>
+                      ) : (
+                        <div dangerouslySetInnerHTML={{ __html: adSlots.slot1.code }} />
+                      )}
+                    </div>
+                  )}
+                  {/* Show ad slot after second group */}
+                  {i === 1 && adSlots.slot2 && (
+                    <div className="ad-slot">
+                      {adSlots.slot2.type === 'image' ? (
+                        <a 
+                          href={adSlots.slot2.link} 
+                          target={adSlots.slot2.open_in_new_tab ? '_blank' : '_self'}
+                          rel={adSlots.slot2.open_in_new_tab ? 'noopener noreferrer' : ''}
+                          className="ad-banner-link"
+                        >
+                          <img 
+                            src={adSlots.slot2.image_url} 
+                            alt={adSlots.slot2.alt_text}
+                            className="ad-banner-image"
+                          />
+                        </a>
+                      ) : (
+                        <div dangerouslySetInnerHTML={{ __html: adSlots.slot2.code }} />
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return groups;
+          })()}
 
           {/* Pagination */}
           <div className="pagination">
@@ -279,7 +306,7 @@ function CompanyBrowse() {
               Previous
             </button>
             <span className="pagination-info">
-              Page {pagination.currentPage} of {Math.ceil(pagination.count / 30)}
+              Page {pagination.currentPage} of {Math.ceil(pagination.count / companiesPerPage)}
             </span>
             <button
               onClick={() => handlePageChange(pagination.currentPage + 1)}

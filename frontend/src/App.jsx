@@ -65,7 +65,7 @@ function App() {
                 <CompanyList />
               </main>
             } />
-            <Route path="/companies" element={
+            <Route path="/all-companies" element={
               <main className="main-content">
                 <CompanyBrowse />
               </main>

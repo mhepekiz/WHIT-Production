@@ -38,7 +38,7 @@ const JobSeekerCard = ({ section }) => {
       </div>
       
       <div className="card-actions">
-        <Link to="/companies" className="card-button primary">
+        <Link to="/all-companies" className="card-button primary">
           Browse Companies
         </Link>
         <Link to="/register" className="card-link">

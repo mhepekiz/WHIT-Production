@@ -113,7 +113,7 @@ function CompanyList() {
         if (filters.engineering_positions) params.engineering_positions = filters.engineering_positions;
         if (filters.status) params.status = filters.status;
         params.page = pagination.currentPage;
-        params.page_size = 12;
+        params.page_size = 10;
 
         const data = await companyService.getCompanies(params);
         console.log('Companies API response:', data);
@@ -227,12 +227,12 @@ function CompanyList() {
               </div>
               
               {/* Show first 10 companies */}
-              <CompanyTable companies={companies.slice(0, 10)} buttonStyles={buttonStyles} />
+              <CompanyTable companies={companies} buttonStyles={buttonStyles} />
               
               {/* View All Companies CTA */}
               <div className="view-all-section">
-                <Link to="/companies" className="view-all-btn">
-                  <span>View All {pagination.count} Companies</span>
+                <Link to="/all-companies" className="view-all-btn">
+                  <span>SHOW ALL COMPANIES</span>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>

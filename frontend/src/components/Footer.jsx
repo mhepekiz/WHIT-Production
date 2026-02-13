@@ -12,7 +12,7 @@ function Footer() {
           <div className="footer-column">
             <h3 className="footer-title">For Job Seekers</h3>
             <ul className="footer-links">
-              <li><Link to="/companies">Browse Companies</Link></li>
+              <li><Link to="/all-companies">Browse Companies</Link></li>
               <li><Link to="/register">Create Account</Link></li>
               <li><Link to="/login">Login</Link></li>
               <li><Link to="/dashboard">My Applications</Link></li>

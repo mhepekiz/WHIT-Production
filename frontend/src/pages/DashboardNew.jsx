@@ -170,7 +170,7 @@ const DashboardNew = () => {
           </Link>
 
           {/* Browse Companies Card */}
-          <Link to="/companies" className="action-card" style={{background: '#ffffff', color: '#2c3e50', border: '1px solid #e9ecef', textDecoration: 'none'}}>
+          <Link to="/all-companies" className="action-card" style={{background: '#ffffff', color: '#2c3e50', border: '1px solid #e9ecef', textDecoration: 'none'}}>
             <div className="card-icon" style={{width: '50px', height: '50px', background: '#2c3e50', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px'}}>
               <span style={{color: 'white', fontSize: '24px'}}>🔍</span>
             </div>
