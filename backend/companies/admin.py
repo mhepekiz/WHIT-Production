@@ -209,12 +209,17 @@ class AdSlotAdmin(admin.ModelAdmin):
 class SiteSettingsAdmin(admin.ModelAdmin):
     """Admin interface for SiteSettings model."""
     
-    list_display = ['companies_per_page', 'companies_per_group', 'label_size', 'updated_at']
+    list_display = ['homepage_companies', 'companies_per_page', 'companies_per_group', 'label_size', 'updated_at']
     readonly_fields = ['updated_at']
     
     fieldsets = (
-        ('Pagination Settings', {
-            'fields': ('companies_per_page', 'companies_per_group')
+        ('Homepage Settings', {
+            'fields': ('homepage_companies',),
+            'description': 'Number of companies shown on the homepage before the "Show All Companies" button.'
+        }),
+        ('Listing Page Settings', {
+            'fields': ('companies_per_page', 'companies_per_group'),
+            'description': 'Settings for the /all-companies listing page.'
         }),
         ('Display Settings', {
             'fields': ('label_size',)

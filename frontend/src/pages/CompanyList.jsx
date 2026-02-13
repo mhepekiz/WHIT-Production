@@ -32,6 +32,7 @@ function CompanyList() {
   });
   const [labelSize, setLabelSize] = useState('medium');
   const [buttonStyles, setButtonStyles] = useState({ padding: '6px 12px', fontSize: '0.75rem' });
+  const [homepageCompanyCount, setHomepageCompanyCount] = useState(10);
   const [adSlots, setAdSlots] = useState({
     slot1: null,
     slot2: null,
@@ -71,6 +72,7 @@ function CompanyList() {
           const data = await response.json();
           console.log('Site settings loaded:', data);
           setLabelSize(data.label_size);
+          if (data.homepage_companies) setHomepageCompanyCount(data.homepage_companies);
           document.documentElement.setAttribute('data-label-size', data.label_size);
           
           // Set button styles based on size
@@ -113,7 +115,7 @@ function CompanyList() {
         if (filters.engineering_positions) params.engineering_positions = filters.engineering_positions;
         if (filters.status) params.status = filters.status;
         params.page = pagination.currentPage;
-        params.page_size = 10;
+        params.page_size = homepageCompanyCount;
 
         const data = await companyService.getCompanies(params);
         console.log('Companies API response:', data);
@@ -134,7 +136,7 @@ function CompanyList() {
     };
 
     fetchCompanies();
-  }, [filters, pagination.currentPage]);
+  }, [filters, pagination.currentPage, homepageCompanyCount]);
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({
@@ -226,8 +228,11 @@ function CompanyList() {
                 <p className="preview-subtitle">Discover companies actively hiring in tech</p>
               </div>
               
-              {/* Show first 10 companies */}
-              <CompanyTable companies={companies} buttonStyles={buttonStyles} />
+              {/* Show companies with fade overlay at bottom */}
+              <div className="homepage-company-list">
+                <CompanyTable companies={companies} buttonStyles={buttonStyles} />
+                <div className="company-list-fade"></div>
+              </div>
               
               {/* View All Companies CTA */}
               <div className="view-all-section">

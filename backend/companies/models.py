@@ -195,7 +195,11 @@ class SiteSettings(models.Model):
     
     companies_per_page = models.IntegerField(
         default=30,
-        help_text='Number of companies to display per page'
+        help_text='Number of companies to display per page on the All Companies listing page'
+    )
+    homepage_companies = models.IntegerField(
+        default=10,
+        help_text='Number of companies to display on the homepage'
     )
     companies_per_group = models.IntegerField(
         default=10,

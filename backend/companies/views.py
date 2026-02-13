@@ -454,6 +454,7 @@ class SiteSettingsViewSet(viewsets.ReadOnlyModelViewSet):
         settings = SiteSettings.load()
         return Response({
             'companies_per_page': settings.companies_per_page,
+            'homepage_companies': settings.homepage_companies,
             'companies_per_group': settings.companies_per_group,
             'label_size': settings.label_size,
         })

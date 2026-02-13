@@ -255,6 +255,21 @@
   margin-bottom: 0;
 }
 
+.homepage-company-list {
+  position: relative;
+}
+
+.company-list-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.85) 60%, #ffffff 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .preview-header {
   text-align: center;
   margin-bottom: 32px;
