@@ -1,5 +1,6 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action, api_view
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count
@@ -17,6 +18,13 @@ from .filters import CompanyFilter
 from .services.sponsor_service import SponsorSelector
 
 
+class CompanyPagination(PageNumberPagination):
+    """Custom pagination that accepts page_size from query params."""
+    page_size = 30
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class CompanyViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Company CRUD operations.
@@ -27,6 +35,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
     
     queryset = Company.objects.all().prefetch_related('functions')
     serializer_class = CompanySerializer
+    pagination_class = CompanyPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = CompanyFilter
     search_fields = ['name', 'city', 'functions__name', 'country']
