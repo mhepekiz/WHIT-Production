@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.utils import timezone
+from companies.models import Company
 
 
 class RecruiterPackage(models.Model):
@@ -190,6 +191,7 @@ class JobOpening(models.Model):
     ]
     
     recruiter = models.ForeignKey(Recruiter, on_delete=models.CASCADE, related_name='job_openings')
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='job_openings', help_text='Assign a company from the directory')
     
     # Job details
     title = models.CharField(max_length=200)

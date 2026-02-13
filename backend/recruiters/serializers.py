@@ -310,7 +310,10 @@ class PublicJobOpeningSerializer(serializers.ModelSerializer):
         ]
 
     def get_company_logo(self, obj):
-        """Try to get logo from linked company"""
+        """Get logo from linked company"""
+        if obj.company and obj.company.logo:
+            return obj.company.logo.url
+        # Fallback: try name-based lookup
         try:
             from companies.models import Company
             company = Company.objects.filter(

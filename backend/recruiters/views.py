@@ -285,7 +285,7 @@ class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        qs = JobOpening.objects.filter(status='active').select_related('recruiter')
+        qs = JobOpening.objects.filter(status='active').select_related('recruiter', 'company')
 
         # Filter by employment type
         employment_type = self.request.query_params.get('employment_type')

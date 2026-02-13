@@ -153,17 +153,18 @@ class JobApplicationInline(admin.TabularInline):
 @admin.register(JobOpening)
 class JobOpeningAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'get_company', 'employment_type', 'location',
+        'title', 'get_company', 'get_assigned_company', 'employment_type', 'location',
         'status', 'is_featured', 'views_count', 'applications_count', 'created_at'
     ]
-    list_filter = ['status', 'employment_type', 'experience_level', 'is_featured', 'remote_allowed']
-    search_fields = ['title', 'recruiter__company_name', 'city', 'country', 'department']
+    list_filter = ['status', 'employment_type', 'experience_level', 'is_featured', 'remote_allowed', 'company']
+    search_fields = ['title', 'recruiter__company_name', 'company__name', 'city', 'country', 'department']
     readonly_fields = ['views_count', 'applications_count', 'created_at', 'updated_at', 'published_at']
+    autocomplete_fields = ['company']
     inlines = [JobApplicationInline]
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('recruiter', 'title', 'status', 'is_featured')
+            'fields': ('recruiter', 'company', 'title', 'status', 'is_featured')
         }),
         ('Job Details', {
             'fields': ('description', 'requirements', 'responsibilities', 'department')
@@ -195,8 +196,13 @@ class JobOpeningAdmin(admin.ModelAdmin):
     
     def get_company(self, obj):
         return obj.recruiter.company_name
-    get_company.short_description = 'Company'
+    get_company.short_description = 'Recruiter Company'
     get_company.admin_order_field = 'recruiter__company_name'
+
+    def get_assigned_company(self, obj):
+        return obj.company.name if obj.company else '—'
+    get_assigned_company.short_description = 'Assigned Company'
+    get_assigned_company.admin_order_field = 'company__name'
 
 
 @admin.register(JobApplication)
