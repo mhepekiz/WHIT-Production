@@ -23,6 +23,7 @@ import RecruiterAnalytics from './pages/RecruiterAnalytics'
 import CompanyAnalyticsDashboard from './pages/CompanyAnalyticsDashboard'
 import CandidateSearch from './pages/CandidateSearch'
 import JobApplications from './pages/JobApplications'
+import JobBoard from './pages/JobBoard'
 import ScrollToTop from './components/ScrollToTop'
 import './App.css'
 
@@ -70,6 +71,11 @@ function App() {
             <Route path="/all-companies" element={
               <main className="main-content">
                 <CompanyBrowse />
+              </main>
+            } />
+            <Route path="/jobs" element={
+              <main className="main-content">
+                <JobBoard />
               </main>
             } />
             <Route path="/add-company" element={

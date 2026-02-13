@@ -15,6 +15,7 @@ from .models import (
 from .serializers import (
     RecruiterPackageSerializer, RecruiterRegistrationSerializer,
     RecruiterSerializer, RecruiterUsageSerializer, JobOpeningSerializer,
+    PublicJobOpeningSerializer,
     JobApplicationSerializer, CandidateSearchSerializer, RecruiterMessageSerializer
 )
 from accounts.models import UserProfile
@@ -276,6 +277,79 @@ class RecruiterProfileViewSet(viewsets.ModelViewSet):
         
         serializer = RecruiterUsageSerializer(usage)
         return Response(serializer.data)
+
+
+class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
+    """Public API for browsing active job openings"""
+    serializer_class = PublicJobOpeningSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        qs = JobOpening.objects.filter(status='active').select_related('recruiter')
+
+        # Filter by employment type
+        employment_type = self.request.query_params.get('employment_type')
+        if employment_type:
+            qs = qs.filter(employment_type=employment_type)
+
+        # Filter by experience level
+        experience_level = self.request.query_params.get('experience_level')
+        if experience_level:
+            qs = qs.filter(experience_level=experience_level)
+
+        # Filter by remote
+        remote = self.request.query_params.get('remote')
+        if remote and remote.lower() in ('true', '1'):
+            qs = qs.filter(remote_allowed=True)
+
+        # Search by keyword (title, description, skills)
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(recruiter__company_name__icontains=search) |
+                Q(department__icontains=search)
+            )
+
+        # Filter by location
+        location = self.request.query_params.get('location')
+        if location:
+            qs = qs.filter(
+                Q(city__icontains=location) |
+                Q(state__icontains=location) |
+                Q(country__icontains=location) |
+                Q(location__icontains=location)
+            )
+
+        # Ordering
+        ordering = self.request.query_params.get('ordering', '-published_at')
+        if ordering in ('published_at', '-published_at', 'title', '-title', 'salary_min', '-salary_min'):
+            qs = qs.order_by(ordering)
+        else:
+            qs = qs.order_by('-is_featured', '-published_at')
+
+        return qs
+
+    @action(detail=False, methods=['get'])
+    def filters(self, request):
+        """Return available filter options"""
+        active_jobs = JobOpening.objects.filter(status='active')
+        return Response({
+            'employment_types': [
+                {'value': c[0], 'label': c[1]}
+                for c in JobOpening.EMPLOYMENT_TYPE_CHOICES
+            ],
+            'experience_levels': [
+                {'value': c[0], 'label': c[1]}
+                for c in JobOpening.EXPERIENCE_LEVEL_CHOICES
+            ],
+            'locations': list(
+                active_jobs.values_list('city', flat=True)
+                .distinct().order_by('city')[:50]
+            ),
+            'total_jobs': active_jobs.count(),
+        })
 
 
 class JobOpeningViewSet(viewsets.ModelViewSet):

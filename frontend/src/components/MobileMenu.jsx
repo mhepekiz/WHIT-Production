@@ -113,6 +113,15 @@ function MobileMenu() {
             Browse Companies
           </Link>
 
+          <Link to="/jobs" className="mobile-menu-link" onClick={closeMenu}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="3" y="5" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M7 5V4C7 3.45 7.45 3 8 3H12C12.55 3 13 3.45 13 4V5" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M7 10H13M7 13H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            Jobs
+          </Link>
+
           <Link to="/add-company" className="mobile-menu-link" onClick={closeMenu}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5"/>
