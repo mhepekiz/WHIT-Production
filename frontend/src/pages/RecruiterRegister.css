@@ -1,18 +1,7 @@
-.recruiter-register-container {
-  min-height: 100vh;
-  padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+/* Container is now handled by FormPageLayout */
 
 .recruiter-register-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  padding: 3rem;
-  max-width: 900px;
+  max-width: 900px !important;
   width: 100%;
 }
 
@@ -72,7 +61,7 @@
 }
 
 .step.active .step-number {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--button-color, #6366f1);
   color: white;
 }
 
@@ -104,9 +93,9 @@
 }
 
 .package-card:hover {
-  border-color: #667eea;
+  border-color: var(--button-color, #6366f1);
   transform: translateY(-5px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 5px 20px rgba(99, 102, 241, 0.2);
 }
 
 .package-card h3 {
@@ -118,7 +107,7 @@
 .package-price {
   font-size: 2rem;
   font-weight: bold;
-  color: #667eea;
+  color: var(--button-color, #6366f1);
   margin-bottom: 1rem;
 }
 
@@ -143,17 +132,17 @@
 }
 
 .package-features li::before {
-  content: '✓';
+  content: '\2713';
   position: absolute;
   left: 0;
-  color: #667eea;
+  color: var(--button-color, #6366f1);
   font-weight: bold;
 }
 
 .select-package-btn {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, var(--button-color, #6366f1) 0%, var(--button-color-light, #8b5cf6) 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -193,7 +182,7 @@
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--button-color, #6366f1);
 }
 
 .form-group textarea {
@@ -224,14 +213,14 @@
   transition: all 0.3s;
 }
 
-.btn-primary {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+.recruiter-register-card .btn-primary {
+  background: linear-gradient(90deg, var(--button-color, #6366f1) 0%, var(--button-color-light, #8b5cf6) 100%);
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
+.recruiter-register-card .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 5px 15px var(--button-shadow, rgba(99, 102, 241, 0.3));
 }
 
 .btn-primary:disabled {
@@ -239,10 +228,10 @@
   cursor: not-allowed;
 }
 
-.btn-secondary {
+.recruiter-register-card .btn-secondary {
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: var(--button-color, #6366f1);
+  border: 2px solid var(--button-color, #6366f1);
 }
 
 .btn-secondary:hover {
@@ -281,8 +270,8 @@
   margin: 0.5rem 0;
 }
 
-.auth-footer a {
-  color: #667eea;
+.recruiter-register-card .auth-footer a {
+  color: var(--button-color, #6366f1);
   text-decoration: none;
   font-weight: 600;
 }
@@ -293,10 +282,6 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .recruiter-register-container {
-    padding: 1rem;
-  }
-
   .recruiter-register-card {
     padding: 2rem 1.5rem;
   }

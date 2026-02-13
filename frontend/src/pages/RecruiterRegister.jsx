@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRecruiterAuth } from '../contexts/RecruiterAuthContext';
 import { getPackages } from '../services/recruiterApi';
+import FormPageLayout from '../components/FormPageLayout';
+import '../components/Auth.css';
 import './RecruiterRegister.css';
 
 function RecruiterRegister() {
@@ -205,8 +207,8 @@ function RecruiterRegister() {
   };
 
   return (
-    <div className="recruiter-register-container">
-      <div className="recruiter-register-card">
+    <FormPageLayout pageName="recruiter_register">
+    <div className="auth-card recruiter-register-card">
         <h2>Recruiter Registration</h2>
         <p className="subtitle">Join WHIT to find the best tech talent</p>
 
@@ -487,7 +489,7 @@ function RecruiterRegister() {
           <p>Looking for a job? <Link to="/register">Register as a candidate</Link></p>
         </div>
       </div>
-    </div>
+    </FormPageLayout>
   );
 }
 
