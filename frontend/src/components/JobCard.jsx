@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { getMediaUrl } from '../services/api';
 import './JobCard.css';
 
@@ -74,6 +75,7 @@ const timeAgo = (dateStr) => {
 };
 
 function JobCard({ job }) {
+  const navigate = useNavigate();
   if (!job) return null;
 
   const salary = formatSalary(job.salary_min, job.salary_max, job.salary_currency);
@@ -84,8 +86,14 @@ function JobCard({ job }) {
   const locationParts = [job.city, job.state, job.country].filter(Boolean);
   const locationStr = locationParts.join(', ');
 
+  const handleCardClick = (e) => {
+    // Don't navigate if clicking a link or button
+    if (e.target.closest('a') || e.target.closest('button')) return;
+    navigate(`/jobs/${job.id}`);
+  };
+
   return (
-    <div className={`job-card ${job.is_featured ? 'featured' : ''}`}>
+    <div className={`job-card ${job.is_featured ? 'featured' : ''}`} onClick={handleCardClick} style={{ cursor: 'pointer' }}>
       {job.is_featured && (
         <div className="job-card-featured-badge">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">

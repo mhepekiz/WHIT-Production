@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.db.models import Q, Count, Sum
+from django.db.models import Q, Count, Sum, F
 from django.views.decorators.csrf import csrf_exempt
 from .models import (
     Recruiter, RecruiterPackage, JobOpening, JobApplication,
@@ -284,6 +284,20 @@ class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PublicJobOpeningSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = None  # Disable DRF default pagination; we handle it in list()
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            from .serializers import PublicJobOpeningDetailSerializer
+            return PublicJobOpeningDetailSerializer
+        return PublicJobOpeningSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        """Return job detail and increment views_count."""
+        instance = self.get_object()
+        JobOpening.objects.filter(pk=instance.pk).update(views_count=F('views_count') + 1)
+        instance.refresh_from_db()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def get_page_size(self):
         """Get page size from SiteSettings."""

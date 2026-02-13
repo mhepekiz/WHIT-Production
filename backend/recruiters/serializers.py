@@ -326,6 +326,39 @@ class PublicJobOpeningSerializer(serializers.ModelSerializer):
         return None
 
 
+class PublicJobOpeningDetailSerializer(serializers.ModelSerializer):
+    """Detail serializer for a single job opening - includes requirements & responsibilities"""
+    recruiter_company = serializers.CharField(source='recruiter.company_name', read_only=True)
+    company_logo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = JobOpening
+        fields = [
+            'id', 'recruiter_company', 'company_logo', 'title', 'description',
+            'requirements', 'responsibilities',
+            'employment_type', 'experience_level',
+            'salary_min', 'salary_max', 'salary_currency', 'location', 'city',
+            'state', 'country', 'remote_allowed', 'skills_required', 'department',
+            'is_featured', 'application_deadline', 'application_url',
+            'application_email', 'views_count', 'applications_count',
+            'created_at', 'published_at'
+        ]
+
+    def get_company_logo(self, obj):
+        if obj.company and obj.company.logo:
+            return obj.company.logo.url
+        try:
+            from companies.models import Company
+            company = Company.objects.filter(
+                name__iexact=obj.recruiter.company_name
+            ).first()
+            if company and company.logo:
+                return company.logo.url
+        except Exception:
+            pass
+        return None
+
+
 class JobOpeningSerializer(serializers.ModelSerializer):
     """Serializer for job openings"""
     recruiter_company = serializers.CharField(source='recruiter.company_name', read_only=True)
