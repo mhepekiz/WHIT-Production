@@ -101,23 +101,23 @@
   margin: 0;
 }
 
-/* Actions Grid */
-.actions-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+/* Actions Grid - 3 columns, 2 rows for 6 cards */
+.dashboard-new .actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 @media (max-width: 992px) {
-  .actions-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .dashboard-new .actions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
 @media (max-width: 600px) {
-  .actions-grid {
-    grid-template-columns: 1fr;
+  .dashboard-new .actions-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
