@@ -494,6 +494,7 @@ class FormLayoutViewSet(viewsets.ReadOnlyModelViewSet):
                 'image_width_percentage': layout.image_width_percentage,
                 'background_color': layout.background_color,
                 'text_color': layout.text_color,
+                'button_color': layout.button_color,
             }
             return Response(data)
         except FormLayout.DoesNotExist:
@@ -512,6 +513,7 @@ class FormLayoutViewSet(viewsets.ReadOnlyModelViewSet):
                 'image_width_percentage': 50,
                 'background_color': '#ffffff',
                 'text_color': '#000000',
+                'button_color': '#6366f1',
             })
 
 

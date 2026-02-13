@@ -41,15 +41,32 @@ const FormPageLayout = ({ children, pageName }) => {
   const formPosition = layout?.form_position || 'center';
   const imageWidthPct = layout?.image_width_percentage || 50;
   const formWidthPct = 100 - imageWidthPct;
+  const buttonColor = layout?.button_color || '#6366f1';
+
+  // Compute a slightly lighter shade for gradient end
+  const lightenColor = (hex, percent = 20) => {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const r = Math.min(255, (num >> 16) + Math.round(255 * percent / 100));
+    const g = Math.min(255, ((num >> 8) & 0x00FF) + Math.round(255 * percent / 100));
+    const b = Math.min(255, (num & 0x0000FF) + Math.round(255 * percent / 100));
+    return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+  };
+
+  const containerStyle = {
+    '--button-color': buttonColor,
+    '--button-color-light': lightenColor(buttonColor, 15),
+    '--button-shadow': `${buttonColor}4D`, // ~30% opacity
+    '--button-shadow-hover': `${buttonColor}66`, // ~40% opacity
+  };
 
   // Center layout - original style
   if (formPosition === 'center') {
-    return <div className="form-page-container form-center">{children}</div>;
+    return <div className="form-page-container form-center" style={containerStyle}>{children}</div>;
   }
 
   // Left or Right layout with side panel
   return (
-    <div className={`form-page-container form-split form-${formPosition}`}>
+    <div className={`form-page-container form-split form-${formPosition}`} style={containerStyle}>
       {/* Form Section */}
       <div className="form-section" style={{ width: `${formWidthPct}%` }}>
         <div className="form-section-inner">

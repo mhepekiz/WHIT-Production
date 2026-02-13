@@ -351,6 +351,11 @@ class FormLayout(models.Model):
         default='#000000',
         help_text='Hex color code for text'
     )
+    button_color = models.CharField(
+        max_length=7,
+        default='#6366f1',
+        help_text='Hex color code for the form submit button (default: indigo #6366f1)'
+    )
     
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)

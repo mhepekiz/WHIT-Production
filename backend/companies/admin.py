@@ -258,8 +258,7 @@ class FormLayoutAdmin(admin.ModelAdmin):
             'description': 'Content displayed on the opposite side when form is positioned left or right'
         }),
         ('Styling', {
-            'fields': ('background_color', 'text_color'),
-            'classes': ('collapse',)
+            'fields': ('background_color', 'text_color', 'button_color'),
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
