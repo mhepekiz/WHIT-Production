@@ -193,7 +193,7 @@ function JobCard({ job }) {
 
       {/* Actions */}
       <div className="job-card-actions">
-        {job.application_url ? (
+        {job.application_url && (
           <a
             href={job.application_url}
             target="_blank"
@@ -205,18 +205,7 @@ function JobCard({ job }) {
               <path d="M3 8H13M10 5L13 8L10 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </a>
-        ) : job.application_email ? (
-          <a
-            href={`mailto:${job.application_email}`}
-            className="job-card-btn primary"
-          >
-            Apply via Email
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M2 4H14V12H2V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-              <path d="M2 4L8 9L14 4" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-            </svg>
-          </a>
-        ) : null}
+        )}
 
         {job.application_deadline && (
           <span className="job-card-deadline">
