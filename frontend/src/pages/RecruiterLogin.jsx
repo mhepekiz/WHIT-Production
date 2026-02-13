@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRecruiterAuth } from '../contexts/RecruiterAuthContext';
-import './RecruiterLogin.css';
+import FormPageLayout from '../components/FormPageLayout';
+import '../components/Auth.css';
 
 function RecruiterLogin() {
   const navigate = useNavigate();
@@ -39,12 +40,10 @@ function RecruiterLogin() {
   };
 
   return (
-    <div className="recruiter-login-container">
-      <div className="recruiter-login-card">
-        <div className="login-header">
-          <h2>Recruiter Login</h2>
-          <p>Access your recruiter dashboard</p>
-        </div>
+    <FormPageLayout pageName="recruiter_login">
+      <div className="auth-card">
+        <h2>Recruiter Login</h2>
+        <p className="auth-subtitle">Access your recruiter dashboard</p>
 
         {(error || authError) && (
           <div className="error-message">{error || authError}</div>
@@ -77,17 +76,19 @@ function RecruiterLogin() {
             />
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
+          <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
-        <div className="login-footer">
-          <p>Don't have a recruiter account? <Link to="/recruiter/register">Register here</Link></p>
-          <p>Looking for a job? <Link to="/login">Login as a candidate</Link></p>
-        </div>
+        <p className="auth-footer">
+          Don't have a recruiter account? <Link to="/recruiter/register">Register here</Link>
+        </p>
+        <p className="auth-footer" style={{ marginTop: '0.5rem' }}>
+          Looking for a job? <Link to="/login">Login as a candidate</Link>
+        </p>
       </div>
-    </div>
+    </FormPageLayout>
   );
 }
 

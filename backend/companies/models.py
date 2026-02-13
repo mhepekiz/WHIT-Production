@@ -233,6 +233,8 @@ class FormLayout(models.Model):
     PAGE_CHOICES = [
         ('login', 'Login Page'),
         ('register', 'Register Page'),
+        ('recruiter_login', 'Recruiter Login Page'),
+        ('recruiter_register', 'Recruiter Register Page'),
     ]
     
     POSITION_CHOICES = [
@@ -273,7 +275,7 @@ class FormLayout(models.Model):
         ('div', 'Div - Block Text'),
     ]
     
-    page_name = models.CharField(max_length=20, choices=PAGE_CHOICES, unique=True)
+    page_name = models.CharField(max_length=30, choices=PAGE_CHOICES, unique=True)
     form_position = models.CharField(
         max_length=10,
         choices=POSITION_CHOICES,
