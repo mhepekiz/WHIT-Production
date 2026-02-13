@@ -139,8 +139,8 @@ function JobApplications() {
   const getStatusBadgeClass = (status) => {
     const statusMap = {
       'pending': 'status-pending',
-      'reviewing': 'status-review',
-      'shortlisted': 'status-shortlisted',
+      'under_review': 'status-review',
+      'interview': 'status-shortlisted',
       'interviewed': 'status-interview',
       'offered': 'status-offered',
       'accepted': 'status-accepted',
@@ -171,8 +171,8 @@ function JobApplications() {
   const stats = {
     total: applications.length,
     pending: applications.filter(a => a.status === 'pending').length,
-    reviewing: applications.filter(a => a.status === 'reviewing').length,
-    shortlisted: applications.filter(a => a.status === 'shortlisted').length,
+    under_review: applications.filter(a => a.status === 'under_review').length,
+    interview: applications.filter(a => a.status === 'interview').length,
     interviewed: applications.filter(a => a.status === 'interviewed').length,
     offered: applications.filter(a => a.status === 'offered').length,
     accepted: applications.filter(a => a.status === 'accepted').length,
@@ -192,7 +192,7 @@ function JobApplications() {
             <span className="stat-label">Total</span>
           </div>
           <div className="stat-item">
-            <span className="stat-value">{stats.pending + stats.reviewing}</span>
+            <span className="stat-value">{stats.pending + stats.under_review}</span>
             <span className="stat-label">To Review</span>
           </div>
           <div className="stat-item">
@@ -221,16 +221,16 @@ function JobApplications() {
           Pending ({stats.pending})
         </button>
         <button
-          className={`filter-tab ${filterStatus === 'reviewing' ? 'active' : ''}`}
-          onClick={() => setFilterStatus('reviewing')}
+          className={`filter-tab ${filterStatus === 'under_review' ? 'active' : ''}`}
+          onClick={() => setFilterStatus('under_review')}
         >
-          Reviewing ({stats.reviewing})
+          Reviewing ({stats.under_review})
         </button>
         <button
-          className={`filter-tab ${filterStatus === 'shortlisted' ? 'active' : ''}`}
-          onClick={() => setFilterStatus('shortlisted')}
+          className={`filter-tab ${filterStatus === 'interview' ? 'active' : ''}`}
+          onClick={() => setFilterStatus('interview')}
         >
-          Shortlisted ({stats.shortlisted})
+          Shortlisted ({stats.interview})
         </button>
         <button
           className={`filter-tab ${filterStatus === 'interviewed' ? 'active' : ''}`}
@@ -330,7 +330,7 @@ function JobApplications() {
                     </button>
                     <button 
                       className="btn btn-success btn-small"
-                      onClick={() => openNotesModal(application.id, 'shortlisted')}
+                      onClick={() => openNotesModal(application.id, 'interview')}
                       disabled={updatingStatus}
                     >
                       Shortlist
@@ -366,23 +366,6 @@ function JobApplications() {
                     >
                       {application.interview_date ? 'Reschedule Interview' : 'Schedule Interview'}
                     </button>
-                    <button 
-                      className="btn btn-success btn-small"
-                      onClick={() => openNotesModal(application.id, 'offered')}
-                      disabled={updatingStatus}
-                    >
-                      Make Offer
-                    </button>
-                    <button 
-                      className="btn btn-danger btn-small"
-                      onClick={() => openNotesModal(application.id, 'rejected')}
-                      disabled={updatingStatus}
-                    >
-                      Reject
-                    </button>
-                  </>
-                )}                {application.status === 'shortlisted' && (
-                  <>
                     <button 
                       className="btn btn-success btn-small"
                       onClick={() => openNotesModal(application.id, 'offered')}
@@ -733,16 +716,6 @@ function JobApplications() {
               </div>
             </div>
           </div>
-                      <button 
-                        className="btn btn-success"
-                        onClick={() => {
-                          setShowDetailModal(false);
-                          openNotesModal(selectedApplication.id, 'offered');
-                        }}
-                        disabled={updatingStatus}
-                      >
-                        Make Offer
-                      </button>
         </div>
       ) : null}
 

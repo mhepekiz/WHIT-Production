@@ -146,52 +146,62 @@
 }
 
 .status-badge {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: capitalize;
   white-space: nowrap;
+  letter-spacing: 0.3px;
+  border: 1px solid transparent;
 }
 
 .status-pending {
-  background: #fef3c7;
-  color: #92400e;
+  background: #fbbf24;
+  color: #fff;
+  border-color: #f59e0b;
 }
 
 .status-review {
-  background: #dbeafe;
-  color: #1e40af;
+  background: #3b82f6;
+  color: #fff;
+  border-color: #2563eb;
 }
 
 .status-shortlisted {
-  background: #e9d5ff;
-  color: #6b21a8;
+  background: #8b5cf6;
+  color: #fff;
+  border-color: #7c3aed;
 }
 
 .status-interview {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: #6366f1;
+  color: #fff;
+  border-color: #4f46e5;
 }
 
 .status-offered {
-  background: #ccfbf1;
-  color: #115e59;
+  background: #14b8a6;
+  color: #fff;
+  border-color: #0d9488;
 }
 
 .status-accepted {
-  background: #d1fae5;
-  color: #065f46;
+  background: #22c55e;
+  color: #fff;
+  border-color: #16a34a;
 }
 
 .status-rejected {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #ef4444;
+  color: #fff;
+  border-color: #dc2626;
 }
 
 .status-withdrawn {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #9ca3af;
+  color: #fff;
+  border-color: #6b7280;
 }
 
 .job-title {
