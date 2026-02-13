@@ -280,9 +280,9 @@ class RecruiterProfileViewSet(viewsets.ModelViewSet):
 
 
 class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
-    """Public API for browsing active job openings"""
+    """API for browsing active job openings (requires authentication)"""
     serializer_class = PublicJobOpeningSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         qs = JobOpening.objects.filter(status='active').select_related('recruiter')

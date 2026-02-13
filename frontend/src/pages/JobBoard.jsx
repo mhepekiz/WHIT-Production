@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import JobCard from '../components/JobCard';
 import { getApiUrl } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import './JobBoard.css';
 
 function JobBoard() {
+  const { token } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [filters, setFilters] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,9 @@ function JobBoard() {
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const res = await fetch(getApiUrl('recruiters/job-board/filters/'));
+        const res = await fetch(getApiUrl('recruiters/job-board/filters/'), {
+          headers: { 'Authorization': `Token ${token}` }
+        });
         if (res.ok) {
           const data = await res.json();
           setFilters(data);
@@ -54,7 +58,9 @@ function JobBoard() {
       if (ordering) params.set('ordering', ordering);
 
       const url = `${getApiUrl('recruiters/job-board/')}?${params.toString()}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
       if (!res.ok) throw new Error('Failed to fetch jobs');
       const data = await res.json();
       // DRF can return paginated or list
