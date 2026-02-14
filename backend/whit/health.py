@@ -24,9 +24,8 @@ def health_check(request):
         
         return JsonResponse(response_data, status=200)
     
-    except Exception as e:
+    except Exception:
         response_data = {
             "status": "unhealthy",
-            "error": str(e)
         }
         return JsonResponse(response_data, status=500)

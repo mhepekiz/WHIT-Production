@@ -60,8 +60,6 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
         """Validate that the email is a company email (not a generic provider)"""
         import re
         
-        print(f"DEBUG: validate_email called with value: {value}")
-        
         generic_domains = [
             'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com',
             'aol.com', 'icloud.com', 'mail.com', 'protonmail.com',
@@ -84,11 +82,9 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
         ]
         
         email_domain = value.split('@')[-1].lower()
-        print(f"DEBUG: Extracted domain: {email_domain}")
         
         # Check exact matches
         if email_domain in generic_domains:
-            print(f"DEBUG: Domain {email_domain} found in generic_domains list")
             raise serializers.ValidationError(
                 "Please use a company email address. Generic email providers (Gmail, Yahoo, etc.) are not allowed for recruiter registration."
             )
@@ -96,19 +92,15 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
         # Check patterns to catch typos like gmail.cmo
         for pattern in generic_patterns:
             if re.match(pattern, email_domain):
-                print(f"DEBUG: Domain {email_domain} matched pattern {pattern}")
                 raise serializers.ValidationError(
                     "Please use a company email address. Generic email providers (Gmail, Yahoo, etc.) are not allowed for recruiter registration."
                 )
         
-        print(f"DEBUG: Email {value} passed validation")
         return value
     
     def validate_contact_email(self, value):
         """Validate that the contact email is a company email"""
         import re
-        
-        print(f"DEBUG: validate_contact_email called with value: {value}")
         
         generic_domains = [
             'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com',
@@ -132,11 +124,9 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
         ]
         
         email_domain = value.split('@')[-1].lower()
-        print(f"DEBUG: Contact email domain: {email_domain}")
         
         # Check exact matches
         if email_domain in generic_domains:
-            print(f"DEBUG: Contact domain {email_domain} found in generic_domains list")
             raise serializers.ValidationError(
                 "Please use a company email address for contact information."
             )
@@ -144,12 +134,10 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
         # Check patterns to catch typos like gmail.cmo
         for pattern in generic_patterns:
             if re.match(pattern, email_domain):
-                print(f"DEBUG: Contact domain {email_domain} matched pattern {pattern}")
                 raise serializers.ValidationError(
                     "Please use a company email address for contact information."
                 )
         
-        print(f"DEBUG: Contact email {value} passed validation")
         return value
     
     def validate(self, attrs):

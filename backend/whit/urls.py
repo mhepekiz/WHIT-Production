@@ -6,8 +6,10 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 from .health import health_check
 
+@require_GET
 def root_handler(request):
     """
     Root endpoint handler - returns API information

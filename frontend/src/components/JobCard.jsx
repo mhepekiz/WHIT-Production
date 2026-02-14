@@ -2,6 +2,16 @@ import { useNavigate } from 'react-router-dom';
 import { getMediaUrl } from '../services/api';
 import './JobCard.css';
 
+/** Only allow http/https URLs to prevent javascript: injection */
+const getSafeUrl = (url) => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url, window.location.origin);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return url;
+  } catch { /* invalid URL */ }
+  return null;
+};
+
 const getEmploymentTypeClass = (type) => {
   switch (type) {
     case 'full-time': return 'chip-engineering';
@@ -193,9 +203,9 @@ function JobCard({ job }) {
 
       {/* Actions */}
       <div className="job-card-actions">
-        {job.application_url && (
+        {getSafeUrl(job.application_url) && (
           <a
-            href={job.application_url}
+            href={getSafeUrl(job.application_url)}
             target="_blank"
             rel="noopener noreferrer"
             className="job-card-btn primary"

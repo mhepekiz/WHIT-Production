@@ -140,14 +140,10 @@ def create_cisco_user():
 @permission_classes([AllowAny])
 def recruiter_register(request):
     """Register a new recruiter"""
-    print(f"DEBUG: Received registration request with data: {request.data}")
     serializer = RecruiterRegistrationSerializer(data=request.data)
-    print(f"DEBUG: Serializer created, checking validity...")
     if serializer.is_valid():
-        print(f"DEBUG: Serializer is valid, creating user...")
         user = serializer.save()
         token, created = Token.objects.get_or_create(user=user)
-        print(f"DEBUG: User created successfully: {user.email}")
         
         return Response({
             'user': {
@@ -159,7 +155,6 @@ def recruiter_register(request):
             'message': 'Recruiter registered successfully'
         }, status=status.HTTP_201_CREATED)
     
-    print(f"DEBUG: Serializer validation failed with errors: {serializer.errors}")
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -171,11 +166,15 @@ def recruiter_login(request):
     email = request.data.get('email')
     password = request.data.get('password')
     
-    print(f"DEBUG: Login attempt for email: {email}")
-    
     if not email or not password:
         return Response({
             'error': 'Please provide both email and password'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Input length limits to prevent abuse
+    if len(email) > 254 or len(password) > 128:
+        return Response({
+            'error': 'Invalid credentials'
         }, status=status.HTTP_400_BAD_REQUEST)
     
     user = None
@@ -183,28 +182,15 @@ def recruiter_login(request):
     # First check if user exists
     try:
         user = User.objects.get(email=email)
-        print(f"DEBUG: Found existing user: {user.email}")
         
         # Verify password
         if not user.check_password(password):
-            print("DEBUG: Password verification failed")
             user = None
         elif not user.is_active:
-            print("DEBUG: User account is inactive")
             user = None
-        else:
-            print("DEBUG: User authenticated successfully")
             
     except User.DoesNotExist:
-        print(f"DEBUG: No user found with email: {email}")
-        
-        # Auto-create test users on first login
-        if email == 'analytics@test.com' and password == 'testpass123':
-            print("DEBUG: Creating analytics test user...")
-            user = create_test_user()
-        elif email == 'mhepekiz@cisco.com' and password == 'password123':
-            print("DEBUG: Creating Cisco test user...")
-            user = create_cisco_user()
+        pass  # User not found
         
     if user is None:
         return Response({
@@ -312,7 +298,10 @@ class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
         """Override list to apply configurable pagination."""
         queryset = self.filter_queryset(self.get_queryset())
         page_size = self.get_page_size()
-        page = int(request.query_params.get('page', 1))
+        try:
+            page = max(1, int(request.query_params.get('page', 1)))
+        except (ValueError, TypeError):
+            page = 1
         total = queryset.count()
         start = (page - 1) * page_size
         end = start + page_size
@@ -399,9 +388,10 @@ class PublicJobOpeningViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(location__icontains=location)
             )
 
-        # Ordering
+        # Ordering - whitelist allowed values
         ordering = self.request.query_params.get('ordering', '-published_at')
-        if ordering in ('published_at', '-published_at', 'title', '-title', 'salary_min', '-salary_min'):
+        allowed_orderings = ('published_at', '-published_at', 'title', '-title', 'salary_min', '-salary_min')
+        if ordering in allowed_orderings:
             qs = qs.order_by(ordering)
         else:
             qs = qs.order_by('-is_featured', '-published_at')
@@ -854,7 +844,10 @@ class RecruiterDashboardViewSet(viewsets.ViewSet):
         
         recruiter = request.user.recruiter_profile
         company_id = request.query_params.get('company_id')
-        days = int(request.query_params.get('days', 30))
+        try:
+            days = min(365, max(1, int(request.query_params.get('days', 30))))
+        except (ValueError, TypeError):
+            days = 30
         
         # Check access
         if company_id:
@@ -994,7 +987,10 @@ def export_company_data(request, company_id):
         )
     
     # Get date range from parameters
-    days = int(request.GET.get('days', 30))
+    try:
+        days = min(365, max(1, int(request.GET.get('days', 30))))
+    except (ValueError, TypeError):
+        days = 30
     end_date = timezone.now().date()
     start_date = end_date - timedelta(days=days)
     

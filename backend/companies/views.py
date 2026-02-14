@@ -1,5 +1,5 @@
 from rest_framework import viewsets, filters, status
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, permission_classes as perm_classes_decorator
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -247,9 +247,9 @@ class CompanyViewSet(viewsets.ModelViewSet):
             
             return Response({'success': True})
             
-        except Exception as e:
+        except Exception:
             return Response(
-                {'error': str(e)}, 
+                {'error': 'Failed to record impression'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
@@ -293,9 +293,9 @@ class CompanyViewSet(viewsets.ModelViewSet):
             
             return Response({'success': True})
             
-        except Exception as e:
+        except Exception:
             return Response(
-                {'error': str(e)}, 
+                {'error': 'Failed to record click'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -346,9 +346,9 @@ class CompanyViewSet(viewsets.ModelViewSet):
                 'job_page_clicks': stats.job_page_clicks
             })
             
-        except Exception as e:
+        except Exception:
             return Response(
-                {'error': str(e)}, 
+                {'error': 'Failed to track click'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -399,9 +399,9 @@ class CompanyViewSet(viewsets.ModelViewSet):
                 'page_views': stats.page_views
             })
             
-        except Exception as e:
+        except Exception:
             return Response(
-                {'error': str(e)}, 
+                {'error': 'Failed to track page view'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -411,6 +411,7 @@ class FunctionViewSet(viewsets.ReadOnlyModelViewSet):
     
     queryset = Function.objects.all()
     serializer_class = FunctionSerializer
+    permission_classes = [AllowAny]
 
 
 class WorkEnvironmentViewSet(viewsets.ReadOnlyModelViewSet):
@@ -418,12 +419,14 @@ class WorkEnvironmentViewSet(viewsets.ReadOnlyModelViewSet):
     
     queryset = WorkEnvironment.objects.all()
     serializer_class = WorkEnvironmentSerializer
+    permission_classes = [AllowAny]
 
 
 class AdSlotViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for retrieving ad slots (admin can manage via Django admin)."""
     
     queryset = AdSlot.objects.filter(is_active=True)
+    permission_classes = [AllowAny]
     
     @action(detail=False, methods=['get'])
     def active(self, request):
@@ -472,6 +475,7 @@ class AdSlotViewSet(viewsets.ReadOnlyModelViewSet):
 
 class SiteSettingsViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for retrieving site settings."""
+    permission_classes = [AllowAny]
     
     @action(detail=False, methods=['get'])
     def current(self, request):
@@ -491,6 +495,7 @@ class FormLayoutViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for retrieving form layout configurations."""
     
     queryset = FormLayout.objects.all()
+    permission_classes = [AllowAny]
     
     @action(detail=False, methods=['get'])
     def by_page(self, request):
@@ -566,6 +571,7 @@ def homepage_sections(request):
 
 
 @api_view(['GET'])
+@perm_classes_decorator([AllowAny])
 def homepage_sections_api(request):
     """Standalone API endpoint for homepage sections."""
     from rest_framework.response import Response

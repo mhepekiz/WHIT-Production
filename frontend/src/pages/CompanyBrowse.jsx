@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { companyService } from '../services/api';
 import CompanyTable from '../components/CompanyTable';
 import Filters from '../components/Filters';
@@ -264,12 +265,12 @@ function CompanyBrowse() {
                             className="ad-banner-image"
                           />
                         </a>
-                      ) : (
-                        <div dangerouslySetInnerHTML={{ __html: adSlots.slot1.code }} />
-                      )}
+                      ) : adSlots.slot1.code ? (
+                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(adSlots.slot1.code) }} />
+                      ) : null}
                     </div>
                   )}
-                  {/* Show ad slot after second group */}
+                  {/* Show ad slot after second group */}}
                   {i === 1 && adSlots.slot2 && (
                     <div className="ad-slot">
                       {adSlots.slot2.type === 'image' ? (
@@ -285,9 +286,9 @@ function CompanyBrowse() {
                             className="ad-banner-image"
                           />
                         </a>
-                      ) : (
-                        <div dangerouslySetInnerHTML={{ __html: adSlots.slot2.code }} />
-                      )}
+                      ) : adSlots.slot2.code ? (
+                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(adSlots.slot2.code) }} />
+                      ) : null}
                     </div>
                   )}
                 </div>

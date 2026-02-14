@@ -4,6 +4,22 @@ import { getApiUrl, getMediaUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './JobDetail.css';
 
+/** Only allow http/https URLs to prevent javascript: injection */
+const getSafeUrl = (url) => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url, window.location.origin);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return url;
+  } catch { /* invalid URL */ }
+  return null;
+};
+
+/** Validate an email address format */
+const isValidEmail = (email) => {
+  if (!email) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 const getEmploymentLabel = (type) => {
   const labels = {
     'full-time': 'Full Time',
@@ -70,6 +86,12 @@ function JobDetail() {
 
   useEffect(() => {
     const fetchJob = async () => {
+      // Validate ID is a positive integer
+      if (!/^\d+$/.test(id)) {
+        setError('Invalid job ID');
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError(null);
       try {
@@ -268,9 +290,9 @@ function JobDetail() {
           {/* Apply card */}
           <div className="job-detail-apply-card">
             <h3>Interested in this role?</h3>
-            {job.application_url ? (
+            {getSafeUrl(job.application_url) ? (
               <a
-                href={job.application_url}
+                href={getSafeUrl(job.application_url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="job-detail-apply-btn"
@@ -280,9 +302,9 @@ function JobDetail() {
                   <path d="M3 8H13M10 5L13 8L10 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </a>
-            ) : job.application_email ? (
+            ) : isValidEmail(job.application_email) ? (
               <a
-                href={`mailto:${job.application_email}`}
+                href={`mailto:${encodeURI(job.application_email)}`}
                 className="job-detail-apply-btn"
               >
                 Apply via Email

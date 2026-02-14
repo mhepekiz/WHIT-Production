@@ -92,7 +92,35 @@ class UserProfileViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        profile.resume = request.FILES['resume']
+        resume_file = request.FILES['resume']
+        
+        # Validate file size (max 10MB)
+        max_size = 10 * 1024 * 1024
+        if resume_file.size > max_size:
+            return Response(
+                {'error': 'Resume file must be under 10MB'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate file type
+        allowed_types = ['application/pdf', 'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+        if resume_file.content_type not in allowed_types:
+            return Response(
+                {'error': 'Only PDF and Word documents are allowed'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate file extension
+        import os
+        ext = os.path.splitext(resume_file.name)[1].lower()
+        if ext not in ['.pdf', '.doc', '.docx']:
+            return Response(
+                {'error': 'Invalid file extension. Allowed: .pdf, .doc, .docx'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        profile.resume = resume_file
         profile.resume_uploaded_at = timezone.now()
         profile.save()
         

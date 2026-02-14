@@ -53,7 +53,7 @@ class SponsoredTrackingService {
         },
         body: JSON.stringify({
           campaign_id: campaignId,
-          page_url: window.location.href,
+          page_url: window.location.pathname,
           filters: filters,
           page_number: pageNumber,
           is_above_fold: element.getBoundingClientRect().top < window.innerHeight
@@ -94,7 +94,7 @@ class SponsoredTrackingService {
         },
         body: JSON.stringify({
           campaign_id: campaignId,
-          page_url: window.location.href,
+          page_url: window.location.pathname,
           filters: filters,
           page_number: pageNumber
         })

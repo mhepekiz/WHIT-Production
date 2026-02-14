@@ -32,33 +32,18 @@ export const loginRecruiter = async (email, password) => {
       password: password
     };
 
-    console.log('🔐 Login attempt starting...');
-    console.log('📧 Email:', email);
-    console.log('🌐 API URL:', `${API_URL}/login/`);
-    console.log('📦 Request data:', loginData);
-
     const response = await axios.post(`${API_URL}/login/`, loginData, {
       headers: {
         'Content-Type': 'application/json'
       }
     });
 
-    console.log('✅ Login successful!', response.data);
-    
     if (response.data.token) {
       localStorage.setItem('recruiterToken', response.data.token);
       localStorage.setItem('recruiterUser', JSON.stringify(response.data.user));
     }
     return response.data;
   } catch (error) {
-    console.error('❌ Login error:', error);
-    console.error('📊 Error status:', error.response?.status);
-    console.error('📄 Error headers:', error.response?.headers);
-    console.error('📝 Error data:', error.response?.data);
-    console.error('🌐 Error config URL:', error.config?.url);
-    console.error('🔧 Error config method:', error.config?.method);
-    console.error('📋 Error config headers:', error.config?.headers);
-    
     throw error;
   }
 };

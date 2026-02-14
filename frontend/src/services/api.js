@@ -24,6 +24,30 @@ const apiClient = axios.create({
   },
 });
 
+// Attach auth token to every request if available
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Token ${token}`;
+  }
+  return config;
+});
+
+// Handle 401 responses globally — clear stale tokens
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      // Redirect to login if not already there
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const companyService = {
   // Get all companies with optional filters
   getCompanies: async (params = {}) => {

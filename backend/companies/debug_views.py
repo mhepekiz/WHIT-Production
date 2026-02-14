@@ -9,7 +9,9 @@ from django.conf import settings
 @csrf_exempt
 @require_http_methods(["GET"])
 def debug_status(request):
-    """Simple debug endpoint to check server status"""
+    """Simple debug endpoint to check server status - staff only"""
+    if not settings.DEBUG and not (request.user.is_authenticated and request.user.is_staff):
+        return JsonResponse({"error": "Not authorized"}, status=403)
     try:
         from companies.models import Company, HowItWorksSection
         from django.db import connection

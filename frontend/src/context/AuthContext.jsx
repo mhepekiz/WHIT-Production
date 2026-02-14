@@ -67,7 +67,6 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      console.log('AuthContext: Sending registration request with:', userData);
       const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/accounts/register/`, {
         method: 'POST',
         headers: {
@@ -76,23 +75,18 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify(userData),
       });
 
-      console.log('AuthContext: Response status:', response.status);
-
       if (response.ok) {
         const data = await response.json();
-        console.log('AuthContext: Registration successful, data:', data);
         localStorage.setItem('token', data.token);
         setToken(data.token);
         setUser(data.user);
         return { success: true };
       } else {
         const error = await response.json();
-        console.error('AuthContext: Registration failed with error:', error);
         return { success: false, error };
       }
     } catch (error) {
-      console.error('AuthContext: Network error during registration:', error);
-      return { success: false, error: { detail: 'Network error: ' + error.message } };
+      return { success: false, error: { detail: 'Network error. Please try again.' } };
     }
   };
 
