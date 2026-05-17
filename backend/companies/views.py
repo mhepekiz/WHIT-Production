@@ -59,6 +59,9 @@ class CompanyViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         organic_companies = queryset.filter(is_sponsored=False)
         
+        if request.query_params.get('homepage_random') == 'true':
+            organic_companies = organic_companies.order_by('?')
+        
         # Get pagination info
         page = self.paginate_queryset(organic_companies)
         if page is not None:

@@ -116,8 +116,9 @@ function CompanyList() {
         if (filters.work_environment) params.work_environment = filters.work_environment;
         if (filters.engineering_positions) params.engineering_positions = filters.engineering_positions;
         if (filters.status) params.status = filters.status;
-        params.page = pagination.currentPage;
-        params.page_size = 12;
+        params.homepage_random = 'true';
+        params.page = 1;
+        params.page_size = 10;
 
         const data = await companyService.getCompanies(params);
         console.log('Companies API response:', data);
@@ -232,8 +233,8 @@ function CompanyList() {
         <>
           <div className="homepage-preview">
             <div className="preview-header">
-              <h2 className="preview-title">Recently Updated Companies</h2>
-              <p className="preview-subtitle">Discover companies actively hiring in tech</p>
+              <h2 className="preview-title">Featured Companies</h2>
+              <p className="preview-subtitle">A fresh random sample of companies actively hiring in tech</p>
             </div>
             
             {/* Show first 10 companies */}
