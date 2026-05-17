@@ -33,6 +33,7 @@ function CompanyList() {
     currentPage: 1,
   });
   const [labelSize, setLabelSize] = useState('medium');
+  const [homepageLimit, setHomepageLimit] = useState(10);
   const [buttonStyles, setButtonStyles] = useState({ padding: '6px 12px', fontSize: '0.75rem' });
   const [adSlots, setAdSlots] = useState({
     slot1: null,
@@ -75,6 +76,7 @@ function CompanyList() {
           const data = await response.json();
           console.log('Site settings loaded:', data);
           setLabelSize(data.label_size);
+          setHomepageLimit(data.companies_per_page || 10);
           document.documentElement.setAttribute('data-label-size', data.label_size);
           
           // Set button styles based on size
@@ -118,11 +120,12 @@ function CompanyList() {
         if (filters.status) params.status = filters.status;
         params.homepage_random = 'true';
         params.page = 1;
-        params.page_size = 10;
+        params.page_size = homepageLimit;
 
         const data = await companyService.getCompanies(params);
         console.log('Companies API response:', data);
-        setCompanies(data.results);
+        const results = data.results || data || [];
+        setCompanies(results.slice(0, homepageLimit));
         setPagination({
           count: data.count,
           next: data.next,
@@ -139,7 +142,7 @@ function CompanyList() {
     };
 
     fetchCompanies();
-  }, [filters, pagination.currentPage]);
+  }, [filters, pagination.currentPage, homepageLimit]);
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({
@@ -237,9 +240,9 @@ function CompanyList() {
               <p className="preview-subtitle">A fresh random sample of companies actively hiring in tech</p>
             </div>
             
-            {/* Show first 10 companies */}
+            {/* Show the admin-configured homepage preview count */}
             <CompanyTable
-              companies={companies.slice(0, 10)}
+              companies={companies.slice(0, homepageLimit)}
               buttonStyles={buttonStyles}
               requireAuthForLinks={!isAuthenticated}
             />
