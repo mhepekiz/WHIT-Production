@@ -259,6 +259,16 @@
   position: relative;
 }
 
+.company-list-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff 88%);
+  pointer-events: none;
+  z-index: 2;
+}
 
 .preview-header {
   text-align: center;

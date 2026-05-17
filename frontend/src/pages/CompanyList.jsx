@@ -233,6 +233,7 @@ function CompanyList() {
               {/* Show the admin-configured random homepage preview count */}
               <div className="homepage-company-list">
                 <CompanyTable companies={companies.slice(0, homepageCompanyCount)} buttonStyles={buttonStyles} />
+                <div className="company-list-fade" aria-hidden="true"></div>
               </div>
               
               {/* View All Companies CTA */}
