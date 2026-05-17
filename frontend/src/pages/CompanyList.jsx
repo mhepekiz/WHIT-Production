@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { companyService } from '../services/api';
 import CompanyTable from '../components/CompanyTable';
 import Filters from '../components/Filters';
@@ -10,6 +11,7 @@ import useHomepageSections from '../hooks/useHomepageSections';
 import './CompanyList.css';
 
 function CompanyList() {
+  const { isAuthenticated } = useAuth();
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -87,7 +89,7 @@ function CompanyList() {
           console.log('Setting button styles:', styles);
           setButtonStyles(styles);
           
-          console.log('Applied sizes:', sizes);
+          console.log('Applied label size:', data.label_size);
         }
       } catch (err) {
         console.error('Failed to fetch site settings:', err);
@@ -214,6 +216,13 @@ function CompanyList() {
         </div>
       )}
 
+      {!isAuthenticated && !loading && (
+        <div className="guest-preview-banner">
+          <span>Browse the company directory freely.</span>
+          <span>Login or create an account to open career links, reviews, and the full company list.</span>
+        </div>
+      )}
+
       {loading ? (
         <div className="loading">
           <div className="loading-spinner"></div>
@@ -228,7 +237,11 @@ function CompanyList() {
             </div>
             
             {/* Show first 10 companies */}
-            <CompanyTable companies={companies.slice(0, 10)} buttonStyles={buttonStyles} />
+            <CompanyTable
+              companies={companies.slice(0, 10)}
+              buttonStyles={buttonStyles}
+              requireAuthForLinks={!isAuthenticated}
+            />
             
             {/* View All Companies CTA */}
             <div className="view-all-section">

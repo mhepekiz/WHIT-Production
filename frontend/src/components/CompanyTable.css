@@ -146,6 +146,19 @@
   border-color: var(--text-muted);
 }
 
+.link-btn.locked-link {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.link-btn.locked-link:hover {
+  background: var(--primary-hover);
+  color: white;
+  border-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
 /* Tags */
 .tag {
   display: inline-block !important;

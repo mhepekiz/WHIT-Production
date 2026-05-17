@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './CompanyTable.css';
 
-function CompanyTable({ companies, buttonStyles = { padding: '6px 12px', fontSize: '0.75rem' } }) {
+function CompanyTable({
+  companies,
+  buttonStyles = { padding: '6px 12px', fontSize: '0.75rem' },
+  requireAuthForLinks = false
+}) {
   const [columnWidths, setColumnWidths] = useState({
     functions: 800,
     location: 259,
@@ -82,16 +87,36 @@ function CompanyTable({ companies, buttonStyles = { padding: '6px 12px', fontSiz
               </div>
             </div>
             <div className="company-actions">
-              <a
-                href={company.jobs_page_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-btn careers-btn"
-                style={buttonStyles}
-              >
-                Careers
-              </a>
-              {company.company_reviews && (
+              {requireAuthForLinks ? (
+                <Link
+                  to="/login"
+                  className="link-btn careers-btn locked-link"
+                  style={buttonStyles}
+                  state={{ from: '/' }}
+                >
+                  Login
+                </Link>
+              ) : (
+                <a
+                  href={company.jobs_page_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-btn careers-btn"
+                  style={buttonStyles}
+                >
+                  Careers
+                </a>
+              )}
+              {requireAuthForLinks ? (
+                <Link
+                  to="/register"
+                  className="link-btn reviews-btn locked-link"
+                  style={buttonStyles}
+                  state={{ from: '/' }}
+                >
+                  Join
+                </Link>
+              ) : company.company_reviews && (
                 <a
                   href={company.company_reviews}
                   target="_blank"
