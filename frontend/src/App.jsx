@@ -70,9 +70,11 @@ function App() {
               </main>
             } />
             <Route path="/all-companies" element={
-              <main className="main-content">
-                <CompanyBrowse />
-              </main>
+              <ProtectedRoute>
+                <main className="main-content">
+                  <CompanyBrowse />
+                </main>
+              </ProtectedRoute>
             } />
             <Route path="/jobs" element={
               <ProtectedRoute>

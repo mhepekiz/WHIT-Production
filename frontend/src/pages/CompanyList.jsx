@@ -33,7 +33,6 @@ function CompanyList() {
   const [labelSize, setLabelSize] = useState('medium');
   const [buttonStyles, setButtonStyles] = useState({ padding: '6px 12px', fontSize: '0.75rem' });
   const [homepageCompanyCount, setHomepageCompanyCount] = useState(10);
-  const [homepageSortOrder, setHomepageSortOrder] = useState('a-z');
   const [adSlots, setAdSlots] = useState({
     slot1: null,
     slot2: null,
@@ -73,8 +72,7 @@ function CompanyList() {
           const data = await response.json();
           console.log('Site settings loaded:', data);
           setLabelSize(data.label_size);
-          if (data.homepage_companies) setHomepageCompanyCount(data.homepage_companies);
-          if (data.homepage_sort_order) setHomepageSortOrder(data.homepage_sort_order);
+          setHomepageCompanyCount(data.companies_per_page || data.homepage_companies || 10);
           document.documentElement.setAttribute('data-label-size', data.label_size);
           
           // Set button styles based on size
@@ -116,23 +114,14 @@ function CompanyList() {
         if (filters.work_environment) params.work_environment = filters.work_environment;
         if (filters.engineering_positions) params.engineering_positions = filters.engineering_positions;
         if (filters.status) params.status = filters.status;
-        params.page = pagination.currentPage;
+        params.page = 1;
         params.page_size = homepageCompanyCount;
-
-        // Map sort order setting to API ordering param
-        const sortMap = {
-          'a-z': 'name',
-          'z-a': '-name',
-          'last-edited': '-updated_at',
-          'random': '?',
-        };
-        if (homepageSortOrder && sortMap[homepageSortOrder]) {
-          params.ordering = sortMap[homepageSortOrder];
-        }
+        params.ordering = '?';
 
         const data = await companyService.getCompanies(params);
         console.log('Companies API response:', data);
-        setCompanies(data.results);
+        const results = data.results || data || [];
+        setCompanies(results.slice(0, homepageCompanyCount));
         setPagination({
           count: data.count,
           next: data.next,
@@ -149,7 +138,7 @@ function CompanyList() {
     };
 
     fetchCompanies();
-  }, [filters, pagination.currentPage, homepageCompanyCount, homepageSortOrder]);
+  }, [filters, pagination.currentPage, homepageCompanyCount]);
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({
@@ -237,14 +226,13 @@ function CompanyList() {
           <div className="main-content-container">
             <div className="homepage-preview">
               <div className="preview-header">
-                <h2 className="preview-title">Recently Updated Companies</h2>
-                <p className="preview-subtitle">Discover companies actively hiring in tech</p>
+                <h2 className="preview-title">Featured Companies</h2>
+                <p className="preview-subtitle">A random sample of companies actively hiring in tech</p>
               </div>
               
-              {/* Show companies with fade overlay at bottom */}
+              {/* Show the admin-configured random homepage preview count */}
               <div className="homepage-company-list">
-                <CompanyTable companies={companies} buttonStyles={buttonStyles} />
-                <div className="company-list-fade"></div>
+                <CompanyTable companies={companies.slice(0, homepageCompanyCount)} buttonStyles={buttonStyles} />
               </div>
               
               {/* View All Companies CTA */}
