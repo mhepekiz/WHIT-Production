@@ -168,12 +168,21 @@ CORS_ALLOWED_ORIGINS = setting_list(
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Email / Brevo SMTP
-EMAIL_BACKEND = setting('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = setting('EMAIL_HOST', default='smtp-relay.brevo.com', secret=True)
-EMAIL_PORT = setting('EMAIL_PORT', default=587, cast=int, secret=True)
-EMAIL_HOST_USER = setting('EMAIL_HOST_USER', default='', secret=True)
-EMAIL_HOST_PASSWORD = setting('EMAIL_HOST_PASSWORD', default='', secret=True)
+# Email / Brevo API
+EMAIL_BACKEND = setting('EMAIL_BACKEND', default='whit.email_backends.BrevoEmailBackend')
+BREVO_API_KEY = setting('BREVO_API_KEY', default='', secret=True)
+BREVO_API_URL = setting('BREVO_API_URL', default='https://api.brevo.com/v3/smtp/email')
+BREVO_API_TIMEOUT = setting('BREVO_API_TIMEOUT', default=15, cast=int)
+if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+    EMAIL_HOST = setting('EMAIL_HOST', default='smtp-relay.brevo.com', secret=True)
+    EMAIL_PORT = setting('EMAIL_PORT', default=587, cast=int, secret=True)
+    EMAIL_HOST_USER = setting('EMAIL_HOST_USER', default='', secret=True)
+    EMAIL_HOST_PASSWORD = setting('EMAIL_HOST_PASSWORD', default='', secret=True)
+else:
+    EMAIL_HOST = ''
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = setting('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_USE_SSL = setting('EMAIL_USE_SSL', default=False, cast=bool)
 DEFAULT_FROM_EMAIL = setting('DEFAULT_FROM_EMAIL', default='WhoIsHiringInTech <noreply@whoishiringintech.com>', secret=True)
