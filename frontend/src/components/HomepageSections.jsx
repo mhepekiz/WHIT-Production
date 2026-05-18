@@ -104,8 +104,8 @@ const RecruiterCard = ({ section }) => {
         </Link>
       </div>
 
-      <div className="recruiter-coming-soon-overlay" role="note" aria-label="Specials for Recruiters coming soon">
-        <div className="coming-soon-note">Specials for Recruiters coming soon</div>
+      <div className="recruiter-coming-soon-overlay" role="note" aria-label="Recruiter Features Coming Soon">
+        <div className="coming-soon-note">Recruiter Features Coming Soon</div>
       </div>
     </div>
   );

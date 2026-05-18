@@ -282,7 +282,7 @@ function Header() {
                         </svg>
                         Register as Recruiter
                       </span>
-                      <span className="dropdown-coming-soon-note">Specials for Recruiters coming soon</span>
+                      <span className="dropdown-coming-soon-note">Recruiter Features Coming Soon</span>
                     </div>
                   </div>
                 )}
@@ -329,7 +329,7 @@ function Header() {
                         </svg>
                         Login as Recruiter
                       </span>
-                      <span className="dropdown-coming-soon-note">Specials for Recruiters coming soon</span>
+                      <span className="dropdown-coming-soon-note">Recruiter Features Coming Soon</span>
                     </div>
                   </div>
                 )}
