@@ -167,6 +167,7 @@ CORS_ALLOWED_ORIGINS = setting_list(
 )
 
 CORS_ALLOW_CREDENTIALS = True
+FRONTEND_BASE_URL = setting('FRONTEND_BASE_URL', default='https://staging.whoishiringintech.com')
 
 # Email / Brevo API
 EMAIL_BACKEND = setting('EMAIL_BACKEND', default='whit.email_backends.BrevoEmailBackend')

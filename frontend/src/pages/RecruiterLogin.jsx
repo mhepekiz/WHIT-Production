@@ -85,6 +85,9 @@ function RecruiterLogin() {
           Don't have a recruiter account? <Link to="/recruiter/register">Register here</Link>
         </p>
         <p className="auth-footer" style={{ marginTop: '0.5rem' }}>
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
+        <p className="auth-footer" style={{ marginTop: '0.5rem' }}>
           Looking for a job? <Link to="/login">Login as a candidate</Link>
         </p>
       </div>

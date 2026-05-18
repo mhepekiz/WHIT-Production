@@ -3,6 +3,36 @@ from django.contrib.auth.models import User
 from companies.models import Function, WorkEnvironment
 
 
+class EmailTemplate(models.Model):
+    """Admin-managed transactional email templates."""
+
+    ACCOUNT_CREATED = 'account_created'
+    EMAIL_VERIFICATION = 'email_verification'
+    PASSWORD_RESET = 'password_reset'
+
+    TEMPLATE_CHOICES = [
+        (ACCOUNT_CREATED, 'New account creation'),
+        (EMAIL_VERIFICATION, 'Verify email'),
+        (PASSWORD_RESET, 'Password reset'),
+    ]
+
+    key = models.CharField(max_length=50, choices=TEMPLATE_CHOICES, unique=True)
+    name = models.CharField(max_length=100)
+    subject = models.CharField(max_length=255)
+    html_body = models.TextField(help_text='Django template syntax is supported.')
+    text_body = models.TextField(blank=True, help_text='Optional plain-text version. Django template syntax is supported.')
+    is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Email Template'
+        verbose_name_plural = 'Email Templates'
+        ordering = ['key']
+
+    def __str__(self):
+        return self.name
+
+
 class UserProfile(models.Model):
     """Extended user profile with job seeker information."""
     
@@ -23,6 +53,7 @@ class UserProfile(models.Model):
     # Resume
     resume = models.FileField(upload_to='resumes/', blank=True, null=True)
     resume_uploaded_at = models.DateTimeField(blank=True, null=True)
+    email_verified_at = models.DateTimeField(blank=True, null=True)
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)

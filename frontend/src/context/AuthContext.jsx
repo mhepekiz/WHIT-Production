@@ -52,10 +52,12 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('token', data.token);
-        setToken(data.token);
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          setToken(data.token);
+        }
         setUser(data.user);
-        return { success: true };
+        return { success: true, message: data.message };
       } else {
         const error = await response.json();
         return { success: false, error: error.non_field_errors?.[0] || 'Login failed' };

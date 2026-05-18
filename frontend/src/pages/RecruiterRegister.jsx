@@ -12,6 +12,7 @@ function RecruiterRegister() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [step, setStep] = useState(1); // 1: Package Selection, 2: Company Info, 3: Personal Info
   
   const [formData, setFormData] = useState({
@@ -165,8 +166,8 @@ function RecruiterRegister() {
     }
 
     try {
-      await register(formData);
-      navigate('/recruiter/dashboard');
+      const data = await register(formData);
+      setSuccessMessage(data.message || 'Recruiter account created. Please check your email to verify your account.');
     } catch (err) {
       console.error('Registration error:', err);
       console.error('Error response:', err.response?.data);
@@ -211,9 +212,10 @@ function RecruiterRegister() {
     <div className="auth-card recruiter-register-card">
         <h2>Recruiter Registration</h2>
         <p className="subtitle">Join WHIT to find the best tech talent</p>
+        {successMessage && <div className="success-message">{successMessage}</div>}
 
         {/* Progress Steps */}
-        <div className="progress-steps">
+        {!successMessage && <div className="progress-steps">
           <div className={`step ${step >= 1 ? 'active' : ''}`}>
             <span className="step-number">1</span>
             <span className="step-label">Package</span>
@@ -226,7 +228,7 @@ function RecruiterRegister() {
             <span className="step-number">3</span>
             <span className="step-label">Personal</span>
           </div>
-        </div>
+        </div>}
 
         {error && <div className="error-message" style={{ whiteSpace: 'pre-wrap' }}>{error}</div>}
         {authError && typeof authError === 'string' && (
@@ -234,7 +236,7 @@ function RecruiterRegister() {
         )}
 
         {/* Step 1: Package Selection */}
-        {step === 1 && (
+        {!successMessage && step === 1 && (
           <div className="packages-grid">
             {packages.map(pkg => (
               <div key={pkg.id} className="package-card" onClick={() => selectPackage(pkg.id)}>
@@ -267,7 +269,7 @@ function RecruiterRegister() {
         )}
 
         {/* Step 2: Company Information */}
-        {step === 2 && (
+        {!successMessage && step === 2 && (
           <form onSubmit={handleStep2Submit}>
             <h3>Company Information</h3>
             
@@ -404,7 +406,7 @@ function RecruiterRegister() {
         )}
 
         {/* Step 3: Personal Information */}
-        {step === 3 && (
+        {!successMessage && step === 3 && (
           <form onSubmit={handleSubmit}>
             <h3>Personal Information</h3>
             

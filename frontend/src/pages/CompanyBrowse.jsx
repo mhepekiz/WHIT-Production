@@ -270,7 +270,7 @@ function CompanyBrowse() {
                       ) : null}
                     </div>
                   )}
-                  {/* Show ad slot after second group */}}
+                  {/* Show ad slot after second group */}
                   {i === 1 && adSlots.slot2 && (
                     <div className="ad-slot">
                       {adSlots.slot2.type === 'image' ? (

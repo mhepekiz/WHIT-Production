@@ -19,6 +19,7 @@ from .serializers import (
     JobApplicationSerializer, CandidateSearchSerializer, RecruiterMessageSerializer
 )
 from accounts.models import UserProfile
+from accounts.emailing import frontend_url, send_account_email
 
 
 class IsRecruiter(permissions.BasePermission):
@@ -143,7 +144,8 @@ def recruiter_register(request):
     serializer = RecruiterRegistrationSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-        token, created = Token.objects.get_or_create(user=user)
+        send_account_email('account_created', user, {'login_url': frontend_url('/recruiter/login')})
+        send_account_email('email_verification', user, {'login_url': frontend_url('/recruiter/login')})
         
         return Response({
             'user': {
@@ -151,8 +153,7 @@ def recruiter_register(request):
                 'first_name': user.first_name,
                 'last_name': user.last_name
             },
-            'token': token.key,
-            'message': 'Recruiter registered successfully'
+            'message': 'Recruiter registered successfully. Please verify your email before logging in.'
         }, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

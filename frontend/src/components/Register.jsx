@@ -16,6 +16,7 @@ const Register = () => {
     last_name: '',
   });
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -36,13 +37,14 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     setErrors({});
+    setSuccessMessage('');
 
     console.log('Submitting registration with data:', formData);
     const result = await register(formData);
     console.log('Registration result:', result);
 
     if (result.success) {
-      navigate('/dashboard');
+      setSuccessMessage(result.message || 'Account created. Please check your email to verify your account.');
     } else {
       console.error('Registration errors:', result.error);
       setErrors(result.error);
@@ -55,8 +57,9 @@ const Register = () => {
       <div className="auth-card">
         <h2>Create Account</h2>
         <p className="auth-subtitle">Join Who Is Hiring In Tech</p>
+        {successMessage && <div className="success-message">{successMessage}</div>}
 
-        <form onSubmit={handleSubmit}>
+        {!successMessage && <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="first_name">First Name</label>
@@ -175,7 +178,7 @@ const Register = () => {
           <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Creating Account...' : 'Register'}
           </button>
-        </form>
+        </form>}
 
         <p className="auth-footer">
           Already have an account? <Link to="/login">Login</Link>

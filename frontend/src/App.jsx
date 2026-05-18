@@ -25,6 +25,9 @@ import CandidateSearch from './pages/CandidateSearch'
 import JobApplications from './pages/JobApplications'
 import StaticPage from './pages/StaticPage'
 import ComingSoon from './pages/ComingSoon'
+import VerifyEmail from './pages/VerifyEmail'
+import ForgotPassword from './pages/ForgotPassword'
+import PasswordReset from './pages/PasswordReset'
 import ScrollToTop from './components/ScrollToTop'
 import './App.css'
 
@@ -67,6 +70,9 @@ function App() {
             {/* Auth routes without main-content wrapper */}
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/verify-email/:uid/:token" element={<VerifyEmail />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/password-reset/:uid/:token" element={<PasswordReset />} />
             
             {/* Regular routes with main-content wrapper */}
             <Route path="/" element={

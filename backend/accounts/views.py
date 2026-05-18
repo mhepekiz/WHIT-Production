@@ -1,11 +1,17 @@
 from rest_framework import generics, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from .emailing import send_account_email
 from .models import UserProfile, JobPreference
 from .serializers import (
     RegisterSerializer,
@@ -27,14 +33,12 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        
-        # Create token for automatic login
-        token, created = Token.objects.get_or_create(user=user)
+        send_account_email('account_created', user)
+        send_account_email('email_verification', user)
         
         return Response({
             'user': UserSerializer(user).data,
-            'token': token.key,
-            'message': 'User registered successfully'
+            'message': 'User registered successfully. Please verify your email before logging in.'
         }, status=status.HTTP_201_CREATED)
 
 
@@ -173,3 +177,74 @@ class DashboardView(generics.RetrieveAPIView):
             'profile': profile,
             'job_preference': job_preference,
         }
+
+
+def get_user_from_uid(uidb64):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        return User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return None
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_email(request):
+    user = get_user_from_uid(request.data.get('uid', ''))
+    token = request.data.get('token', '')
+
+    if not user or not default_token_generator.check_token(user, token):
+        return Response({'error': 'This verification link is invalid or expired.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.is_active = True
+    user.save(update_fields=['is_active'])
+    profile = UserProfile.objects.filter(user=user).first()
+    if profile and not profile.email_verified_at:
+        profile.email_verified_at = timezone.now()
+        profile.save(update_fields=['email_verified_at'])
+
+    return Response({'message': 'Email verified successfully. You can now log in.'})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def resend_verification_email(request):
+    email = request.data.get('email', '').strip()
+    user = User.objects.filter(email__iexact=email).first()
+    if user and not user.is_active:
+        send_account_email('email_verification', user)
+    return Response({'message': 'If an unverified account exists, a new verification email has been sent.'})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_request(request):
+    email = request.data.get('email', '').strip()
+    user = User.objects.filter(email__iexact=email, is_active=True).first()
+    if user:
+        send_account_email('password_reset', user)
+    return Response({'message': 'If an active account exists for this email, a password reset link has been sent.'})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_confirm(request):
+    user = get_user_from_uid(request.data.get('uid', ''))
+    token = request.data.get('token', '')
+    password = request.data.get('password', '')
+    password2 = request.data.get('password2', '')
+
+    if not user or not default_token_generator.check_token(user, token):
+        return Response({'error': 'This password reset link is invalid or expired.'}, status=status.HTTP_400_BAD_REQUEST)
+    if password != password2:
+        return Response({'password2': ['Password fields did not match.']}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        validate_password(password, user)
+    except DjangoValidationError as exc:
+        return Response({'password': exc.messages}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.set_password(password)
+    user.save(update_fields=['password'])
+    Token.objects.filter(user=user).delete()
+    return Response({'message': 'Password reset successfully. Please log in with your new password.'})

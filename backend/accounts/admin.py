@@ -1,14 +1,38 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
-from .models import UserProfile, JobPreference
+from .models import EmailTemplate, UserProfile, JobPreference
+
+
+@admin.register(EmailTemplate)
+class EmailTemplateAdmin(admin.ModelAdmin):
+    """Admin interface for transactional email templates."""
+
+    list_display = ['name', 'key', 'is_active', 'updated_at']
+    list_filter = ['is_active', 'key']
+    search_fields = ['name', 'subject', 'html_body', 'text_body']
+    readonly_fields = ['updated_at']
+
+    fieldsets = (
+        ('Template', {
+            'fields': ('key', 'name', 'is_active')
+        }),
+        ('Content', {
+            'fields': ('subject', 'html_body', 'text_body'),
+            'description': 'Available variables include user, first_name, email, site_name, login_url, verification_url, and password_reset_url depending on the email type.'
+        }),
+        ('Timestamps', {
+            'fields': ('updated_at',),
+            'classes': ('collapse',)
+        }),
+    )
 
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     """Admin interface for UserProfile model."""
     
-    list_display = ['user', 'current_title', 'location', 'years_of_experience', 'has_resume', 'created_at']
+    list_display = ['user', 'email_verified', 'current_title', 'location', 'years_of_experience', 'has_resume', 'created_at']
     search_fields = ['user__username', 'user__email', 'user__first_name', 'user__last_name', 'current_title', 'location']
     list_filter = ['created_at', 'updated_at', 'years_of_experience']
     readonly_fields = ['created_at', 'updated_at', 'resume_uploaded_at', 'resume_link']
@@ -30,6 +54,9 @@ class UserProfileAdmin(admin.ModelAdmin):
             'fields': ('resume', 'resume_link', 'resume_uploaded_at'),
             'description': 'Upload and manage candidate resume'
         }),
+        ('Email Verification', {
+            'fields': ('email_verified_at',)
+        }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
@@ -42,6 +69,12 @@ class UserProfileAdmin(admin.ModelAdmin):
             return format_html('<span style="color: green;">✓ Yes</span>')
         return format_html('<span style="color: red;">✗ No</span>')
     has_resume.short_description = 'Resume'
+
+    def email_verified(self, obj):
+        if obj.email_verified_at:
+            return format_html('<span style="color: green;">✓ Yes</span>')
+        return format_html('<span style="color: orange;">Pending</span>')
+    email_verified.short_description = 'Email verified'
     
     def resume_link(self, obj):
         """Display clickable link to view/download resume"""

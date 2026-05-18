@@ -90,6 +90,16 @@
   font-weight: 500;
 }
 
+.success-message {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
 .auth-card .btn-primary {
   width: 100%;
   background: linear-gradient(90deg, var(--button-color, #6366f1) 0%, var(--button-color-light, #8b5cf6) 100%) !important;

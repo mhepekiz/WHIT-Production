@@ -51,8 +51,10 @@ export const RecruiterAuthProvider = ({ children }) => {
     setError(null);
     try {
       const data = await apiRegisterRecruiter(registrationData);
-      setIsAuthenticated(true);
-      setRecruiterUser(data.user);
+      if (data.token) {
+        setIsAuthenticated(true);
+        setRecruiterUser(data.user);
+      }
       return data;
     } catch (err) {
       const errorMessage = err.response?.data || 'Registration failed';
