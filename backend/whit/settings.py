@@ -2,17 +2,21 @@
 Django settings for whit project.
 """
 
-import os
 from pathlib import Path
-from decouple import config
+from .secrets import setting, setting_list
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,nahhat.com,www.nahhat.com,staging.whoishiringintech.com,45.79.211.144').split(',')
+DEBUG = setting('DEBUG', default=True, cast=bool)
+SECRET_KEY = setting('SECRET_KEY', default='django-insecure-change-this-in-production', secret=True)
+if not DEBUG and SECRET_KEY == 'django-insecure-change-this-in-production':
+    raise RuntimeError('SECRET_KEY must be configured for non-debug environments.')
+ALLOWED_HOSTS = setting_list(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1,nahhat.com,www.nahhat.com,staging.whoishiringintech.com,45.79.211.144'
+)
 
 # Application definition
 INSTALLED_APPS = [
@@ -69,17 +73,17 @@ WSGI_APPLICATION = 'whit.wsgi.application'
 
 # Database
 # Use PostgreSQL if configured, otherwise use SQLite
-DATABASE_ENGINE = config('DATABASE_ENGINE', default='sqlite')
+DATABASE_ENGINE = setting('DATABASE_ENGINE', default='sqlite', secret=True)
 
 if DATABASE_ENGINE == 'postgresql':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DATABASE_NAME', default='whit_db'),
-            'USER': config('DATABASE_USER', default='postgres'),
-            'PASSWORD': config('DATABASE_PASSWORD', default=''),
-            'HOST': config('DATABASE_HOST', default='localhost'),
-            'PORT': config('DATABASE_PORT', default='5432'),
+            'NAME': setting('DATABASE_NAME', default='whit_db', secret=True),
+            'USER': setting('DATABASE_USER', default='postgres', secret=True),
+            'PASSWORD': setting('DATABASE_PASSWORD', default='', secret=True),
+            'HOST': setting('DATABASE_HOST', default='localhost', secret=True),
+            'PORT': setting('DATABASE_PORT', default='5432', secret=True),
         }
     }
 else:
@@ -105,10 +109,10 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = config('STATIC_URL', default='/static/')
+STATIC_URL = setting('STATIC_URL', default='/static/')
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = config('MEDIA_URL', default='/media/')
+MEDIA_URL = setting('MEDIA_URL', default='/media/')
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Security settings for production
@@ -157,12 +161,23 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
-CORS_ALLOWED_ORIGINS = config(
+CORS_ALLOWED_ORIGINS = setting_list(
     'CORS_ALLOWED_ORIGINS',
     default='http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,https://staging.whoishiringintech.com'
-).split(',')
+)
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Email / Brevo SMTP
+EMAIL_BACKEND = setting('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = setting('EMAIL_HOST', default='smtp-relay.brevo.com', secret=True)
+EMAIL_PORT = setting('EMAIL_PORT', default=587, cast=int, secret=True)
+EMAIL_HOST_USER = setting('EMAIL_HOST_USER', default='', secret=True)
+EMAIL_HOST_PASSWORD = setting('EMAIL_HOST_PASSWORD', default='', secret=True)
+EMAIL_USE_TLS = setting('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_USE_SSL = setting('EMAIL_USE_SSL', default=False, cast=bool)
+DEFAULT_FROM_EMAIL = setting('DEFAULT_FROM_EMAIL', default='WhoIsHiringInTech <noreply@whoishiringintech.com>', secret=True)
+SERVER_EMAIL = setting('SERVER_EMAIL', default=DEFAULT_FROM_EMAIL, secret=True)
 
 # Logging configuration
 LOGGING = {

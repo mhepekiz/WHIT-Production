@@ -104,6 +104,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173
 
 For production deployment to a server, see:
 - [SYSTEM_DOCUMENTATION.md](SYSTEM_DOCUMENTATION.md) - Practical operating guide for architecture, staging deploys, admin settings, and maintenance
+- [SECRETS_AND_EMAIL.md](SECRETS_AND_EMAIL.md) - Google Cloud Secret Manager and Brevo SMTP setup
 - [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) - Complete deployment instructions
 - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Troubleshooting guide for common issues
 

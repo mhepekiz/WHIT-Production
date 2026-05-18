@@ -106,6 +106,8 @@ STATIC_URL
 MEDIA_URL
 ```
 
+Production can read sensitive values from Google Cloud Secret Manager when `GCP_SECRET_MANAGER_ENABLED=True`. See `SECRETS_AND_EMAIL.md` for the exact secret names, service account setup, and Brevo email configuration.
+
 If `DATABASE_ENGINE=postgresql`, Django uses PostgreSQL. Otherwise it falls back to SQLite.
 
 ### Authentication
