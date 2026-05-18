@@ -103,6 +103,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173
 ## Production Deployment
 
 For production deployment to a server, see:
+- [SYSTEM_DOCUMENTATION.md](SYSTEM_DOCUMENTATION.md) - Practical operating guide for architecture, staging deploys, admin settings, and maintenance
 - [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) - Complete deployment instructions
 - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Troubleshooting guide for common issues
 
