@@ -269,18 +269,21 @@ function Header() {
                       </svg>
                       Register as Job Seeker
                     </Link>
-                    <Link 
-                      to="/recruiter/register" 
-                      className="dropdown-item"
-                      onClick={() => setRegisterDropdownOpen(false)}
+                    <div
+                      className="dropdown-item recruiter-auth-coming-soon"
+                      role="menuitem"
+                      aria-disabled="true"
                     >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 4H13V13H3V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-                        <path d="M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4" stroke="currentColor" strokeWidth="1.5"/>
-                        <path d="M8 7V10M6.5 8.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                      </svg>
-                      Register as Recruiter
-                    </Link>
+                      <span className="dropdown-item-content">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path d="M3 4H13V13H3V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+                          <path d="M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M8 7V10M6.5 8.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                        Register as Recruiter
+                      </span>
+                      <span className="dropdown-coming-soon-note">Specials for Recruiters coming soon</span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -313,18 +316,21 @@ function Header() {
                       </svg>
                       Login as Job Seeker
                     </Link>
-                    <Link 
-                      to="/recruiter/login" 
-                      className="dropdown-item"
-                      onClick={() => setLoginDropdownOpen(false)}
+                    <div
+                      className="dropdown-item recruiter-auth-coming-soon"
+                      role="menuitem"
+                      aria-disabled="true"
                     >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 4H13V13H3V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-                        <path d="M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4" stroke="currentColor" strokeWidth="1.5"/>
-                        <path d="M8 7V10M6.5 8.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                      </svg>
-                      Login as Recruiter
-                    </Link>
+                      <span className="dropdown-item-content">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path d="M3 4H13V13H3V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+                          <path d="M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M8 7V10M6.5 8.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                        Login as Recruiter
+                      </span>
+                      <span className="dropdown-coming-soon-note">Specials for Recruiters coming soon</span>
+                    </div>
                   </div>
                 )}
               </div>

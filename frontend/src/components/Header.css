@@ -152,6 +152,48 @@
   color: #6B7280; /* Fix 3: Neutral icon color instead of brand */
 }
 
+.recruiter-auth-coming-soon {
+  position: relative;
+  min-height: 56px;
+  overflow: hidden;
+  cursor: default;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.recruiter-auth-coming-soon:hover {
+  background: rgba(255, 255, 255, 0.62);
+  color: #111827;
+}
+
+.dropdown-item-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  filter: blur(1.4px);
+  opacity: 0.42;
+}
+
+.dropdown-coming-soon-note {
+  position: absolute;
+  inset: 6px 8px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: 1px solid rgba(21, 101, 192, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #1565c0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+}
+
 .dropdown-divider {
   height: 1px;
   background-color: #E5E7EB; /* Subtle neutral divider */
