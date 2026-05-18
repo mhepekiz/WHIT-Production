@@ -67,7 +67,17 @@ class CompanyViewSet(viewsets.ModelViewSet):
     pagination_class = CompanyPagination
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        public_actions = [
+            'list',
+            'retrieve',
+            'filters',
+            'stats',
+            'record_sponsored_impression',
+            'record_sponsored_click',
+            'track_job_click',
+            'track_page_view',
+        ]
+        if self.action in public_actions:
             return [AllowAny()]
         return [IsAuthenticated()]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
