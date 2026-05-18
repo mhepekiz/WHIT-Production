@@ -102,7 +102,10 @@ function Header() {
         {/* Center: Primary Navigation */}
         <nav className="nav__center" aria-label="Primary">
           <Link to="/all-companies" className="nav__link">Browse Companies</Link>
-          <Link to="/jobs" className="nav__link">Jobs</Link>
+          <span className="nav__link nav__link-disabled" aria-disabled="true">
+            Jobs
+            <span className="nav__coming-soon-note">Recruiter Features Coming Soon</span>
+          </span>
           <Link to="/add-company" className="nav__link">Add Company</Link>
         </nav>
 

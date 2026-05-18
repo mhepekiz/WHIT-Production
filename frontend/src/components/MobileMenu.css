@@ -143,6 +143,43 @@
   color: var(--splunk-primary);
 }
 
+.mobile-menu-link-disabled {
+  cursor: default;
+  color: #9ca3af;
+}
+
+.mobile-menu-link-disabled:hover {
+  background: transparent;
+  color: #9ca3af;
+}
+
+.mobile-menu-link-disabled svg,
+.mobile-menu-link-disabled:hover svg {
+  color: #9ca3af;
+}
+
+.mobile-menu-disabled-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-menu-coming-soon-note {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 210px;
+  padding: 4px 8px;
+  border: 1px solid rgba(21, 101, 192, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #1565c0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 /* Menu Divider */
 .mobile-menu-divider {
   height: 2px;

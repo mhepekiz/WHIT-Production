@@ -23,9 +23,8 @@ import RecruiterAnalytics from './pages/RecruiterAnalytics'
 import CompanyAnalyticsDashboard from './pages/CompanyAnalyticsDashboard'
 import CandidateSearch from './pages/CandidateSearch'
 import JobApplications from './pages/JobApplications'
-import JobBoard from './pages/JobBoard'
-import JobDetail from './pages/JobDetail'
 import StaticPage from './pages/StaticPage'
+import ComingSoon from './pages/ComingSoon'
 import ScrollToTop from './components/ScrollToTop'
 import './App.css'
 
@@ -83,17 +82,13 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/jobs" element={
-              <ProtectedRoute>
-                <main className="main-content">
-                  <JobBoard />
-                </main>
-              </ProtectedRoute>
+              <main className="main-content">
+                <ComingSoon />
+              </main>
             } />            <Route path="/jobs/:id" element={
-              <ProtectedRoute>
-                <main className="main-content">
-                  <JobDetail />
-                </main>
-              </ProtectedRoute>
+              <main className="main-content">
+                <ComingSoon />
+              </main>
             }/>            <Route path="/add-company" element={
               <ProtectedRoute>
                 <main className="main-content">

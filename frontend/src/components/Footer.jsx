@@ -48,7 +48,7 @@ function Footer() {
               <li><Link to="/add-company">Add Company</Link></li>
               <li><Link to="/recruiter/register">Recruiter Sign Up</Link></li>
               <li><Link to="/recruiter/login">Recruiter Login</Link></li>
-              <li><Link to="/recruiter/dashboard/jobs">Post Jobs</Link></li>
+              <li><span className="footer-link-disabled">Post Jobs <span>Recruiter Features Coming Soon</span></span></li>
               <li><Link to="/pricing">Pricing</Link></li>
             </ul>
           </div>
