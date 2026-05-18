@@ -223,7 +223,7 @@ function CompanyList() {
         </div>
       ) : (
         <>
-          <div className="main-content-container">
+          <div className="main-content-container homepage-content-container">
             <div className="homepage-preview">
               <div className="preview-header">
                 <h2 className="preview-title">Featured Companies</h2>

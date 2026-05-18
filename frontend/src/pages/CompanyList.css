@@ -11,6 +11,10 @@
   overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
+.homepage-content-container {
+  max-width: 1760px;
+}
+
 .top-bar {
   display: flex;
   justify-content: space-between;
