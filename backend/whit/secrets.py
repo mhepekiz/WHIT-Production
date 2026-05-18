@@ -24,10 +24,13 @@ def _cast_value(value, cast):
     return cast(value)
 
 
-GCP_SECRET_MANAGER_ENABLED = _env_bool('GCP_SECRET_MANAGER_ENABLED', False)
-GCP_PROJECT_ID = os.environ.get('GCP_PROJECT_ID') or os.environ.get('GOOGLE_CLOUD_PROJECT')
-GCP_SECRET_NAME_PREFIX = os.environ.get('GCP_SECRET_NAME_PREFIX', '').strip()
-GCP_SECRET_VERSION = os.environ.get('GCP_SECRET_VERSION', 'latest')
+GCP_SECRET_MANAGER_ENABLED = config('GCP_SECRET_MANAGER_ENABLED', default=False, cast=bool)
+GCP_PROJECT_ID = config('GCP_PROJECT_ID', default=os.environ.get('GOOGLE_CLOUD_PROJECT'))
+GCP_SECRET_NAME_PREFIX = config('GCP_SECRET_NAME_PREFIX', default='').strip()
+GCP_SECRET_VERSION = config('GCP_SECRET_VERSION', default='latest')
+GOOGLE_APPLICATION_CREDENTIALS = config('GOOGLE_APPLICATION_CREDENTIALS', default='')
+if GOOGLE_APPLICATION_CREDENTIALS:
+    os.environ.setdefault('GOOGLE_APPLICATION_CREDENTIALS', GOOGLE_APPLICATION_CREDENTIALS)
 
 
 @lru_cache(maxsize=1)
