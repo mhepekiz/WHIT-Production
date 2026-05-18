@@ -177,6 +177,39 @@
   color: #ffffff;
 }
 
+.recruiter-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.recruiter-coming-soon-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.46);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  cursor: default;
+}
+
+.coming-soon-note {
+  max-width: 320px;
+  padding: 14px 22px;
+  border: 1px solid rgba(0, 123, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .role-navigation-container {

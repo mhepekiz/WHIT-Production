@@ -103,6 +103,10 @@ const RecruiterCard = ({ section }) => {
           Sign Up →
         </Link>
       </div>
+
+      <div className="recruiter-coming-soon-overlay" role="note" aria-label="Specials for Recruiters coming soon">
+        <div className="coming-soon-note">Specials for Recruiters coming soon</div>
+      </div>
     </div>
   );
 };
