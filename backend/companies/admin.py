@@ -5,7 +5,7 @@ from django import forms
 from .models import (
     Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout,
     HowItWorksSection, HowItWorksStep, RecruiterSection, CompanyRecruiterAccess,
-    CampaignStatistics
+    CampaignStatistics, StaticPage
 )
 
 
@@ -203,6 +203,45 @@ class AdSlotAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(StaticPage)
+class StaticPageAdmin(admin.ModelAdmin):
+    """Admin interface for creating public static pages."""
+
+    list_display = ['title', 'slug', 'is_published', 'show_in_top_nav', 'show_in_footer_nav', 'order', 'updated_at']
+    list_filter = ['is_published', 'show_in_top_nav', 'show_in_footer_nav']
+    search_fields = ['title', 'slug', 'content', 'excerpt']
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ['created_at', 'updated_at', 'public_url']
+    list_editable = ['is_published', 'show_in_top_nav', 'show_in_footer_nav', 'order']
+
+    fieldsets = (
+        ('Page Content', {
+            'fields': ('title', 'slug', 'content', 'excerpt')
+        }),
+        ('Navigation', {
+            'fields': ('show_in_top_nav', 'show_in_footer_nav', 'order'),
+            'description': 'Use these checkboxes to automatically add the page to the top navigation and/or footer navigation.'
+        }),
+        ('Publishing', {
+            'fields': ('is_published', 'public_url')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def public_url(self, obj):
+        if not obj or not obj.slug:
+            return 'Save the page to generate a public URL.'
+        return obj.get_absolute_url()
+    public_url.short_description = 'Public URL'
 
 
 @admin.register(SiteSettings)

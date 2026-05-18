@@ -300,7 +300,7 @@
   } /* move these to hamburger */
   
   /* Hide About link on mobile while keeping auth buttons */
-  .nav__right .nav__link[href="#about"] {
+  .nav__static-page-link {
     display: none;
   }
   

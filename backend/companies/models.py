@@ -3,6 +3,7 @@ from django.utils.html import format_html
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.validators import MinValueValidator
+from django.utils.text import slugify
 
 
 class Company(models.Model):
@@ -394,6 +395,59 @@ class FormLayout(models.Model):
         if self.side_image:
             return self.side_image.url
         return self.side_image_url
+
+
+class StaticPage(models.Model):
+    """Admin-managed public static page."""
+
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(
+        max_length=220,
+        unique=True,
+        blank=True,
+        help_text='URL slug. Leave blank to generate from title.'
+    )
+    content = models.TextField(help_text='Page body. Basic HTML is supported.')
+    excerpt = models.CharField(
+        max_length=300,
+        blank=True,
+        help_text='Optional short summary for internal reference or future previews.'
+    )
+    show_in_top_nav = models.BooleanField(default=False, help_text='Show this page in the top navigation.')
+    show_in_footer_nav = models.BooleanField(default=False, help_text='Show this page in the footer navigation.')
+    is_published = models.BooleanField(default=True, help_text='Only published pages are visible on the public site.')
+    order = models.PositiveIntegerField(default=0, help_text='Lower numbers appear first in navigation.')
+    meta_title = models.CharField(max_length=200, blank=True)
+    meta_description = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', 'title']
+        verbose_name = 'Static Page'
+        verbose_name_plural = 'Static Pages'
+        indexes = [
+            models.Index(fields=['slug']),
+            models.Index(fields=['is_published', 'show_in_top_nav', 'order']),
+            models.Index(fields=['is_published', 'show_in_footer_nav', 'order']),
+        ]
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title) or 'page'
+            slug = base_slug
+            counter = 2
+            while StaticPage.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f'{base_slug}-{counter}'
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return f'/pages/{self.slug}'
 
 
 # Sponsor Campaign Models

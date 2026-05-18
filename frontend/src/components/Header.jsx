@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRecruiterAuth } from '../contexts/RecruiterAuthContext';
 import MobileMenu from './MobileMenu';
+import { staticPageService } from '../services/api';
 import './Header.css';
 
 function Header() {
@@ -11,10 +12,30 @@ function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [registerDropdownOpen, setRegisterDropdownOpen] = useState(false);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+  const [topNavPages, setTopNavPages] = useState([]);
   const dropdownRef = useRef(null);
   const registerDropdownRef = useRef(null);
   const loginDropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchTopNavPages = async () => {
+      try {
+        const pages = await staticPageService.getTopNavPages();
+        if (isMounted) setTopNavPages(pages);
+      } catch (error) {
+        if (isMounted) setTopNavPages([]);
+      }
+    };
+
+    fetchTopNavPages();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -87,7 +108,15 @@ function Header() {
 
         {/* Right: Secondary Navigation */}
         <div className="nav__right">
-          <a href="#about" className="nav__link">About</a>
+          {topNavPages.length > 0 ? (
+            topNavPages.map(page => (
+              <Link key={page.id} to={page.url} className="nav__link nav__static-page-link">
+                {page.title}
+              </Link>
+            ))
+          ) : (
+            <a href="#about" className="nav__link nav__static-page-link">About</a>
+          )}
           {isAuthenticated || isRecruiterAuth ? (
             <div className="user-menu" ref={dropdownRef}>
               <button 

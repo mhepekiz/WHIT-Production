@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Company, Function, WorkEnvironment, HowItWorksSection, HowItWorksStep, RecruiterSection
+from .models import Company, Function, WorkEnvironment, HowItWorksSection, HowItWorksStep, RecruiterSection, StaticPage
 
 
 class FunctionSerializer(serializers.ModelSerializer):
@@ -111,3 +111,27 @@ class RecruiterSectionSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'button_text', 'button_link',
             'is_active', 'order', 'background_color', 'text_color', 'button_color'
         ]
+
+class StaticPageSerializer(serializers.ModelSerializer):
+    """Serializer for public static pages."""
+
+    url = serializers.CharField(source='get_absolute_url', read_only=True)
+
+    class Meta:
+        model = StaticPage
+        fields = [
+            'id', 'title', 'slug', 'content', 'excerpt', 'url',
+            'show_in_top_nav', 'show_in_footer_nav', 'order',
+            'meta_title', 'meta_description', 'updated_at'
+        ]
+
+
+class StaticPageNavSerializer(serializers.ModelSerializer):
+    """Small serializer for static page navigation links."""
+
+    url = serializers.CharField(source='get_absolute_url', read_only=True)
+
+    class Meta:
+        model = StaticPage
+        fields = ['id', 'title', 'slug', 'url', 'order']
+

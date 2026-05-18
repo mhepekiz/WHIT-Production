@@ -1,8 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
+import { staticPageService } from '../services/api';
 
 function Footer() {
+  const [footerPages, setFooterPages] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchFooterPages = async () => {
+      try {
+        const pages = await staticPageService.getFooterNavPages();
+        if (isMounted) setFooterPages(pages);
+      } catch (error) {
+        if (isMounted) setFooterPages([]);
+      }
+    };
+
+    fetchFooterPages();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <footer className="site-footer">
       <div className="footer-container">
@@ -35,12 +57,18 @@ function Footer() {
           <div className="footer-column">
             <h3 className="footer-title">Company & Resources</h3>
             <ul className="footer-links">
-              <li><Link to="/about">About Us</Link></li>
-              <li><Link to="/contact">Contact</Link></li>
-              <li><Link to="/blog">Blog</Link></li>
-              <li><Link to="/help">Help Center</Link></li>
-              <li><Link to="/privacy">Privacy Policy</Link></li>
-              <li><Link to="/terms">Terms of Service</Link></li>
+              {footerPages.length > 0 ? (
+                footerPages.map(page => (
+                  <li key={page.id}><Link to={page.url}>{page.title}</Link></li>
+                ))
+              ) : (
+                <>
+                  <li><Link to="/pages/about">About Us</Link></li>
+                  <li><Link to="/pages/contact">Contact</Link></li>
+                  <li><Link to="/pages/privacy">Privacy Policy</Link></li>
+                  <li><Link to="/pages/terms">Terms of Service</Link></li>
+                </>
+              )}
             </ul>
           </div>
 

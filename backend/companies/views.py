@@ -6,14 +6,16 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count
 from django.utils import timezone
-from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout, SponsorCampaign, HowItWorksSection, RecruiterSection, CampaignStatistics
+from .models import Company, Function, WorkEnvironment, AdSlot, SiteSettings, FormLayout, SponsorCampaign, HowItWorksSection, RecruiterSection, CampaignStatistics, StaticPage
 from .serializers import (
     CompanySerializer,
     CompanyListSerializer,
     FunctionSerializer,
     WorkEnvironmentSerializer,
     HowItWorksSectionSerializer,
-    RecruiterSectionSerializer
+    RecruiterSectionSerializer,
+    StaticPageSerializer,
+    StaticPageNavSerializer
 )
 from .filters import CompanyFilter
 from .services.sponsor_service import SponsorSelector
@@ -24,6 +26,27 @@ class CompanyPagination(PageNumberPagination):
     page_size = 30
     page_size_query_param = 'page_size'
     max_page_size = 100
+
+
+class StaticPageViewSet(viewsets.ReadOnlyModelViewSet):
+    """Public read-only API for admin-managed static pages."""
+
+    serializer_class = StaticPageSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        return StaticPage.objects.filter(is_published=True).order_by('order', 'title')
+
+    @action(detail=False, methods=['get'], url_path='top-nav')
+    def top_nav(self, request):
+        pages = self.get_queryset().filter(show_in_top_nav=True)
+        return Response(StaticPageNavSerializer(pages, many=True).data)
+
+    @action(detail=False, methods=['get'], url_path='footer-nav')
+    def footer_nav(self, request):
+        pages = self.get_queryset().filter(show_in_footer_nav=True)
+        return Response(StaticPageNavSerializer(pages, many=True).data)
 
 
 class CompanyViewSet(viewsets.ModelViewSet):

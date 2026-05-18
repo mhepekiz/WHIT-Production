@@ -91,4 +91,22 @@ export const companyService = {
   },
 };
 
+
+export const staticPageService = {
+  getPage: async (slug) => {
+    const response = await apiClient.get(`/static-pages/${slug}/`);
+    return response.data;
+  },
+
+  getTopNavPages: async () => {
+    const response = await apiClient.get('/static-pages/top-nav/');
+    return response.data;
+  },
+
+  getFooterNavPages: async () => {
+    const response = await apiClient.get('/static-pages/footer-nav/');
+    return response.data;
+  },
+};
+
 export default apiClient;

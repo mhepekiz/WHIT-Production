@@ -25,6 +25,7 @@ import CandidateSearch from './pages/CandidateSearch'
 import JobApplications from './pages/JobApplications'
 import JobBoard from './pages/JobBoard'
 import JobDetail from './pages/JobDetail'
+import StaticPage from './pages/StaticPage'
 import ScrollToTop from './components/ScrollToTop'
 import './App.css'
 
@@ -59,6 +60,11 @@ function App() {
           <div className="app">
             <Header />
             <Routes>
+            <Route path="/pages/:slug" element={
+              <main className="main-content">
+                <StaticPage />
+              </main>
+            } />
             {/* Auth routes without main-content wrapper */}
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
