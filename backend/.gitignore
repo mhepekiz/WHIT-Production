@@ -30,11 +30,20 @@ ENV/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-# media/  # Allow media files for staging environment
+media/*
+!media/.gitkeep
 staticfiles/
 
 # Environment variables
 .env
+.env.*
+!.env.example
+!.env.*.example
+
+# Data exports and local databases
+database_dump*.json
+local_database_dump*.json
+test_data.sql
 
 # IDE
 .vscode/

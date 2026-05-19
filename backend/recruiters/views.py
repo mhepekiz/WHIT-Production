@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.http import FileResponse, Http404
 from django.utils import timezone
 from django.db.models import Q, Count, Sum, F
 from django.views.decorators.csrf import csrf_exempt
@@ -509,6 +510,37 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
         
         # If candidate, show their applications
         return JobApplication.objects.filter(candidate_user=user)
+
+    @action(detail=True, methods=['get'], url_path='resume-file')
+    def download_resume_file(self, request, pk=None):
+        """Download an application-specific resume through authenticated API access."""
+        application = self.get_object()
+        if not application.resume_file:
+            raise Http404('Resume not found')
+
+        return FileResponse(
+            application.resume_file.open('rb'),
+            as_attachment=False,
+            filename=application.resume_file.name.split('/')[-1],
+        )
+
+    @action(detail=True, methods=['get'], url_path='profile-resume')
+    def download_profile_resume(self, request, pk=None):
+        """Download the candidate profile resume through authenticated API access."""
+        application = self.get_object()
+        try:
+            resume = application.candidate_user.profile.resume
+        except UserProfile.DoesNotExist:
+            resume = None
+
+        if not resume:
+            raise Http404('Resume not found')
+
+        return FileResponse(
+            resume.open('rb'),
+            as_attachment=False,
+            filename=resume.name.split('/')[-1],
+        )
     
     @action(detail=True, methods=['patch'])
     def update_status(self, request, pk=None):

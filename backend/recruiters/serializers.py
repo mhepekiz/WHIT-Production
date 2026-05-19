@@ -378,6 +378,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
     candidate_phone = serializers.SerializerMethodField()
     candidate_profile = serializers.SerializerMethodField()
     can_view_contact = serializers.SerializerMethodField()
+    resume_file = serializers.SerializerMethodField()
     profile_resume = serializers.SerializerMethodField()
     
     class Meta:
@@ -422,13 +423,25 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             except Exception:
                 return None
         return None
+
+    def get_resume_file(self, obj):
+        """Return authenticated API URL for an application-specific resume."""
+        if not obj.resume_file:
+            return None
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(f'/api/recruiters/applications/{obj.id}/resume-file/')
+        return f'/api/recruiters/applications/{obj.id}/resume-file/'
     
     def get_profile_resume(self, obj):
-        """Return resume URL from user's profile"""
+        """Return authenticated API URL for the candidate's profile resume."""
         try:
             profile = obj.candidate_user.profile
             if profile.resume:
-                return profile.resume.url
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(f'/api/recruiters/applications/{obj.id}/profile-resume/')
+                return f'/api/recruiters/applications/{obj.id}/profile-resume/'
         except AttributeError:
             # Resume not available
             pass  # nosec B110

@@ -27,7 +27,7 @@ const ResumeUpload = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setCurrentResume(data.resume);
+        setCurrentResume(data.resume_url || data.resume);
       }
     } catch (error) {
       console.error('Error fetching resume:', error);

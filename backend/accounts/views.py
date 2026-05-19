@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.http import FileResponse, Http404
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
@@ -130,6 +131,19 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(profile)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='resume')
+    def download_resume(self, request):
+        """Download the current user's resume through authenticated API access."""
+        profile = UserProfile.objects.get(user=request.user)
+        if not profile.resume:
+            raise Http404('Resume not found')
+
+        return FileResponse(
+            profile.resume.open('rb'),
+            as_attachment=False,
+            filename=profile.resume.name.split('/')[-1],
+        )
 
 
 class JobPreferenceViewSet(viewsets.ModelViewSet):

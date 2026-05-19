@@ -540,8 +540,3 @@
     grid-template-rows: repeat(8, 1fr);
   }
 }
-  
-  .controls {
-    flex-wrap: wrap;
-  }
-}

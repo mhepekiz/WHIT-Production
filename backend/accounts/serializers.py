@@ -98,7 +98,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if obj.resume:
             request = self.context.get('request')
             if request:
-                return request.build_absolute_uri(obj.resume.url)
+                return request.build_absolute_uri('/api/accounts/profile/resume/')
         return None
 
 
